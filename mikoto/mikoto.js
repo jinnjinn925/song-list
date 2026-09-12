@@ -253,34 +253,22 @@ function displaySongs(songs) {
 
     list.innerHTML = '';
 
-
     if (songs.length === 0) {
-
-        list.textContent =
-            '該当する曲がありません';
-
+        list.textContent = '該当する曲がありません';
         return;
     }
 
-
     let currentArtist = '';
-
     let artistSongs = null;
-
 
     songs.forEach(song => {
 
-
         // 新しいアーティスト
-
         if (song.artist !== currentArtist) {
 
-            currentArtist =
-                song.artist;
-
+            currentArtist = song.artist;
 
             // アーティスト名
-
             const artistDiv =
                 document.createElement('div');
 
@@ -291,17 +279,20 @@ function displaySongs(songs) {
                 'artist';
 
 
-            // 曲を入れる箱
-
-            artistSongs =
+            // ★ このアーティスト専用の曲入れ
+            const newArtistSongs =
                 document.createElement('div');
 
-            artistSongs.className =
+            newArtistSongs.className =
                 'artist-songs';
+			
+			
+			// 最初は閉じた状態
+			newArtistSongs.classList.add('collapsed');
+			artistDiv.classList.add('collapsed');
 
 
             // アーティスト名を押したら開閉
-
             artistDiv.addEventListener(
                 'click',
                 () => {
@@ -310,7 +301,7 @@ function displaySongs(songs) {
                         'collapsed'
                     );
 
-                    artistSongs.classList.toggle(
+                    newArtistSongs.classList.toggle(
                         'collapsed'
                     );
 
@@ -320,12 +311,15 @@ function displaySongs(songs) {
 
             list.appendChild(artistDiv);
 
-            list.appendChild(artistSongs);
+            list.appendChild(newArtistSongs);
+
+
+            // 次の曲をこの箱に入れる
+            artistSongs = newArtistSongs;
         }
 
 
         // 曲名
-
         const songDiv =
             document.createElement('div');
 
