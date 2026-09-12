@@ -176,16 +176,21 @@
             });
 
             songs.sort((a, b) => {
-                const result = collator.compare(
+                // アーティストの読み順
+                const artistResult = collator.compare(
                     a.artist_initial,
                     b.artist_initial
                 );
 
-                if (result !== 0) {
-                    return result;
+                if (artistResult !== 0) {
+                    return artistResult;
                 }
-        
-                return collator.compare(a.title, b.title);
+
+                // 同じアーティストなら曲名の読み順
+                return collator.compare(
+                    a.title_initial,
+                    b.title_initial
+                );
             });
             window.data = songs;
 
