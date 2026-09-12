@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Song List</title>
+	
+	<link rel="stylesheet" href="ao.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+    <header id="page-header">
+        <h1 id="streamer-name"></h1>
+
+        <div id="song-count">
+            曲数：読み込み中...
+        </div>
+
+        <button id="complete-filter">
+            ★ 最後まで歌える曲だけ表示
+        </button>
+    </header>
+
+    <section id="favorite-section">
+        <h2>お気に入りアーティスト</h2>
+        <div id="favorite-artists"></div>
+    </section>
+
+
+    <div id="artist-nav"></div>
+
+    <div id="song-list">
+        読み込み中...
+    </div>
+
+
+    <script src = "ao.css"></script>
+
+</body>
+</html>
