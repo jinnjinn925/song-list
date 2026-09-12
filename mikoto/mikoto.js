@@ -18,7 +18,6 @@
         // 50音・アルファベット
         const initials = [
             '一覧',
-            'A-Z',
             'あ', 'か', 'さ', 'た', 'な',
             'は', 'ま', 'や', 'ら', 'わ'
         ];
@@ -94,16 +93,6 @@
                 // A-Zの場合
                 if (initial === '一覧') {
                     displaySongs(data);
-                    
-                }else if (initial === 'A-Z') {
-
-                    displaySongs(
-                        data.filter(song =>
-                            /^[a-z]/i.test(
-                                song.artist_initial
-                            )
-                        )
-                    );
 
                     return;
                 }
