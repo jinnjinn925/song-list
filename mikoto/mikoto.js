@@ -90,8 +90,31 @@ function getRow(text) {
         return '';
     }
 
-    const first =
-        normalizeForRow(text).charAt(0);
+    // ひらがなに統一
+    text = text
+        .normalize('NFC')
+        .replace(
+            /[\u30A1-\u30F6]/g,
+            char => String.fromCharCode(
+                char.charCodeAt(0) - 0x60
+            )
+        );
+
+    // 濁点・半濁点を清音に変換
+    const first = text.charAt(0);
+
+    const rowMap = {
+        'あ': 'あいうえお',
+        'か': 'かきくけこがぎぐげご',
+        'さ': 'さしすせそざじずぜぞ',
+        'た': 'たちつてとだぢづでど',
+        'な': 'なにぬねの',
+        'は': 'はひふへほばびぶべぼぱぴぷぺぽ',
+        'ま': 'まみむめも',
+        'や': 'やゆよ',
+        'ら': 'らりるれろ',
+        'わ': 'わをん'
+    };
 
     for (const row in rowMap) {
 
