@@ -158,7 +158,7 @@
 
             // URLからストリーマーのIDを取得
             const path = window.location.pathname;
-            const urlId = path.split('/').filter(Boolean).pop();
+			const urlId = path.split('/').filter(Boolean).pop().replace('.html', '');
 
 
             // streamersテーブルからストリーマーを探す
