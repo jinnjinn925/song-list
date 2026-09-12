@@ -6,44 +6,23 @@
 
     <title>Song List</title>
 
-    <style>
-        body {
-            font-family: sans-serif;
-            margin: 20px;
-        }
-
-        h1 {
-            margin-bottom: 30px;
-        }
-
-        .artist {
-            margin-top: 25px;
-            margin-bottom: 8px;
-            font-size: 20px;
-            font-weight: bold;
-        }
-
-        .song {
-            padding: 8px 0;
-            border-bottom: 1px solid #ddd;
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
 
-    <h1>歌える曲リスト</h1>
+    <h1>Song List</h1>
 
     <div id="artist-nav"></div>
+
     <div id="song-list">
         読み込み中...
     </div>
 
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script>
 
+        // Supabaseへの接続
         const supabaseUrl = 'https://dgssybbbgnnygmccjltn.supabase.co';
         const supabaseKey = 'sb_publishable_JNz1mi6gysaFjOa0A4I5ow_iDe3PQbd';
 
@@ -53,22 +32,96 @@
         );
 
 
-        async function loadSongs() {
+        const list = document.getElementById('song-list');
+        const nav = document.getElementById('artist-nav');
 
-            const list = document.getElementById('song-list');
-            const initials = [
-                'A-Z',
-                'あ', 'か', 'さ', 'た', 'な',
-                'は', 'ま', 'や', 'ら', 'わ'
-            ];
 
-            initials.forEach(initial => {
-                const button = document.createElement('button');
-                button.textContent = initial;
-                nav.appendChild(button);
+        // 50音・アルファベット
+        const initials = [
+            'A-Z',
+            'あ', 'か', 'さ', 'た', 'な',
+            'は', 'ま', 'や', 'ら', 'わ'
+        ];
+
+
+        // 曲を表示する関数
+        function displaySongs(songs) {
+
+            list.innerHTML = '';
+
+            let currentArtist = '';
+
+
+            songs.forEach(song => {
+
+                // アーティストが変わったら見出しを作る
+                if (song.artist !== currentArtist) {
+
+                    currentArtist = song.artist;
+
+                    const artistDiv = document.createElement('div');
+
+                    artistDiv.textContent = song.artist;
+                    artistDiv.className = 'artist';
+
+                    list.appendChild(artistDiv);
+                }
+
+
+                // 曲名を表示
+                const songDiv = document.createElement('div');
+
+                songDiv.textContent =
+                    song.title +
+                    (song.complete ? ' ★' : '');
+
+                songDiv.className = 'song';
+
+                list.appendChild(songDiv);
+            });
+        }
+
+
+        // 50音ボタンを作る
+        initials.forEach(initial => {
+
+            const button = document.createElement('button');
+
+            button.textContent = initial;
+
+
+            // ボタンを押したとき
+            button.addEventListener('click', () => {
+
+                if (initial === 'A-Z') {
+
+                    // 英字のアーティストだけ表示
+                    displaySongs(
+                        data.filter(song =>
+                            /^[a-z]/i.test(song.artist_initial)
+                        )
+                    );
+
+                } else {
+
+                    // 選んだ行だけ表示
+                    displaySongs(
+                        data.filter(song =>
+                            song.artist_initial.startsWith(initial)
+                        )
+                    );
+                }
             });
 
-            const { data, error } = await supabaseClient
+
+            nav.appendChild(button);
+        });
+
+
+        // Supabaseから曲を取得
+        async function loadSongs() {
+
+            const { data: songs, error } = await supabaseClient
                 .from('songs')
                 .select('*')
                 .eq('streamer_id', 1)
@@ -78,47 +131,21 @@
 
 
             if (error) {
-                list.textContent = 'エラー：' + error.message;
+
                 console.error(error);
+
+                list.textContent =
+                    '読み込みに失敗しました';
+
                 return;
             }
 
 
-            list.innerHTML = '';
+            // 取得したデータを使えるようにする
+            window.data = songs;
 
-
-            let currentArtist = '';
-
-
-            data.forEach(song => {
-
-                // アーティストが変わったら見出しを作る
-                if (song.artist !== currentArtist) {
-
-                    const artist = document.createElement('div');
-
-                    artist.className = 'artist';
-                    artist.textContent = song.artist;
-
-                    list.appendChild(artist);
-
-                    currentArtist = song.artist;
-                }
-
-
-                // 曲名
-                const div = document.createElement('div');
-
-                div.className = 'song';
-
-                div.textContent =
-                    song.title +
-                    (song.complete ? ' ★' : '');
-
-                list.appendChild(div);
-
-            });
-
+            // 最初は全部表示
+            displaySongs(data);
         }
 
 
@@ -126,5 +153,7 @@
 
     </script>
 
+</body>
+</html>
 </body>
 </html>
