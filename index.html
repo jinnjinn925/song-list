@@ -24,12 +24,15 @@
 
         // Supabaseへの接続
         const supabaseUrl = 'https://dgssybbbgnnygmccjltn.supabase.co';
-        const supabaseKey = 'sb_publishable_JNz1mi6gysaFjOa0A4I5ow_iDe3PQbd';
 
-        const supabaseClient = window.supabase.createClient(
-            supabaseUrl,
-            supabaseKey
-        );
+        const supabaseKey =
+            'sb_publishable_JNz1mi6gysaFjOa0I4I5ow_iDe3PQbd';
+
+        const supabaseClient =
+            window.supabase.createClient(
+                supabaseUrl,
+                supabaseKey
+            );
 
 
         const list = document.getElementById('song-list');
@@ -42,6 +45,21 @@
             'あ', 'か', 'さ', 'た', 'な',
             'は', 'ま', 'や', 'ら', 'わ'
         ];
+
+
+        // 各行に含まれる文字
+        const initialGroups = {
+            'あ': ['あ', 'い', 'う', 'え', 'お'],
+            'か': ['か', 'き', 'く', 'け', 'こ'],
+            'さ': ['さ', 'し', 'す', 'せ', 'そ'],
+            'た': ['た', 'ち', 'つ', 'て', 'と'],
+            'な': ['な', 'に', 'ぬ', 'ね', 'の'],
+            'は': ['は', 'ひ', 'ふ', 'へ', 'ほ'],
+            'ま': ['ま', 'み', 'む', 'め', 'も'],
+            'や': ['や', 'ゆ', 'よ'],
+            'ら': ['ら', 'り', 'る', 'れ', 'ろ'],
+            'わ': ['わ', 'を', 'ん']
+        };
 
 
         // 曲を表示する関数
@@ -59,7 +77,8 @@
 
                     currentArtist = song.artist;
 
-                    const artistDiv = document.createElement('div');
+                    const artistDiv =
+                        document.createElement('div');
 
                     artistDiv.textContent = song.artist;
                     artistDiv.className = 'artist';
@@ -69,7 +88,8 @@
 
 
                 // 曲名を表示
-                const songDiv = document.createElement('div');
+                const songDiv =
+                    document.createElement('div');
 
                 songDiv.textContent =
                     song.title +
@@ -85,7 +105,8 @@
         // 50音ボタンを作る
         initials.forEach(initial => {
 
-            const button = document.createElement('button');
+            const button =
+                document.createElement('button');
 
             button.textContent = initial;
 
@@ -93,24 +114,34 @@
             // ボタンを押したとき
             button.addEventListener('click', () => {
 
+                // A-Zの場合
                 if (initial === 'A-Z') {
 
-                    // 英字のアーティストだけ表示
                     displaySongs(
                         data.filter(song =>
-                            /^[a-z]/i.test(song.artist_initial)
+                            /^[a-z]/i.test(
+                                song.artist_initial
+                            )
                         )
                     );
 
-                } else {
-
-                    // 選んだ行だけ表示
-                    displaySongs(
-                        data.filter(song =>
-                            song.artist_initial.startsWith(initial)
-                        )
-                    );
+                    return;
                 }
+
+
+                // 50音の場合
+                const group =
+                    initialGroups[initial];
+
+
+                displaySongs(
+                    data.filter(song =>
+                        group.some(letter =>
+                            song.artist_initial
+                                .startsWith(letter)
+                        )
+                    )
+                );
             });
 
 
@@ -121,13 +152,14 @@
         // Supabaseから曲を取得
         async function loadSongs() {
 
-            const { data: songs, error } = await supabaseClient
-                .from('songs')
-                .select('*')
-                .eq('streamer_id', 1)
-                .order('artist_initial')
-                .order('artist')
-                .order('title');
+            const { data: songs, error } =
+                await supabaseClient
+                    .from('songs')
+                    .select('*')
+                    .eq('streamer_id', 1)
+                    .order('artist_initial')
+                    .order('artist')
+                    .order('title');
 
 
             if (error) {
@@ -141,8 +173,9 @@
             }
 
 
-            // 取得したデータを使えるようにする
+            // 取得したデータを保存
             window.data = songs;
+
 
             // 最初は全部表示
             displaySongs(data);
@@ -153,7 +186,5 @@
 
     </script>
 
-</body>
-</html>
 </body>
 </html>
