@@ -156,56 +156,94 @@
         // Supabaseから曲を取得
         async function loadSongs() {
 
-            const { data: songs, error } =
-                await supabaseClient
-                    .from('songs')
-                    .select('*')
-                    .eq('streamer_id', 1);
+        // URLからストリーマーのIDを取得
+        const path = window.location.pathname;
+        const urlId = path.split('/').filter(Boolean).pop();
 
 
-            if (error) {
-
-                console.error(error);
-
-                list.textContent =
-                    '読み込みに失敗しました';
-
-                return;
-            }
-
-
-            // 取得したデータを保存
-            const collator = new Intl.Collator('ja', {
-                sensitivity: 'base'
-            });
-
-            songs.sort((a, b) => {
-                // アーティストの読み順
-                const artistResult = collator.compare(
-                    a.artist_initial,
-                    b.artist_initial
-                );
-
-                if (artistResult !== 0) {
-                    return artistResult;
-                }
-
-                // 同じアーティストなら曲名の読み順
-                return collator.compare(
-                    a.title_initial,
-                    b.title_initial
-                );
-            });
-            window.data = songs;
+        // streamersテーブルからストリーマーを探す
+        const {
+            data: streamer,
+            error: streamerError
+        } = await supabaseClient
+            .from('streamers')
+            .select('*')
+            .eq('url_id', urlId)
+            .single();
 
 
-            // 最初は全部表示
-            displaySongs(data);
+        // ストリーマーが見つからなかった場合
+        if (streamerError || !streamer) {
+
+            console.error(streamerError);
+
+            list.textContent =
+                'ストリーマーが見つかりません';
+
+            return;
         }
 
 
-        loadSongs();
+        // そのストリーマーの曲を取得
+        const {
+            data: songs,
+            error: songsError
+        } = await supabaseClient
+            .from('songs')
+            .select('*')
+            .eq('streamer_id', streamer.id);
 
+
+        // 曲の取得に失敗した場合
+        if (songsError) {
+
+            console.error(songsError);
+
+            list.textContent =
+                '曲の読み込みに失敗しました';
+
+            return;
+        }
+
+
+        // 並び替え
+        const collator = new Intl.Collator('ja', {
+            sensitivity: 'base'
+        });
+
+
+        songs.sort((a, b) => {
+
+            // アーティストの読み順
+            const artistResult = collator.compare(
+                a.artist_initial,
+                b.artist_initial
+            );
+
+
+            if (artistResult !== 0) {
+                return artistResult;
+            }
+
+
+            // 同じアーティストなら曲名の読み順
+            return collator.compare(
+                a.title_initial,
+                b.title_initial
+            );
+        });
+
+
+        // 曲データを保存
+        window.data = songs;
+
+
+        // 最初は全部表示
+        displaySongs(data);
+    }
+
+
+    loadSongs();
     </script>
 
 </body>
