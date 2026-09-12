@@ -4,6 +4,12 @@ const supabaseUrl = 'https://dgssybbbgnnygmccjltn.supabase.co';
 const supabaseKey =
     'sb_publishable_JNz1mi6gysaFjOa0A4I5ow_iDe3PQbd';
 
+// =========================
+// Supabaseへの接続
+// =========================
+
+
+
 const supabaseClient =
     window.supabase.createClient(
         supabaseUrl,
@@ -11,109 +17,126 @@ const supabaseClient =
     );
 
 
-const list = document.getElementById('song-list');
-const nav = document.getElementById('artist-nav');
+// =========================
+// HTMLの要素を取得
+// =========================
+
+const list =
+    document.getElementById('song-list');
+
+const nav =
+    document.getElementById('artist-nav');
+
+const streamerName =
+    document.getElementById('streamer-name');
+
+const songCount =
+    document.getElementById('song-count');
+
+const completeFilter =
+    document.getElementById('complete-filter');
+
+const favoriteSection =
+    document.getElementById('favorite-section');
+
+const favoriteArtists =
+    document.getElementById('favorite-artists');
 
 
-// ==============================
-// 50音ボタン
-// ==============================
+// =========================
+// 50音
+// =========================
 
 const initials = [
     '一覧',
-    'あ', 'か', 'さ', 'た', 'な',
-    'は', 'ま', 'や', 'ら', 'わ'
+    'あ',
+    'か',
+    'さ',
+    'た',
+    'な',
+    'は',
+    'ま',
+    'や',
+    'ら',
+    'わ'
 ];
 
 
-// ==============================
-// 50音の分類
-// ==============================
+// =========================
+// 現在の表示状態
+// =========================
 
-// 濁音・半濁音を清音に変換
+let data = [];
+
+let currentRow = null;
+
+let currentFavoriteArtist = null;
+
+let showCompleteOnly = false;
+
+
+// =========================
+// 50音用の読みを整理
+// =========================
+
 function normalizeForRow(text) {
 
+    if (!text) return '';
+
     return text
-        .replace(/が/g, 'か')
-        .replace(/ぎ/g, 'き')
-        .replace(/ぐ/g, 'く')
-        .replace(/げ/g, 'け')
-        .replace(/ご/g, 'こ')
-
-        .replace(/ざ/g, 'さ')
-        .replace(/じ/g, 'し')
-        .replace(/ず/g, 'す')
-        .replace(/ぜ/g, 'せ')
-        .replace(/ぞ/g, 'そ')
-
-        .replace(/だ/g, 'た')
-        .replace(/ぢ/g, 'ち')
-        .replace(/づ/g, 'つ')
-        .replace(/で/g, 'て')
-        .replace(/ど/g, 'と')
-
-        .replace(/ば/g, 'は')
-        .replace(/び/g, 'ひ')
-        .replace(/ぶ/g, 'ふ')
-        .replace(/べ/g, 'へ')
-        .replace(/ぼ/g, 'ほ')
-
-        .replace(/ぱ/g, 'は')
-        .replace(/ぴ/g, 'ひ')
-        .replace(/ぷ/g, 'ふ')
-        .replace(/ぺ/g, 'へ')
-        .replace(/ぽ/g, 'ほ');
-}
-
-
-// 各行に属する最初の文字
-const rowMap = {
-
-    'あ': 'あいうえお',
-    'か': 'かきくけこ',
-    'さ': 'さしすせそ',
-    'た': 'たちつてと',
-    'な': 'なにぬねの',
-    'は': 'はひふへほ',
-    'ま': 'まみむめも',
-    'や': 'やゆよ',
-    'ら': 'らりるれろ',
-    'わ': 'わをん'
-
-};
-
-
-// 指定した文字が何行か調べる
-function getRow(text) {
-
-    if (!text) {
-        return '';
-    }
-
-    // ひらがなに統一
-    text = text
         .normalize('NFC')
         .replace(
             /[\u30A1-\u30F6]/g,
-            char => String.fromCharCode(
-                char.charCodeAt(0) - 0x60
-            )
+            char =>
+                String.fromCharCode(
+                    char.charCodeAt(0) - 0x60
+                )
         );
+}
 
-    // 濁点・半濁点を清音に変換
+
+// =========================
+// 何行か判定
+// =========================
+
+function getRow(text) {
+
+    if (!text) return '';
+
+    text = normalizeForRow(text);
+
     const first = text.charAt(0);
 
     const rowMap = {
+
         'あ': 'あいうえお',
-        'か': 'かきくけこがぎぐげご',
-        'さ': 'さしすせそざじずぜぞ',
-        'た': 'たちつてとだぢづでど',
-        'な': 'なにぬねの',
-        'は': 'はひふへほばびぶべぼぱぴぷぺぽ',
-        'ま': 'まみむめも',
-        'や': 'やゆよ',
-        'ら': 'らりるれろ',
-        'わ': 'わをん'
+
+        'か':
+            'かきくけこがぎぐげご',
+
+        'さ':
+            'さしすせそざじずぜぞ',
+
+        'た':
+            'たちつてとだぢづでど',
+
+        'な':
+            'なにぬねの',
+
+        'は':
+            'はひふへほばびぶべぼぱぴぷぺぽ',
+
+        'ま':
+            'まみむめも',
+
+        'や':
+            'やゆよ',
+
+        'ら':
+            'らりるれろ',
+
+        'わ':
+            'わをん'
     };
 
     for (const row in rowMap) {
@@ -128,11 +151,10 @@ function getRow(text) {
 }
 
 
-// ==============================
-// 50音順ソート
-// ==============================
+// =========================
+// 日本語の並び順
+// =========================
 
-// 日本語の読みを比較するためのCollator
 const collator =
     new Intl.Collator('ja', {
         sensitivity: 'base',
@@ -140,55 +162,124 @@ const collator =
     });
 
 
-// 読みをソート用に整える
+// =========================
+// 並び替え用の読み
+// =========================
+
 function createSortKey(text) {
 
-    if (!text) {
-        return '';
-    }
+    if (!text) return '';
 
     return text
-        // カタカナ → ひらがな
-        .replace(/[\u30a1-\u30f6]/g, char =>
-            String.fromCharCode(
-                char.charCodeAt(0) - 0x60
-            )
-        )
-
-        // 長音「ー」は直前の母音として扱いやすくする
-        .replace(/ー/g, '');
-
+        .normalize('NFC')
+        .replace(
+            /[\u30A1-\u30F6]/g,
+            char =>
+                String.fromCharCode(
+                    char.charCodeAt(0) - 0x60
+                )
+        );
 }
 
 
-// 読み順を比較
+// =========================
+// 読みを比較
+// =========================
+
 function compareReading(a, b) {
 
-    const keyA = createSortKey(a);
-    const keyB = createSortKey(b);
-
-    return collator.compare(keyA, keyB);
-
+    return collator.compare(
+        createSortKey(a),
+        createSortKey(b)
+    );
 }
 
 
-// ==============================
-// 曲表示
-// ==============================
+// =========================
+// 表示する曲を決定
+// =========================
+
+function getVisibleSongs() {
+
+    let songs = [...data];
+
+
+    // お気に入りアーティストで絞る
+
+    if (currentFavoriteArtist) {
+
+        songs = songs.filter(
+            song =>
+                song.artist ===
+                currentFavoriteArtist
+        );
+
+    }
+
+
+    // 50音で絞る
+
+    if (currentRow) {
+
+        songs = songs.filter(
+            song =>
+                getRow(song.artist_initial) ===
+                currentRow
+        );
+
+    }
+
+
+    // 最後まで歌える曲だけ
+
+    if (showCompleteOnly) {
+
+        songs = songs.filter(
+            song => song.complete === true
+        );
+
+    }
+
+
+    return songs;
+}
+
+
+// =========================
+// 曲一覧を表示
+// =========================
 
 function displaySongs(songs) {
 
     list.innerHTML = '';
 
+
+    if (songs.length === 0) {
+
+        list.textContent =
+            '該当する曲がありません';
+
+        return;
+    }
+
+
     let currentArtist = '';
+
+    let artistSongs = null;
 
 
     songs.forEach(song => {
 
-        // アーティストが変わったら見出し
+
+        // 新しいアーティスト
+
         if (song.artist !== currentArtist) {
 
-            currentArtist = song.artist;
+            currentArtist =
+                song.artist;
+
+
+            // アーティスト名
 
             const artistDiv =
                 document.createElement('div');
@@ -199,11 +290,42 @@ function displaySongs(songs) {
             artistDiv.className =
                 'artist';
 
+
+            // 曲を入れる箱
+
+            artistSongs =
+                document.createElement('div');
+
+            artistSongs.className =
+                'artist-songs';
+
+
+            // アーティスト名を押したら開閉
+
+            artistDiv.addEventListener(
+                'click',
+                () => {
+
+                    artistDiv.classList.toggle(
+                        'collapsed'
+                    );
+
+                    artistSongs.classList.toggle(
+                        'collapsed'
+                    );
+
+                }
+            );
+
+
             list.appendChild(artistDiv);
+
+            list.appendChild(artistSongs);
         }
 
 
         // 曲名
+
         const songDiv =
             document.createElement('div');
 
@@ -214,16 +336,199 @@ function displaySongs(songs) {
         songDiv.className =
             'song';
 
-        list.appendChild(songDiv);
+
+        artistSongs.appendChild(songDiv);
 
     });
-
 }
 
 
-// ==============================
-// 50音ボタンを作る
-// ==============================
+// =========================
+// 曲数表示
+// =========================
+
+function updateSongCount() {
+
+    const total =
+        data.length;
+
+    const complete =
+        data.filter(
+            song => song.complete === true
+        ).length;
+
+
+    songCount.textContent =
+        `曲数：${total}曲`
+        + `　★最後まで：${complete}曲`;
+}
+
+
+// =========================
+// フィルターボタン表示
+// =========================
+
+function updateCompleteButton() {
+
+    if (showCompleteOnly) {
+
+        completeFilter.textContent =
+            '★ 最後まで歌える曲だけ表示中';
+
+        completeFilter.classList.add(
+            'active'
+        );
+
+    } else {
+
+        completeFilter.textContent =
+            '★ 最後まで歌える曲だけ表示';
+
+        completeFilter.classList.remove(
+            'active'
+        );
+    }
+}
+
+
+// =========================
+// お気に入りアーティスト表示
+// =========================
+
+function displayFavoriteArtists(
+    favoriteList
+) {
+
+    favoriteArtists.innerHTML = '';
+
+
+    if (
+        !favoriteList ||
+        favoriteList.length === 0
+    ) {
+
+        favoriteSection.style.display =
+            'none';
+
+        return;
+    }
+
+
+    favoriteSection.style.display =
+        'block';
+
+
+    favoriteList.forEach(artistName => {
+
+        const button =
+            document.createElement('button');
+
+        button.textContent =
+            artistName;
+
+        button.className =
+            'favorite-button';
+
+
+        button.addEventListener(
+            'click',
+            () => {
+
+                // 同じボタンをもう一度押すと解除
+
+                if (
+                    currentFavoriteArtist ===
+                    artistName
+                ) {
+
+                    currentFavoriteArtist =
+                        null;
+
+                    button.classList.remove(
+                        'active'
+                    );
+
+                } else {
+
+                    currentFavoriteArtist =
+                        artistName;
+
+                    currentRow = null;
+
+
+                    // 他のお気に入りの選択を解除
+
+                    document
+                        .querySelectorAll(
+                            '.favorite-button'
+                        )
+                        .forEach(
+                            otherButton => {
+
+                                otherButton.classList.remove(
+                                    'active'
+                                );
+
+                            }
+                        );
+
+
+                    button.classList.add(
+                        'active'
+                    );
+
+                }
+
+
+                // 50音ボタンの選択を解除
+
+                document
+                    .querySelectorAll(
+                        '#artist-nav button'
+                    )
+                    .forEach(
+                        navButton => {
+
+                            navButton.classList.remove(
+                                'active'
+                            );
+
+                        }
+                    );
+
+
+                render();
+
+            }
+        );
+
+
+        favoriteArtists.appendChild(
+            button
+        );
+
+    });
+}
+
+
+// =========================
+// 現在の条件で再表示
+// =========================
+
+function render() {
+
+    const visibleSongs =
+        getVisibleSongs();
+
+    displaySongs(visibleSongs);
+
+    updateCompleteButton();
+}
+
+
+// =========================
+// 50音ボタン
+// =========================
 
 initials.forEach(initial => {
 
@@ -234,31 +539,111 @@ initials.forEach(initial => {
         initial;
 
 
-    button.addEventListener('click', () => {
+    button.addEventListener(
+        'click',
+        () => {
 
-        // 一覧
-        if (initial === '一覧') {
 
-            displaySongs(data);
+            // 一覧
 
-            return;
+            if (initial === '一覧') {
+
+                currentRow = null;
+
+                currentFavoriteArtist = null;
+
+
+                document
+                    .querySelectorAll(
+                        '.favorite-button'
+                    )
+                    .forEach(
+                        favoriteButton => {
+
+                            favoriteButton.classList.remove(
+                                'active'
+                            );
+
+                        }
+                    );
+
+
+                document
+                    .querySelectorAll(
+                        '#artist-nav button'
+                    )
+                    .forEach(
+                        navButton => {
+
+                            navButton.classList.remove(
+                                'active'
+                            );
+
+                        }
+                    );
+
+
+                button.classList.add(
+                    'active'
+                );
+
+
+                render();
+
+                return;
+            }
+
+
+            // 50音を選択
+
+            currentRow = initial;
+
+            currentFavoriteArtist = null;
+
+
+            // お気に入り選択を解除
+
+            document
+                .querySelectorAll(
+                    '.favorite-button'
+                )
+                .forEach(
+                    favoriteButton => {
+
+                        favoriteButton.classList.remove(
+                            'active'
+                        );
+
+                    }
+                );
+
+
+            // 50音ボタンの選択状態
+
+            document
+                .querySelectorAll(
+                    '#artist-nav button'
+                )
+                .forEach(
+                    navButton => {
+
+                        navButton.classList.remove(
+                            'active'
+                        );
+
+                    }
+                );
+
+
+            button.classList.add(
+                'active'
+            );
+
+
+            render();
+
         }
-
-
-        // 50音の行で絞り込み
-        const filtered =
-            data.filter(song => {
-
-                return getRow(
-                    song.artist_initial
-                ) === initial;
-
-            });
-
-
-        displaySongs(filtered);
-
-    });
+    );
 
 
     nav.appendChild(button);
@@ -266,15 +651,32 @@ initials.forEach(initial => {
 });
 
 
-// ==============================
-// Supabaseから曲を取得
-// ==============================
+// =========================
+// 最後まで歌えるフィルター
+// =========================
+
+completeFilter.addEventListener(
+    'click',
+    () => {
+
+        showCompleteOnly =
+            !showCompleteOnly;
+
+        render();
+
+    }
+);
+
+
+// =========================
+// 曲を読み込む
+// =========================
 
 async function loadSongs() {
 
-    // URLからurl_idを取得
     const path =
         window.location.pathname;
+
 
     const urlId =
         path
@@ -284,28 +686,23 @@ async function loadSongs() {
             .replace('.html', '');
 
 
-    // ==========================
-    // ストリーマー取得
-    // ==========================
+    // ストリーマー情報
 
     const {
         data: streamer,
         error: streamerError
-    } = await supabaseClient
-
-        .from('streamers')
-
-        .select('*')
-
-        .eq(
-            'url_id',
-            urlId
-        )
-
-        .single();
+    } =
+        await supabaseClient
+            .from('streamers')
+            .select('*')
+            .eq('url_id', urlId)
+            .single();
 
 
-    if (streamerError || !streamer) {
+    if (
+        streamerError ||
+        !streamer
+    ) {
 
         console.error(
             streamerError
@@ -315,27 +712,35 @@ async function loadSongs() {
             'ストリーマーが見つかりません';
 
         return;
-
     }
 
 
-    // ==========================
-    // 曲取得
-    // ==========================
+    // ストリーマー名
+
+    streamerName.textContent =
+        streamer.name;
+
+
+    // お気に入り
+
+    displayFavoriteArtists(
+        streamer.favorite_artists || []
+    );
+
+
+    // 曲情報
 
     const {
         data: songs,
         error: songsError
-    } = await supabaseClient
-
-        .from('songs')
-
-        .select('*')
-
-        .eq(
-            'streamer_id',
-            streamer.id
-        );
+    } =
+        await supabaseClient
+            .from('songs')
+            .select('*')
+            .eq(
+                'streamer_id',
+                streamer.id
+            );
 
 
     if (songsError) {
@@ -348,17 +753,13 @@ async function loadSongs() {
             '曲の読み込みに失敗しました';
 
         return;
-
     }
 
 
-    // ==========================
-    // 並び替え
-    // ==========================
+    // 曲を並び替え
 
     songs.sort((a, b) => {
 
-        // アーティストの読み順
         const artistResult =
             compareReading(
                 a.artist_initial,
@@ -367,14 +768,10 @@ async function loadSongs() {
 
 
         if (artistResult !== 0) {
-
             return artistResult;
-
         }
 
 
-        // 同じアーティストなら
-        // 曲名の読み順
         const titleResult =
             compareReading(
                 a.title_initial,
@@ -383,13 +780,10 @@ async function loadSongs() {
 
 
         if (titleResult !== 0) {
-
             return titleResult;
-
         }
 
 
-        // 読みが同じなら表示名
         return collator.compare(
             a.title,
             b.title
@@ -398,18 +792,33 @@ async function loadSongs() {
     });
 
 
-    // データ保存
-    window.data = songs;
+    // データを保存
+
+    data = songs;
 
 
-    // 最初は全部表示
-    displaySongs(data);
+    // 曲数表示
 
+    updateSongCount();
+
+
+    // 最初は一覧
+
+    document
+        .querySelector(
+            '#artist-nav button'
+        )
+        .classList.add('active');
+
+
+    // 表示
+
+    render();
 }
 
 
-// ==============================
+// =========================
 // 実行
-// ==============================
+// =========================
 
 loadSongs();

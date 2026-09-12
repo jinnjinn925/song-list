@@ -14,35 +14,139 @@ html {
 
 body {
     margin: 0;
-    padding: 0 0 110px 0;
+    padding: 0 0 120px 0;
     background: #f8f8f8;
     color: #222;
+
     font-family:
         "Noto Sans JP",
         "Hiragino Kaku Gothic ProN",
         "Yu Gothic",
         sans-serif;
+
     line-height: 1.6;
 }
 
 
 /* =========================
-   ページ全体
-   ========================= */
+   ヘッダー
+========================= */
 
-#song-list {
+#page-header {
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
-    padding: 20px 16px;
+    padding: 20px 16px 10px;
+}
+
+#streamer-name {
+    margin: 0 0 5px;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+#song-count {
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: #666;
 }
 
 
 /* =========================
-   アーティスト
-   ========================= */
+   フィルターボタン
+========================= */
+
+#complete-filter {
+    width: 100%;
+    min-height: 44px;
+
+    padding: 8px 12px;
+
+    border: 1px solid #ccc;
+    border-radius: 8px;
+
+    background: #fff;
+    color: #222;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#complete-filter.active {
+    background: #222;
+    color: #fff;
+    border-color: #222;
+}
+
+
+/* =========================
+   お気に入りアーティスト
+========================= */
+
+#favorite-section {
+    width: 100%;
+    max-width: 600px;
+
+    margin: 0 auto;
+    padding: 5px 16px 15px;
+}
+
+#favorite-section h2 {
+    margin: 0 0 8px;
+
+    font-size: 16px;
+    font-weight: 700;
+}
+
+#favorite-artists {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.favorite-button {
+    padding: 7px 12px;
+
+    border: 1px solid #ccc;
+    border-radius: 999px;
+
+    background: #fff;
+    color: #222;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.favorite-button.active {
+    background: #222;
+    color: #fff;
+    border-color: #222;
+}
+
+
+/* =========================
+   曲一覧
+========================= */
+
+#song-list {
+    width: 100%;
+    max-width: 600px;
+
+    margin: 0 auto;
+    padding: 10px 16px;
+}
 
 .artist {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
     margin-top: 24px;
     padding: 8px 4px 5px;
 
@@ -50,19 +154,37 @@ body {
     font-weight: 700;
 
     border-bottom: 2px solid #222;
+
+    cursor: pointer;
+
+    -webkit-tap-highlight-color: transparent;
 }
-
-
-/* 最初のアーティストだけ上の余白を減らす */
 
 .artist:first-child {
     margin-top: 0;
 }
 
+.artist::after {
+    content: "−";
 
-/* =========================
-   曲
-   ========================= */
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.artist.collapsed::after {
+    content: "+";
+}
+
+
+/* アーティストの曲 */
+
+.artist-songs {
+    overflow: hidden;
+}
+
+.artist-songs.collapsed {
+    display: none;
+}
 
 .song {
     padding: 9px 5px;
@@ -74,8 +196,8 @@ body {
 
 
 /* =========================
-   下部ナビゲーション
-   ========================= */
+   50音ナビ
+========================= */
 
 #artist-nav {
     position: fixed;
@@ -98,14 +220,11 @@ body {
 
     display: flex;
     flex-wrap: wrap;
+
     justify-content: center;
+
     gap: 5px;
 }
-
-
-/* =========================
-   ナビゲーションのボタン
-   ========================= */
 
 #artist-nav button {
     min-width: 38px;
@@ -117,7 +236,6 @@ body {
     border-radius: 8px;
 
     background: #fff;
-
     color: #222;
 
     font-family: inherit;
@@ -128,8 +246,11 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
-
-/* 押している間 */
+#artist-nav button.active {
+    background: #222;
+    color: #fff;
+    border-color: #222;
+}
 
 #artist-nav button:active {
     transform: scale(0.95);
@@ -137,28 +258,31 @@ body {
 
 
 /* =========================
-   スマホで少しコンパクトに
-   ========================= */
+   400px以下
+========================= */
 
 @media (max-width: 400px) {
 
-    #artist-nav {
-        gap: 4px;
-        padding: 7px 5px;
+    body {
+        padding-bottom: 115px;
     }
 
-    #artist-nav button {
-        min-width: 34px;
-        min-height: 36px;
+    #page-header {
+        padding: 16px 12px 8px;
+    }
 
-        padding: 4px 6px;
+    #streamer-name {
+        font-size: 22px;
+    }
 
-        font-size: 13px;
+    #favorite-section {
+        padding-left: 12px;
+        padding-right: 12px;
     }
 
     #song-list {
-        padding-left: 13px;
-        padding-right: 13px;
+        padding-left: 12px;
+        padding-right: 12px;
     }
 
     .artist {
@@ -167,5 +291,19 @@ body {
 
     .song {
         font-size: 15px;
+    }
+
+    #artist-nav {
+        padding: 6px;
+        gap: 4px;
+    }
+
+    #artist-nav button {
+        min-width: 34px;
+        min-height: 34px;
+
+        padding: 4px 6px;
+
+        font-size: 13px;
     }
 }
