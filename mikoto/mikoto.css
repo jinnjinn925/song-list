@@ -1,0 +1,171 @@
+@charset "utf-8";
+/* CSS Document */
+/* =========================
+   全体
+   ========================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+}
+
+body {
+    margin: 0;
+    padding: 0 0 110px 0;
+    background: #f8f8f8;
+    color: #222;
+    font-family:
+        "Noto Sans JP",
+        "Hiragino Kaku Gothic ProN",
+        "Yu Gothic",
+        sans-serif;
+    line-height: 1.6;
+}
+
+
+/* =========================
+   ページ全体
+   ========================= */
+
+#song-list {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px 16px;
+}
+
+
+/* =========================
+   アーティスト
+   ========================= */
+
+.artist {
+    margin-top: 24px;
+    padding: 8px 4px 5px;
+
+    font-size: 18px;
+    font-weight: 700;
+
+    border-bottom: 2px solid #222;
+}
+
+
+/* 最初のアーティストだけ上の余白を減らす */
+
+.artist:first-child {
+    margin-top: 0;
+}
+
+
+/* =========================
+   曲
+   ========================= */
+
+.song {
+    padding: 9px 5px;
+
+    font-size: 16px;
+
+    border-bottom: 1px solid #e5e5e5;
+}
+
+
+/* =========================
+   下部ナビゲーション
+   ========================= */
+
+#artist-nav {
+    position: fixed;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    z-index: 1000;
+
+    width: 100%;
+
+    padding: 8px;
+
+    background: rgba(255, 255, 255, 0.96);
+
+    border-top: 1px solid #ddd;
+
+    box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.08);
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+}
+
+
+/* =========================
+   ナビゲーションのボタン
+   ========================= */
+
+#artist-nav button {
+    min-width: 38px;
+    min-height: 38px;
+
+    padding: 5px 8px;
+
+    border: 1px solid #ccc;
+    border-radius: 8px;
+
+    background: #fff;
+
+    color: #222;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    cursor: pointer;
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+/* 押している間 */
+
+#artist-nav button:active {
+    transform: scale(0.95);
+}
+
+
+/* =========================
+   スマホで少しコンパクトに
+   ========================= */
+
+@media (max-width: 400px) {
+
+    #artist-nav {
+        gap: 4px;
+        padding: 7px 5px;
+    }
+
+    #artist-nav button {
+        min-width: 34px;
+        min-height: 36px;
+
+        padding: 4px 6px;
+
+        font-size: 13px;
+    }
+
+    #song-list {
+        padding-left: 13px;
+        padding-right: 13px;
+    }
+
+    .artist {
+        font-size: 17px;
+    }
+
+    .song {
+        font-size: 15px;
+    }
+}
