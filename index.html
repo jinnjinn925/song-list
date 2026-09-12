@@ -156,10 +156,7 @@
                 await supabaseClient
                     .from('songs')
                     .select('*')
-                    .eq('streamer_id', 1)
-                    .order('artist_initial')
-                    .order('artist')
-                    .order('title');
+                    .eq('streamer_id', 1);
 
 
             if (error) {
@@ -174,6 +171,22 @@
 
 
             // 取得したデータを保存
+            const collator = new Intl.Collator('ja', {
+                sensitivity: 'base'
+            });
+
+            songs.sort((a, b) => {
+                const result = collator.compare(
+                    a.artist_initial,
+                    b.artist_initial
+                );
+
+                if (result !== 0) {
+                    return result;
+                }
+        
+                return collator.compare(a.title, b.title);
+            });
             window.data = songs;
 
 
