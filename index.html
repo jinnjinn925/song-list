@@ -1,72 +1,67 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewpoint" context="width=device-width, initial-scale=1.0">
-  <title>Song List</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Song List</title>
 </head>
+
 <body>
-  <h1>歌える曲リスト</h1>
-  <div id="song-list">
-    読み込み中...
-  </div>
 
-  <!-- Supabaseのライブラリ -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <h1>歌える曲リスト</h1>
 
-  <script>
-    const supabaseUrl = 'https://dgssybbbgnnygmccjltn.supabase.co';
-    const supabaseKey = 'sb_publishable_JNz1mi6gysaFjOa0A4I5ow_iDe3PQbd';
+    <div id="song-list">
+        読み込み中...
+    </div>
 
-    const supabasClient = window.supabase.createClient(
-      supabaseUrl,
-      supabaseKey
-    );
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    //streamer_id = 1 の曲を取得
-    async function loadSongs() {
-    const list = document.getElementById('song-list');
+    <script>
+        const supabaseUrl = 'https://dgssybbbgnnygmccjltn.supabase.co';
+        const supabaseKey = 'sb_publishable_JNz1mi6gysaFjOa0A4I5ow_iDe3PQbd';
 
-    try {
-        list.textContent = 'Supabaseに接続中...';
+        const supabaseClient = window.supabase.createClient(
+            supabaseUrl,
+            supabaseKey
+        );
 
-        const { data, error } = await supabaseClient
-            .from('songs')
-            .select('*')
-            .eq('streamer_id', 1);
+        async function loadSongs() {
 
-        if (error) {
-            throw error;
+            const list = document.getElementById('song-list');
+
+            const { data, error } = await supabaseClient
+                .from('songs')
+                .select('*')
+                .eq('streamer_id', 1);
+
+            if (error) {
+                list.textContent = 'エラー：' + error.message;
+                console.error(error);
+                return;
+            }
+
+            list.innerHTML = '';
+
+            if (data.length === 0) {
+                list.textContent = '曲が見つかりませんでした';
+                return;
+            }
+
+            data.forEach(song => {
+
+                const div = document.createElement('div');
+
+                div.textContent =
+                    song.artist + ' / ' +
+                    song.title +
+                    (song.complete ? ' ★' : '');
+
+                list.appendChild(div);
+            });
         }
 
-        list.innerHTML = '';
+        loadSongs();
+    </script>
 
-        if (data.length === 0) {
-            list.textContent = '曲が見つかりませんでした';
-            return;
-        }
-
-        data.forEach(song => {
-            const div = document.createElement('div');
-
-            div.textContent =
-                song.artist + ' / ' +
-                song.title +
-                (song.complete ? ' ★' : '');
-
-            list.appendChild(div);
-        });
-
-    } catch (error) {
-        console.error(error);
-
-        list.textContent =
-            'エラー：' + error.message;
-    }
-}
-
-loadSongs();
-  </script>
-  
 </body>
 </html>
