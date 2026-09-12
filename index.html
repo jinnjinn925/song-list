@@ -41,6 +41,7 @@
 
         // 50音・アルファベット
         const initials = [
+            '一覧'
             'A-Z',
             'あ', 'か', 'さ', 'た', 'な',
             'は', 'ま', 'や', 'ら', 'わ'
@@ -115,7 +116,10 @@
             button.addEventListener('click', () => {
 
                 // A-Zの場合
-                if (initial === 'A-Z') {
+                if (initial === '一覧') {
+                    displaySongs(data);
+                    
+                }else if (initial === 'A-Z') {
 
                     displaySongs(
                         data.filter(song =>
