@@ -24,35 +24,48 @@
     );
 
     //streamer_id = 1 の曲を取得
-    async function loadSongs(){
-      
-      const{data,errror} = await supabaseClient
-        .from('songs')
-        .select('*')
-        .eq('streamer_id', 1)
-        .order('artist_initial')
-        .order('artist')
-        .order('title');
-      if(error){
+    async function loadSongs() {
+    const list = document.getElementById('song-list');
+
+    try {
+        list.textContent = 'Supabaseに接続中...';
+
+        const { data, error } = await supabaseClient
+            .from('songs')
+            .select('*')
+            .eq('streamer_id', 1);
+
+        if (error) {
+            throw error;
+        }
+
+        list.innerHTML = '';
+
+        if (data.length === 0) {
+            list.textContent = '曲が見つかりませんでした';
+            return;
+        }
+
+        data.forEach(song => {
+            const div = document.createElement('div');
+
+            div.textContent =
+                song.artist + ' / ' +
+                song.title +
+                (song.complete ? ' ★' : '');
+
+            list.appendChild(div);
+        });
+
+    } catch (error) {
         console.error(error);
-        document.getElementByld('song-list').textContent = 'データ取得エラー :'+ error.message;
-        return;
-      }
 
-      const list = document.getElementByld('song-list');
-
-      list.innerHTML='';
-
-      data.forEach(song => {
-        const div = document.createElement('div');
-
-        div.textContent = song.artist + '/' + song.title + (song.complete ? '★':'');
-
-        list.appendChild(div);
-      });
+        list.textContent =
+            'エラー：' + error.message;
     }
+}
 
-    loadSongs();
+loadSongs();
   </script>
   
 </body>
