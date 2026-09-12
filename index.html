@@ -34,6 +34,7 @@
 
     <h1>歌える曲リスト</h1>
 
+    <div id="artist-nav"></div>
     <div id="song-list">
         読み込み中...
     </div>
@@ -55,6 +56,17 @@
         async function loadSongs() {
 
             const list = document.getElementById('song-list');
+            const initials = [
+                'A-Z',
+                'あ', 'か', 'さ', 'た', 'な',
+                'は', 'ま', 'や', 'ら', 'わ'
+            ];
+
+            initials.forEach(initial => {
+                const button = document.createElement('button');
+                button.textContent = initial;
+                nav.appendChild(button);
+            });
 
             const { data, error } = await supabaseClient
                 .from('songs')
