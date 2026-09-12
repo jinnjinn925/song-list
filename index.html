@@ -49,6 +49,19 @@
 
             data.forEach(song => {
 
+                // アーティストが変わったら見出しを作る
+                if (song.artist !== currentArtist) {
+
+                    const artist = document.createElement('div');
+
+                    artist.className = 'artist';
+                    artist.textContent = song.artist;
+
+                    list.appendChild(artist);
+
+                    currentArtist = song.artist;
+                }
+
                 const div = document.createElement('div');
 
                 div.textContent =
