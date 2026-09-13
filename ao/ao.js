@@ -533,6 +533,8 @@ function displaySongs(songs) {
                     newArtistSongs.classList.toggle(
                         'collapsed'
                     );
+					
+					updateSongCount();
 
                 }
             );
