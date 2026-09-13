@@ -42,6 +42,18 @@ const favoriteSection =
 const favoriteArtists =
     document.getElementById('favorite-artists');
 
+const menuButton =
+    document.getElementById('menu-button');
+
+const menuPanel =
+    document.getElementById('menu-panel');
+
+const songSearch =
+    document.getElementById('song-search');
+
+const searchClear =
+    document.getElementById('search-clear');
+
 
 // =========================
 // 50音
@@ -716,15 +728,14 @@ function displayFavoriteArtists(
 // =========================
 
 function render() {
-
     const visibleSongs =
         getVisibleSongs();
 
     displaySongs(visibleSongs);
 
     updateCompleteButton();
+    updateSongCount();
 }
-
 
 // =========================
 // 50音ボタン
@@ -1015,6 +1026,85 @@ async function loadSongs() {
 
     render();
 }
+
+
+// =========================
+// 検索メニュー
+// =========================
+
+menuButton.addEventListener(
+    'click',
+    () => {
+
+        menuPanel.classList.toggle('open');
+
+    }
+);
+
+
+songSearch.addEventListener(
+    'input',
+    () => {
+
+        searchQuery =
+            songSearch.value.trim();
+
+        // 検索したら50音・お気に入りを解除
+
+        if (searchQuery) {
+
+            currentRow = null;
+
+            currentFavoriteArtist = null;
+
+
+            document
+                .querySelectorAll(
+                    '.favorite-button'
+                )
+                .forEach(
+                    button => {
+                        button.classList.remove(
+                            'active'
+                        );
+                    }
+                );
+
+
+            document
+                .querySelectorAll(
+                    '#artist-nav button'
+                )
+                .forEach(
+                    button => {
+                        button.classList.remove(
+                            'active'
+                        );
+                    }
+                );
+
+        }
+
+        render();
+
+    }
+);
+
+
+searchClear.addEventListener(
+    'click',
+    () => {
+
+        songSearch.value = '';
+
+        searchQuery = '';
+
+        render();
+
+        songSearch.focus();
+
+    }
+);
 
 
 // =========================
