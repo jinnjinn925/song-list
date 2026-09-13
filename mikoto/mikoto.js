@@ -43,6 +43,16 @@ const favoriteArtists =
     document.getElementById('favorite-artists');
 
 
+const menuPanel =
+    document.getElementById('menu-panel');
+
+const songSearch =
+    document.getElementById('song-search');
+
+const searchClear =
+    document.getElementById('search-clear');
+
+
 // =========================
 // 50音
 // =========================
@@ -74,6 +84,7 @@ let currentFavoriteArtist = null;
 
 let showCompleteOnly = false;
 
+let searchQuery = '';
 
 // =========================
 // 50音用の読みを整理
@@ -162,6 +173,8 @@ const collator =
     });
 
 
+
+
 // =========================
 // 並び替え用の読み
 // =========================
@@ -170,7 +183,7 @@ function createSortKey(text) {
 
     if (!text) return '';
 
-    return text
+    let key = text
         .normalize('NFC')
         .replace(
             /[\u30A1-\u30F6]/g,
@@ -179,6 +192,179 @@ function createSortKey(text) {
                     char.charCodeAt(0) - 0x60
                 )
         );
+
+    // =========================
+    // 伸ばし棒の母音変換
+    // =========================
+
+    const vowelMap = {
+
+        // あ段
+        'あ': 'あ',
+        'か': 'あ',
+        'が': 'あ',
+        'さ': 'あ',
+        'ざ': 'あ',
+        'た': 'あ',
+        'だ': 'あ',
+        'な': 'あ',
+        'は': 'あ',
+        'ば': 'あ',
+        'ぱ': 'あ',
+        'ま': 'あ',
+        'や': 'あ',
+        'ら': 'あ',
+        'わ': 'あ',
+
+        // い段
+        'い': 'い',
+        'き': 'い',
+        'ぎ': 'い',
+        'し': 'い',
+        'じ': 'い',
+        'ち': 'い',
+        'ぢ': 'い',
+        'に': 'い',
+        'ひ': 'い',
+        'び': 'い',
+        'ぴ': 'い',
+        'み': 'い',
+        'り': 'い',
+
+        // う段
+        'う': 'う',
+        'く': 'う',
+        'ぐ': 'う',
+        'す': 'う',
+        'ず': 'う',
+        'つ': 'う',
+        'づ': 'う',
+        'ぬ': 'う',
+        'ふ': 'う',
+        'ぶ': 'う',
+        'ぷ': 'う',
+        'む': 'う',
+        'ゆ': 'う',
+        'る': 'う',
+
+        // え段
+        'え': 'え',
+        'け': 'え',
+        'げ': 'え',
+        'せ': 'え',
+        'ぜ': 'え',
+        'て': 'え',
+        'で': 'え',
+        'ね': 'え',
+        'へ': 'え',
+        'べ': 'え',
+        'ぺ': 'え',
+        'め': 'え',
+        'れ': 'え',
+
+        // お段
+        'お': 'お',
+        'こ': 'お',
+        'ご': 'お',
+        'そ': 'お',
+        'ぞ': 'お',
+        'と': 'お',
+        'ど': 'お',
+        'の': 'お',
+        'ほ': 'お',
+        'ぼ': 'お',
+        'ぽ': 'お',
+        'も': 'お',
+        'よ': 'お',
+        'ろ': 'お',
+        'を': 'お'
+    };
+
+
+    // =========================
+    // 拗音
+    // =========================
+
+    const smallVowelMap = {
+
+        'ゃ': 'あ',
+        'ゅ': 'う',
+        'ょ': 'お'
+    };
+
+
+    let result = '';
+    let previousMainChar = null;
+
+
+    for (const char of key) {
+
+        // -------------------------
+        // 伸ばし棒
+        // -------------------------
+
+        if (char === 'ー') {
+
+            // 直前が「ゃ・ゅ・ょ」なら
+            // その小文字の母音を使う
+            if (
+                result.length > 0 &&
+                smallVowelMap[previousMainChar]
+            ) {
+                result += smallVowelMap[previousMainChar];
+            }
+
+            // 通常のかななら、その文字の母音
+            else if (
+                result.length > 0 &&
+                vowelMap[previousMainChar]
+            ) {
+                result += vowelMap[previousMainChar];
+            }
+
+            // 判定できない場合はそのまま
+            else {
+                result += 'ー';
+            }
+
+            continue;
+        }
+
+
+        result += char;
+
+
+        // -------------------------
+        // 通常のかな
+        // -------------------------
+
+        if (vowelMap[char]) {
+            previousMainChar = char;
+        }
+
+        // -------------------------
+        // 拗音
+        // -------------------------
+
+        else if (smallVowelMap[char]) {
+            previousMainChar = char;
+        }
+
+        // -------------------------
+        // 「っ」など
+        // -------------------------
+
+        else if (char === 'っ') {
+            // 「っ」の前の音を維持
+        }
+
+        else {
+            previousMainChar = char;
+        }
+    }
+
+
+    return result;
 }
 
 
@@ -193,6 +379,8 @@ function compareReading(a, b) {
         createSortKey(b)
     );
 }
+
+
 
 
 // =========================
@@ -241,9 +429,43 @@ function getVisibleSongs() {
     }
 
 
+    // 曲名・アーティスト名で検索
+
+    if (searchQuery) {
+
+		const query =
+			  searchQuery.toLowerCase();
+
+		songs = songs.filter(song => {
+
+			const artist =
+				  (song.artist || '')
+						.toLowerCase();
+
+			const title =
+				  (song.title || '')
+						.toLowerCase();
+
+			const artistInitial =
+				  (song.artist_initial || '')
+						.toLowerCase();
+
+			const titleInitial =
+				  (song.title_initial || '')
+						.toLowerCase();
+
+			return (
+				artist.includes(query) ||
+				title.includes(query) ||
+				artistInitial.includes(query) ||
+				titleInitial.includes(query)
+			);
+		});
+	}
+
+
     return songs;
 }
-
 
 // =========================
 // 曲一覧を表示
@@ -287,9 +509,16 @@ function displaySongs(songs) {
                 'artist-songs';
 			
 			
-			// 最初は閉じた状態
-			newArtistSongs.classList.add('collapsed');
-			artistDiv.classList.add('collapsed');
+			// 「一覧」のときだけ最初から開く
+			if (currentRow === null && currentFavoriteArtist === null && !searchQuery) {
+				// 一覧
+				newArtistSongs.classList.remove('collapsed');
+    			artistDiv.classList.remove('collapsed');
+			} else {
+				// 50音・お気に入り・検索は閉じた状態
+				newArtistSongs.classList.add('collapsed');
+				artistDiv.classList.add('collapsed');
+			}
 
 
             // アーティスト名を押したら開閉
@@ -304,6 +533,8 @@ function displaySongs(songs) {
                     newArtistSongs.classList.toggle(
                         'collapsed'
                     );
+					
+					updateSongCount();
 
                 }
             );
@@ -325,7 +556,7 @@ function displaySongs(songs) {
 
         songDiv.textContent =
             song.title +
-            (song.complete ? ' ★' : '');
+            (song.complete ? ' *' : '');
 
         songDiv.className =
             'song';
@@ -346,15 +577,37 @@ function updateSongCount() {
     const total =
         data.length;
 
+    const visible =
+        getVisibleSongs().length;
+
     const complete =
         data.filter(
             song => song.complete === true
         ).length;
 
 
-    songCount.textContent =
-        `曲数：${total}曲`
-        + `　★最後まで：${complete}曲`;
+    if (searchQuery) {
+
+        songCount.textContent =
+            `「${searchQuery}」を含む ${visible}曲 / ${total}曲`
+            + `　*最後まで：${complete}曲`;
+
+    } else if (
+        currentRow !== null ||
+        currentFavoriteArtist !== null ||
+        showCompleteOnly
+    ) {
+
+        songCount.textContent =
+            `${visible}曲 / ${total}曲`
+            + `　*最後まで：${complete}曲`;
+
+    } else {
+
+        songCount.textContent =
+            `曲数：${total}曲`
+            + `　*最後まで：${complete}曲`;
+    }
 }
 
 
@@ -367,7 +620,7 @@ function updateCompleteButton() {
     if (showCompleteOnly) {
 
         completeFilter.textContent =
-            '★ 最後まで歌える曲だけ表示中';
+            '*最後まで歌える曲';
 
         completeFilter.classList.add(
             'active'
@@ -376,7 +629,7 @@ function updateCompleteButton() {
     } else {
 
         completeFilter.textContent =
-            '★ 最後まで歌える曲だけ表示';
+            '*最後まで歌える曲だけ表示';
 
         completeFilter.classList.remove(
             'active'
@@ -510,15 +763,14 @@ function displayFavoriteArtists(
 // =========================
 
 function render() {
-
     const visibleSongs =
         getVisibleSongs();
 
     displaySongs(visibleSongs);
 
     updateCompleteButton();
+    updateSongCount();
 }
-
 
 // =========================
 // 50音ボタン
@@ -809,6 +1061,85 @@ async function loadSongs() {
 
     render();
 }
+
+
+// =========================
+// 検索メニュー
+// =========================
+
+
+
+
+songSearch.addEventListener(
+    'input',
+    () => {
+
+        searchQuery =
+            songSearch.value.trim();
+		
+		searchClear.classList.toggle(
+			'visible',
+			searchQuery.length > 0
+		);
+
+        // 検索したら50音・お気に入りを解除
+
+        if (searchQuery) {
+
+            currentRow = null;
+
+            currentFavoriteArtist = null;
+
+
+            document
+                .querySelectorAll(
+                    '.favorite-button'
+                )
+                .forEach(
+                    button => {
+                        button.classList.remove(
+                            'active'
+                        );
+                    }
+                );
+
+
+            document
+                .querySelectorAll(
+                    '#artist-nav button'
+                )
+                .forEach(
+                    button => {
+                        button.classList.remove(
+                            'active'
+                        );
+                    }
+                );
+
+        }
+
+        render();
+
+    }
+);
+
+
+searchClear.addEventListener(
+    'click',
+    () => {
+
+        songSearch.value = '';
+
+        searchQuery = '';
+		
+		searchClear.classList.remove('visible');
+
+        render();
+
+        songSearch.focus();
+
+    }
+);
 
 
 // =========================

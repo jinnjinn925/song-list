@@ -33,10 +33,96 @@ body {
 ========================= */
 
 #page-header {
+    position: relative;
+
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
     padding: 20px 16px 10px;
+}
+
+#menu-button {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+
+    width: 44px;
+    height: 44px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: transparent;
+    color: #222;
+
+    font-size: 26px;
+
+    cursor: pointer;
+    z-index: 1001;
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+.menu-panel {
+    display: block;
+
+    margin-top: 10px;
+}
+
+.menu-panel.open {
+    display: block;
+}
+
+.menu-panel label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.search-box {
+    display: flex;
+    gap: 8px;
+}
+
+#song-search {
+    flex: 1;
+    min-width: 0;
+
+    height: 44px;
+    padding: 0 14px;
+
+    border: 1px solid #ccc;
+    border-radius: 10px;
+
+    background: #fff;
+
+    font-family: inherit;
+    font-size: 16px;
+
+    outline: none;
+}
+
+#song-search:focus {
+    border-color: #888;
+}
+
+#search-clear {
+    display: none;
+    height: 44px;
+    padding: 0 14px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#search-clear.visible {
+    display: block;
 }
 
 #streamer-name {
