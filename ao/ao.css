@@ -469,3 +469,11 @@ main {
 #artist-nav button.active {
     background: rgba(255, 255, 255, 0.55);
 }
+
+#song-search {
+    color: #333;
+}
+
+#song-search::placeholder {
+    color: #666;
+}
