@@ -402,7 +402,7 @@ function getVisibleSongs() {
     	songs = songs.filter(
         	song =>
             	song.confident === true ||
-            	favoriteArtists.includes(
+            	favoriteArtistsList.includes(
                 	song.artist
             	)
     	);
