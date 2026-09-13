@@ -321,7 +321,7 @@ body {
     border: 1px solid #ccc;
     border-radius: 8px;
 
-    background: #fff;
+    background: rgba(255, 255, 0.4);
     color: #222;
 
     font-family: inherit;
@@ -455,4 +455,17 @@ main {
     border: 1px solid rgba(255, 255, 255, 0.75);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
+}
+
+/* 50音ナビゲーション */
+#artist-nav button {
+    background: rgba(255, 255, 255, 0.30);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* 選択中 */
+#artist-nav button.active {
+    background: rgba(255, 255, 255, 0.55);
 }

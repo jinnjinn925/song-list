@@ -851,7 +851,7 @@ initials.forEach(initial => {
 
                 currentRow = null;
 
-                currentFavoriteArtist = null;
+                favoriteMode = null;
 
 
                 document
@@ -899,7 +899,7 @@ initials.forEach(initial => {
 
             currentRow = initial;
 
-            currentFavoriteArtist = null;
+            favoriteMode = null;
 
 
             // お気に入り選択を解除
