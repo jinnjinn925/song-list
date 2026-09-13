@@ -10,10 +10,7 @@
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- Kuromoji.js 0.1.2 + IPA辞書 -->
-    <!-- 以前の cdnjs 0.8.0 指定ではなく、実在する npm パッケージを直接使用 -->
-    <script src="https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.js"></script>
-
+    <!-- KuromojiはWeb Worker内で読み込みます。ページを固まらせません。 -->
     <script src="add.js" defer></script>
 </head>
 <body>

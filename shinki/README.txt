@@ -1,22 +1,18 @@
-# レパートリー一括登録（動作版）
+# レパートリー一括登録 v3
 
-## 使い方
-1. `addddaodd.html?id=配信者ID` をGitHub Pagesへ置く。
-2. 「アーティスト名,曲名」を1行ずつ貼り付ける。
-3. 「ふりがなを自動生成して確認する」を押す。
-4. 自動生成された読みを確認・修正する。
-5. 「この内容で一括登録する」でSupabaseへ登録。
+Kuromoji.js の辞書ロードと解析を Web Worker に分離した版です。
+前版のようにページ本体を固まらせない構成です。
 
-## 重要
-- Kuromoji.js 0.1.2をjsDelivrから読み込みます。
-- KuromojiのIPA辞書も同じjsDelivrの辞書URLから読み込みます。
-- Shirabe APIは使っていません。したがってGitHub Pages→ShirabeのCORS問題は発生しません。
-- Supabaseの既存の `songs` テーブルへの登録形式は元の処理を維持しています。
-- 日本語の漢字・かなはKuromojiで読みを生成します。
-- 英字・数字はひらがなの読みへ変換します（例: ABC→えーびーしー、366→さんびゃくろくじゅうろく）。
-- 固有名詞などKuromojiが誤読する場合は、確認画面で直接修正してください。
+依存:
+- Supabase JS: jsDelivr
+- Kuromoji.js 0.1.2: jsDelivr
+- Kuromoji IPA辞書: jsDelivr
 
-## 入力例
-ヨルシカ,言え。
-コブクロ,赤い糸
-Hump Back,拝啓、少年よ
+GitHub Pagesに以下4ファイルを同じフォルダへ置いてください。
+- addddaodd.html
+- add.js
+- furigana-worker.js
+- ao_2.css
+
+URL例:
+addddaodd.html?id=1
