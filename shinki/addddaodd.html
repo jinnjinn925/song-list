@@ -7,62 +7,64 @@
     <title>レパートリー一括登録</title>
     <link rel="stylesheet" href="ao_2.css">
 
-    <!-- Supabase SDK -->
+    <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- 処理スクリプト -->
+    <!-- Kuromoji.js 0.1.2 + IPA辞書 -->
+    <!-- 以前の cdnjs 0.8.0 指定ではなく、実在する npm パッケージを直接使用 -->
+    <script src="https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.js"></script>
+
     <script src="add.js" defer></script>
 </head>
 <body>
+<main style="max-width: 900px; margin: 20px auto; padding: 20px;">
+    <h2>レパートリー一括登録</h2>
 
-    <main style="max-width: 700px; margin: 20px auto; padding: 20px;">
-        <h2>レパートリー一括登録</h2>
+    <input type="hidden" id="streamer-id">
 
-        <!-- 配信者ID（URLの ?id=1 から自動セットされる隠し枠） -->
-        <input type="hidden" id="streamer-id">
+    <div id="step-1">
+        <p style="font-size:14px; color:#555;">
+            「アーティスト名,曲名」の形で貼り付けてください。タブ区切りにも対応しています。
+        </p>
 
-        <!-- STEP 1: コピペ枠 -->
-        <div id="step-1">
-            <p style="font-size:14px; color:#555;">「アーティスト名,曲名」の形で貼り付けてください。タブ区切り・カンマ区切り・空白区切りにも対応します。</p>
-            <textarea id="csv-input" rows="8" style="width:100%; padding:10px;" placeholder="ヨルシカ,言え。
+        <textarea id="csv-input" rows="10" style="width:100%; padding:10px;"
+            placeholder="ヨルシカ,言え。
 コブクロ,赤い糸
-Hump Back,拝啓、少年よ
-Mrs. GREEN APPLE,ダーリン
-Ado,唱
-366日,366日"></textarea>
-            
-            <button type="button" id="parse-btn" class="favorite-button" style="width:100%; margin-top:10px; padding:12px;">
-                ふりがなを自動生成して確認する
-            </button>
-        </div>
+Hump Back,拝啓、少年よ"></textarea>
 
-        <!-- STEP 2: プレビュー＆修正枠（初期状態は非表示） -->
-        <div id="step-2" style="display:none; margin-top:24px;">
-            <h3>登録内容の確認・修正</h3>
-            <p style="font-size:13px; color:#666;">漢字・カタカナ・英字・数字をひらがなにした読みを自動生成します。間違っている部分だけ直接修正してください。</p>
-            
-            <table style="width:100%; border-collapse:collapse; margin-top:10px;">
+        <button type="button" id="parse-btn" class="favorite-button"
+            style="width:100%; margin-top:10px; padding:12px;">
+            ふりがなを自動生成して確認する
+        </button>
+    </div>
+
+    <div id="step-2" style="display:none; margin-top:24px;">
+        <h3>登録内容の確認・修正</h3>
+        <p style="font-size:13px; color:#666;">
+            自動生成された読みは必ず確認してください。間違っている箇所は直接修正できます。
+        </p>
+
+        <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; margin-top:10px; min-width:760px;">
                 <thead>
                     <tr style="background:#f0f0f0; text-align:left;">
                         <th style="padding:8px;">アーティスト</th>
-                        <th style="padding:8px;">読み（修正可）</th>
+                        <th style="padding:8px;">読み</th>
                         <th style="padding:8px;">曲名</th>
-                        <th style="padding:8px;">読み（修正可）</th>
+                        <th style="padding:8px;">読み</th>
                     </tr>
                 </thead>
-                <tbody id="preview-body">
-                    <!-- JSでここに行が作られます -->
-                </tbody>
+                <tbody id="preview-body"></tbody>
             </table>
-
-            <button type="button" id="submit-all-btn" class="favorite-button" style="width:100%; margin-top:16px; padding:12px; font-weight:bold;">
-                この内容で一括登録する
-            </button>
         </div>
 
-        <div id="message" style="margin-top: 15px; font-weight: bold;"></div>
-    </main>
+        <button type="button" id="submit-all-btn" class="favorite-button"
+            style="width:100%; margin-top:16px; padding:12px; font-weight:bold;">
+            この内容で一括登録する
+        </button>
+    </div>
 
-   
+    <div id="message" style="margin-top:15px; font-weight:bold;"></div>
+</main>
 </body>
 </html>

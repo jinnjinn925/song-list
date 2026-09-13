@@ -2,202 +2,127 @@ const supabaseUrl = 'https://dgssybbbgnnygmccjltn.supabase.co';
 const supabaseKey = 'sb_publishable_JNz1mi6gysaFjOa0A4I5ow_iDe3PQbd';
 const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-const FURIGANA_API = 'https://shirabe.dev/api/v1/text/furigana';
-const API_INTERVAL_MS = 1100; // Shirabe Free は 1 req/s
+let tokenizer = null;
+let tokenizerPromise = null;
 
-// カタカナ → ひらがな
-function katakanaToHiragana(src) {
-    return String(src || '').replace(/[\u30a1-\u30f6]/g, ch =>
-        String.fromCharCode(ch.charCodeAt(0) - 0x60)
-    );
+const DIC_PATH = 'https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/';
+
+const $ = (id) => document.getElementById(id);
+
+function setMessage(text, color = '') {
+    $('message').textContent = text;
+    $('message').style.color = color;
 }
 
-// 英字を「文字の日本語読み」にするフォールバック。
-// APIが英字をそのまま返した場合でも、最終結果を必ずひらがなにする。
+function katakanaToHiragana(text) {
+    return String(text || '').replace(/[\u30A1-\u30F6]/g,
+        ch => String.fromCharCode(ch.charCodeAt(0) - 0x60));
+}
+
 const LETTER_READING = {
     A:'えー', B:'びー', C:'しー', D:'でぃー', E:'いー', F:'えふ',
     G:'じー', H:'えいち', I:'あい', J:'じぇい', K:'けー', L:'える',
     M:'えむ', N:'えぬ', O:'おー', P:'ぴー', Q:'きゅー', R:'あーる',
-    S:'えす', T:'てぃー', U:'ゆー', V:'ぶい', W:'だぶりゅー', X:'えっくす',
-    Y:'わい', Z:'ぜっと'
+    S:'えす', T:'てぃー', U:'ゆー', V:'ぶい', W:'だぶりゅー',
+    X:'えっくす', Y:'わい', Z:'ぜっと'
 };
 
-function spellAsciiLetters(text) {
-    return String(text).replace(/[A-Za-z]+/g, word =>
-        [...word.toUpperCase()].map(ch => LETTER_READING[ch] || ch).join('')
-    );
-}
+const DIGIT_READING = {
+    '0':'ぜろ','1':'いち','2':'に','3':'さん','4':'よん',
+    '5':'ご','6':'ろく','7':'なな','8':'はち','9':'きゅう'
+};
 
-// 整数の日本語読み（0〜999999999999程度）
-const DIGIT = ['ぜろ','いち','に','さん','よん','ご','ろく','なな','はち','きゅう'];
-const SMALL_UNIT = ['', 'じゅう', 'ひゃく', 'せん'];
-const LARGE_UNIT = ['', 'まん', 'おく', 'ちょう'];
-
-function readFourDigits(n) {
-    if (n === 0) return '';
-    let out = '';
-    const s = String(n).padStart(4, '0');
-    for (let i = 0; i < 4; i++) {
-        const d = Number(s[i]);
+function fourDigitsToJapanese(n) {
+    const units = ['', 'じゅう', 'ひゃく', 'せん'];
+    const small = ['', 'いち', 'に', 'さん', 'よん', 'ご', 'ろく', 'なな', 'はち', 'きゅう'];
+    let result = '';
+    for (let i = 3; i >= 0; i--) {
+        const d = Math.floor(n / Math.pow(10, i)) % 10;
         if (!d) continue;
-        const pos = 3 - i;
-        if (d === 1 && pos > 0) {
-            out += SMALL_UNIT[pos];
-        } else {
-            out += DIGIT[d] + SMALL_UNIT[pos];
-        }
+        if (i === 3) result += d === 3 ? 'さんぜん' : d === 8 ? 'はっせん' : small[d] + 'せん';
+        else if (i === 2) result += d === 3 ? 'さんびゃく' : d === 6 ? 'ろっぴゃく' : d === 8 ? 'はっぴゃく' : small[d] + 'ひゃく';
+        else if (i === 1) result += d === 1 ? 'じゅう' : small[d] + 'じゅう';
+        else result += small[d];
     }
-    return out;
+    return result;
 }
 
-function numberToJapanese(n) {
-    n = Number(n);
-    if (!Number.isFinite(n) || n < 0 || !Number.isInteger(n)) {
-        return String(n).split('').map(ch => DIGIT[Number(ch)] ?? ch).join('');
+function integerToJapaneseDigits(s) {
+    if (!/^\d+$/.test(s)) return '';
+    const normalized = s.replace(/^0+(?=\d)/, '');
+    if (normalized.length > 12) {
+        return [...s].map(x => DIGIT_READING[x]).join('');
     }
-    if (n === 0) return 'ぜろ';
-
-    let out = '';
+    const groups = [];
+    let rest = Number(normalized);
     let groupIndex = 0;
-    while (n > 0) {
-        const group = n % 10000;
+    while (rest > 0) {
+        const group = rest % 10000;
         if (group) {
-            out = readFourDigits(group) + LARGE_UNIT[groupIndex] + out;
+            const part = fourDigitsToJapanese(group);
+            groups.unshift({
+                text: part,
+                unit: ['', 'まん', 'おく'][groupIndex] || ''
+            });
         }
-        n = Math.floor(n / 10000);
+        rest = Math.floor(rest / 10000);
         groupIndex++;
     }
-    return out;
+    return groups.length ? groups.map(g => g.text + g.unit).join('') : 'ぜろ';
 }
 
-// 連続する数字を日本語読みへ。
-// 例: 366 → さんびゃくろくじゅうろく
-function spellNumbers(text) {
-    return String(text).replace(/\d+/g, m => {
-        if (m.length > 12) {
-            return [...m].map(ch => DIGIT[Number(ch)]).join('');
-        }
-        return numberToJapanese(m);
-    });
+function asciiRunToHiragana(run) {
+    if (/^\d+$/.test(run)) return integerToJapaneseDigits(run);
+    return run.toUpperCase().split('').map(ch => LETTER_READING[ch] || ch).join('');
 }
 
-function normalizeReading(text) {
-    let s = katakanaToHiragana(text || '');
+/*
+ * Kuromojiに日本語部分を読ませ、英字・数字は明示的にひらがなへ変換する。
+ * 例:
+ *   東京都  -> とうきょうと
+ *   366     -> さんびゃくろくじゅうろく
+ *   ABC     -> えーびーしー
+ */
+function toHiragana(text) {
+    if (!text) return '';
 
-    // APIが英字・数字をそのまま返した場合の最終処理
-    s = spellNumbers(s);
-    s = spellAsciiLetters(s);
+    const parts = [];
+    const re = /[A-Za-z0-9]+|[^A-Za-z0-9]+/g;
+    const chunks = text.match(re) || [];
 
-    // ひらがな・記号以外に残ったカタカナも念のため変換
-    s = katakanaToHiragana(s);
-    return s;
-}
-
-// APIを1回呼んで、artist｜title の2部分をまとめて取得。
-// 1曲につき1リクエストなので、Freeの1 req/s制限にも対応しやすい。
-async function fetchReadingPair(artist, title) {
-    const separator = '｜';
-    const response = await fetch(FURIGANA_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: `${artist}${separator}${title}` })
-    });
-
-    if (!response.ok) {
-        let detail = '';
-        try {
-            const err = await response.json();
-            detail = err?.error?.message ? `: ${err.error.message}` : '';
-        } catch (_) {}
-        throw new Error(`読みAPIエラー (${response.status})${detail}`);
-    }
-
-    const data = await response.json();
-    if (!Array.isArray(data.tokens)) {
-        throw new Error('読みAPIの応答形式が不正です。');
-    }
-
-    // separator を境界として、tokenごとのreadingを結合
-    let left = '';
-    let right = '';
-    let seenSeparator = false;
-
-    for (const token of data.tokens) {
-        const surface = token.surface ?? '';
-        const reading = token.reading ?? surface;
-
-        if (!seenSeparator && surface === separator) {
-            seenSeparator = true;
+    for (const chunk of chunks) {
+        if (/^[A-Za-z0-9]+$/.test(chunk)) {
+            parts.push(asciiRunToHiragana(chunk));
             continue;
         }
 
-        if (seenSeparator) {
-            right += reading;
-        } else {
-            left += reading;
-        }
-    }
-
-    // APIが区切り記号を独立tokenにしなかった場合の保険
-    if (!seenSeparator) {
-        const reconstructed = data.tokens
-            .map(t => t.surface ?? '')
-            .join('');
-        const idx = reconstructed.indexOf(separator);
-
-        if (idx >= 0) {
-            let leftReading = '';
-            let rightReading = '';
-            let pos = 0;
-            for (const token of data.tokens) {
-                const surface = token.surface ?? '';
-                const reading = token.reading ?? surface;
-                const end = pos + surface.length;
-
-                if (end <= idx) {
-                    leftReading += reading;
-                } else if (pos >= idx + separator.length) {
-                    rightReading += reading;
-                }
-                pos = end;
+        if (tokenizer) {
+            const tokens = tokenizer.tokenize(chunk);
+            for (const token of tokens) {
+                const reading = token.reading || token.surface_form || '';
+                parts.push(katakanaToHiragana(reading));
             }
-            left = leftReading;
-            right = rightReading;
+        } else {
+            parts.push(katakanaToHiragana(chunk));
         }
     }
 
-    return {
-        artist: normalizeReading(left),
-        title: normalizeReading(right)
-    };
+    return parts.join('');
 }
 
-// APIに失敗した場合のローカル最低限フォールバック。
-// 漢字の読みは取得できないが、英字・数字・カタカナはひらがな化する。
-function localFallback(text) {
-    return normalizeReading(text);
-}
-
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-// HTML属性へ安全に入れるためのエスケープ
 function escapeHtml(value) {
-    return String(value ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+    return String(value ?? '').replace(/[&<>"']/g, ch => ({
+        '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+    }[ch]));
 }
 
-// 入力1行を artist/title に分割
 function parseLine(line) {
-    const trimmed = line.trim();
-    if (!trimmed) return null;
+    const s = line.trim();
+    if (!s) return null;
 
-    // まずタブ、半角/全角カンマ
-    let parts = trimmed.split(/[\t,，]/);
+    // タブ、半角/全角カンマに対応
+    const parts = s.split(/[\t,，]/);
+
     if (parts.length >= 2) {
         return {
             artist: parts[0].trim(),
@@ -205,99 +130,139 @@ function parseLine(line) {
         };
     }
 
-    // 全角スペース、2つ以上の半角スペース
-    const wsParts = trimmed.split(/(?:　+|\s{2,})/);
-    if (wsParts.length >= 2) {
-        return {
-            artist: wsParts[0].trim(),
-            title: wsParts.slice(1).join(' ').trim()
-        };
+    // 区切りが無い場合は連続空白を区切りとして試す
+    const ws = s.split(/\s{2,}/);
+    if (ws.length >= 2) {
+        return { artist: ws[0].trim(), title: ws.slice(1).join(' ').trim() };
     }
 
-    // 最後の保険：最初の半角スペースで分割
-    const firstSpace = trimmed.search(/\s/);
-    if (firstSpace >= 0) {
-        return {
-            artist: trimmed.slice(0, firstSpace).trim(),
-            title: trimmed.slice(firstSpace + 1).trim()
-        };
-    }
-
-    return { artist: trimmed, title: '' };
+    return null;
 }
 
-window.addEventListener('load', () => {
+function buildPreviewRow(artist, title) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+        <td style="padding:6px;">
+            <input type="text" class="row-artist" value="${escapeHtml(artist)}" style="width:100%;">
+        </td>
+        <td style="padding:6px;">
+            <input type="text" class="row-artist-initial" value="${escapeHtml(toHiragana(artist))}" style="width:100%;">
+        </td>
+        <td style="padding:6px;">
+            <input type="text" class="row-title" value="${escapeHtml(title)}" style="width:100%;">
+        </td>
+        <td style="padding:6px;">
+            <input type="text" class="row-title-initial" value="${escapeHtml(toHiragana(title))}" style="width:100%;">
+        </td>
+    `;
+    return tr;
+}
+
+function loadTokenizer() {
+    if (tokenizer) return Promise.resolve(tokenizer);
+    if (tokenizerPromise) return tokenizerPromise;
+
+    tokenizerPromise = new Promise((resolve, reject) => {
+        if (typeof kuromoji === 'undefined') {
+            reject(new Error('Kuromoji.js が読み込めませんでした。'));
+            return;
+        }
+
+        setMessage('日本語辞書を読み込んでいます。初回だけ少し時間がかかります…');
+
+        kuromoji.builder({ dicPath: DIC_PATH }).build((err, builtTokenizer) => {
+            if (err) {
+                console.error('Kuromoji dictionary error:', err);
+                reject(err);
+                return;
+            }
+
+            tokenizer = builtTokenizer;
+            console.log('Kuromoji 準備完了');
+            resolve(tokenizer);
+        });
+    });
+
+    return tokenizerPromise;
+}
+
+window.addEventListener('load', async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const streamerId = urlParams.get('id');
 
     if (streamerId) {
-        document.getElementById('streamer-id').value = streamerId;
+        $('streamer-id').value = streamerId;
     } else {
-        alert('URLに配信者ID (?id=1 など) が付いていません。');
+        setMessage('URLに配信者ID（?id=1 など）が付いていません。', 'red');
+    }
+
+    try {
+        await loadTokenizer();
+        setMessage('日本語辞書の準備が完了しました。');
+    } catch (err) {
+        console.error(err);
+        setMessage(
+            '日本語辞書の読み込みに失敗しました。ページを再読み込みしてください。',
+            'red'
+        );
     }
 });
 
-document.getElementById('parse-btn').addEventListener('click', async () => {
-    const textInput = document.getElementById('csv-input').value.trim();
+$('parse-btn').addEventListener('click', async () => {
+    const textInput = $('csv-input').value.trim();
     if (!textInput) {
         alert('曲リストを貼り付けてください。');
         return;
     }
 
-    const lines = textInput.split(/\r?\n/);
-    const items = lines.map(parseLine).filter(item => item && (item.artist || item.title));
-
-    if (!items.length) {
-        alert('解析できる曲がありません。');
+    try {
+        await loadTokenizer();
+    } catch (err) {
+        console.error(err);
+        alert('日本語辞書の準備に失敗しています。ページを再読み込みしてください。');
         return;
     }
 
-    const previewBody = document.getElementById('preview-body');
-    const message = document.getElementById('message');
+    const lines = textInput.split(/\r?\n/);
+    const previewBody = $('preview-body');
     previewBody.innerHTML = '';
-    document.getElementById('step-2').style.display = 'block';
 
-    let successCount = 0;
+    let count = 0;
+    let skipped = 0;
 
-    for (let i = 0; i < items.length; i++) {
-        const { artist, title } = items[i];
-
-        message.style.color = '';
-        message.textContent = `読みを生成中… ${i + 1} / ${items.length}`;
-
-        let artistInitial = localFallback(artist);
-        let titleInitial = localFallback(title);
-
-        try {
-            const reading = await fetchReadingPair(artist, title);
-            artistInitial = reading.artist || artistInitial;
-            titleInitial = reading.title || titleInitial;
-        } catch (error) {
-            console.warn(`読み生成失敗 (${artist} / ${title}):`, error);
+    for (const line of lines) {
+        const parsed = parseLine(line);
+        if (!parsed || !parsed.artist || !parsed.title) {
+            if (line.trim()) skipped++;
+            continue;
         }
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td style="padding:6px;"><input type="text" class="row-artist" value="${escapeHtml(artist)}" style="width:90%;"></td>
-            <td style="padding:6px;"><input type="text" class="row-artist-initial" value="${escapeHtml(artistInitial)}" style="width:90%;"></td>
-            <td style="padding:6px;"><input type="text" class="row-title" value="${escapeHtml(title)}" style="width:90%;"></td>
-            <td style="padding:6px;"><input type="text" class="row-title-initial" value="${escapeHtml(titleInitial)}" style="width:90%;"></td>
-        `;
-        previewBody.appendChild(tr);
-        successCount++;
-
-        // Free枠の1 req/sを超えないように待つ（最後の行では不要）
-        if (i < items.length - 1) {
-            await sleep(API_INTERVAL_MS);
-        }
+        previewBody.appendChild(buildPreviewRow(parsed.artist, parsed.title));
+        count++;
     }
 
-    message.style.color = 'green';
-    message.textContent = `${successCount} 件を解析しました。読みを確認してください。`;
+    if (!count) {
+        $('step-2').style.display = 'none';
+        setMessage('読み取れる「アーティスト,曲名」の行がありません。', 'red');
+        return;
+    }
+
+    $('step-2').style.display = 'block';
+    setMessage(
+        `${count} 件を解析しました。読みを確認してください。` +
+        (skipped ? `（${skipped} 行は形式を認識できず無視しました）` : ''),
+        'green'
+    );
 });
 
-document.getElementById('submit-all-btn').addEventListener('click', async () => {
-    const streamerId = parseInt(document.getElementById('streamer-id').value, 10);
+$('submit-all-btn').addEventListener('click', async () => {
+    const streamerId = parseInt($('streamer-id').value, 10);
+
+    if (!Number.isInteger(streamerId)) {
+        alert('配信者IDが正しくありません。URLを確認してください。');
+        return;
+    }
+
     const rows = document.querySelectorAll('#preview-body tr');
     const insertData = [];
 
@@ -321,23 +286,31 @@ document.getElementById('submit-all-btn').addEventListener('click', async () => 
     });
 
     if (!insertData.length) {
-        alert('登録する曲がありません。');
+        alert('登録できる曲がありません。');
         return;
     }
 
-    const message = document.getElementById('message');
-    message.style.color = '';
-    message.textContent = '送信中...';
+    const button = $('submit-all-btn');
+    button.disabled = true;
+    button.style.opacity = '0.6';
+    setMessage('Supabaseへ登録中…');
 
-    const { error } = await supabaseClient.from('songs').insert(insertData);
+    try {
+        const { error } = await supabaseClient.from('songs').insert(insertData);
 
-    if (error) {
-        message.style.color = 'red';
-        message.textContent = 'エラー: ' + error.message;
-    } else {
-        message.style.color = 'green';
-        message.textContent = `🎉 ${insertData.length} 件を一括登録しました！`;
-        document.getElementById('csv-input').value = '';
-        document.getElementById('step-2').style.display = 'none';
+        if (error) {
+            throw error;
+        }
+
+        setMessage(`🎉 ${insertData.length} 件を一括登録しました！`, 'green');
+        $('csv-input').value = '';
+        $('preview-body').innerHTML = '';
+        $('step-2').style.display = 'none';
+    } catch (error) {
+        console.error('Supabase insert error:', error);
+        setMessage('登録エラー: ' + (error.message || error), 'red');
+    } finally {
+        button.disabled = false;
+        button.style.opacity = '';
     }
 });
