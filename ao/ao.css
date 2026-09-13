@@ -87,6 +87,7 @@ body {
     gap: 8px;
 }
 
+/* 70〜87行目：サイズや枠線の基本設定 */
 #song-search {
     flex: 1;
     min-width: 0;
@@ -94,10 +95,10 @@ body {
     height: 44px;
     padding: 0 14px;
 
-    border: 1px solid #ccc;
-    border-radius: 10px;
+    /*border: 1px solid #ccc;*/
+    border-radius: 10px;/* 角の丸み */
 
-    background: #fff;
+    /*background: #fff;*/
 
     font-family: inherit;
     font-size: 16px;
@@ -163,11 +164,11 @@ body {
     min-width: 0;
     padding: 8px 12px;
 
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.5);/* 枠線の色 */
     border-radius: 999px; /* 角丸丸みデザイン */
 
-    background: rgba(255, 255, 255, 0.35);
-    color: #222;
+    background: rgba(255, 255, 255, 0.35);/* 通常時の透過背景 */
+    color: #222;/* 通常時の文字色 */
 
     font-family: inherit;
     font-size: 13px; /* 3つ並んでも収まりやすいサイズ */
@@ -182,9 +183,9 @@ body {
 }
 
 .favorite-button.active {
-    background: #222;
-    color: #fff;
-    border-color: #222;
+    background: #222;/* 選択時の背景色（現在黒） */
+    color: #fff;/* 選択時の文字色（現在白） */
+    border-color: #222;/* 選択時の枠線色 */
 }
 
 
@@ -208,8 +209,9 @@ body {
     margin-top: 24px;
     padding: 8px 4px 5px;
 
-    font-size: 18px;
+    font-size: 18px;/* アーティスト名の文字サイズ */
     font-weight: 700;
+	color: #222;      /* ← 文字色を変更したい場合はここを追加（例: color: #fff; で白） */
 
     border-bottom: 2px solid #184F88; /*アーティスト名の下の線の色*/
 
@@ -247,9 +249,10 @@ body {
 .song {
     padding: 9px 5px;
 
-    font-size: 16px;
+    font-size: 16px;/* 曲名の文字サイズ */
+	color: #222;     /* ← 曲名の文字色を変更したい場合はここを追加 */
 
-    border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid #e5e5e5;/* 各曲の間の区切り線の色 */
 }
 
 
@@ -270,9 +273,9 @@ body {
 
     padding: 8px;
 
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.2);/* バー全体の透過背景色 */
 
-    border-top: 1px solid #ddd;
+    border-top: 1px solid #ddd;/* 上側の境界線の色 */
 
     box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.08);
 
@@ -291,7 +294,8 @@ body {
     padding: 5px 8px;
 
     border: 1px solid #ccc;
-    border-radius: 8px;
+    border-radius: 8px;/* 角の丸み */
+	color: #222;        /* 文字色 */
 
     background: rgba(255, 255, 0.4);
     color: #222;
@@ -374,39 +378,40 @@ body {
 
 /* 擬似要素で固定背景を作成 */
 body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-image: url("background.jpg");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  z-index: -1; /* コンテンツの背面に配置 */
+	content: "";
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-image: url("background.jpg");
+	background-size: cover;
+ 	background-position: center;
+ 	background-repeat: no-repeat;
+	z-index: -1; /* コンテンツの背面に配置 */
+	/*filter: brightness(0.95); /* 背景画像の調整 ← 追加例: 0.9などに下げると画像が少し暗くなり文字が読みやすくなります */
 }
 
 /* メイン部分を少し透過 */
 main {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.2);/* メインコンテンツ全体の透け感 0.2を下げると透明度が上がり、上げると白みが増します */
 }
 /* 曲リストの半透明パネル */
 #song-list {
-    background: rgba(155, 155, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0);
-    border-radius: 18px;
+    background: rgba(155, 155, 255, 0.1);/* パネルの背景色と透明度 (赤, 緑, 青, 透明度0〜1) */
+    border: 1px solid rgba(255, 255, 255, 0);/* 枠線の太さ・種類・色 */
+    border-radius: 18px;/* 角の丸み */
     padding: 10px 16px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);/* パネルの影の濃さ */
+    backdrop-filter: blur(8px);/* 背景のボカシ具合（数字が大きいとボケが強くなる） */
     -webkit-backdrop-filter: blur(8px);
 }
 /* 検索欄・お気に入りボタンを半透明にする */
 #song-search,
 #search-clear,
 .favorite-button {
-    background: rgba(255, 255, 255, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(255, 255, 255, 0.35);/* 入力欄の背景透過度 */
+    border: 1px solid rgba(255, 255, 255, 0.5);/* 枠線の色 */
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
@@ -438,23 +443,23 @@ main {
 
 /* 50音ナビゲーション */
 #artist-nav button {
-    background: rgba(255, 255, 255, 0.30);
-    border: 1px solid rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.30);/* 50音ボタンの透過背景 */
+    border: 1px solid rgba(255, 255, 255, 0.75);/* ボタンの枠線色 */
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
 
 /* 選択中 */
 #artist-nav button.active {
-    background: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.55);/* 選択中の背景透過度 */
 }
 
 #song-search {
-    color: #333;
+    color: #333;/* 入力した文字の色 */
 }
 
 #song-search::placeholder {
-    color: #333;
+    color: #333;/* 検索前の「曲名・アーティスト名で検索」の文字色 */
 }
 
 #filter-buttons {
