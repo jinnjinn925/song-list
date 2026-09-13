@@ -64,13 +64,9 @@ body {
 }
 
 .menu-panel {
-    display: none;
+    display: block;
 
-    margin-top: 12px;
-    padding: 14px;
-
-    border-radius: 12px;
-    background: #f5f5f5;
+    margin-top: 10px;
 }
 
 .menu-panel.open {
