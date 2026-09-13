@@ -23,17 +23,18 @@ window.addEventListener('load', () => {
 
     // ★ cdnjs の辞書フォルダ（dict/）を指定
     kuromoji.builder({
-    		DIC_URL: "https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/"
-		}).build((err, _tokenizer) => {
-        if (err) {
-            console.error("kuromoji読み込み失敗:", err);
-            document.getElementById('message').textContent = '辞書の読み込みに失敗しました。';
-        } else {
-            tokenizer = _tokenizer;
-            console.log("kuromoji 準備完了！");
-            document.getElementById('message').textContent = '';
-        }
-    });
+    		dicPath: "https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/"
+	}).build((err, _tokenizer) => {
+    	if (err) {
+        	console.error("kuromoji読み込み失敗:", err);
+        	document.getElementById('message').textContent =
+            	'辞書の読み込みに失敗しました。';
+    	} else {
+        	tokenizer = _tokenizer;
+        	console.log("kuromoji 準備完了！");
+        	document.getElementById('message').textContent = '';
+    	}
+	});
 });
 
 // カタカナをひらがなに直す補助関数
