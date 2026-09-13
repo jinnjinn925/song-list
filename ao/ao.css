@@ -16,7 +16,7 @@ body {
     margin: 0;
     padding: 0 0 120px 0;
     background: #f8f8f8;
-    color: #222;
+    color: #f8f8f8;
 
     font-family:
         "Noto Sans JP",
@@ -404,5 +404,5 @@ body {
 
 /* メイン部分を少し透過 */
 main {
-    background: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 20);
 }
