@@ -1,0 +1,96 @@
+@charset "utf-8";
+/* CSS Document */
+
+/* 全体の基本スタイル */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+main {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+h2 {
+    color: #2c3e50;
+    margin-top: 0;
+    border-bottom: 2px solid #eef2f5;
+    padding-bottom: 10px;
+}
+
+h3 {
+    color: #34495e;
+}
+
+/* 入力エリア（テキストエリア） */
+textarea {
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+textarea:focus {
+    border-color: #3498db;
+}
+
+/* プレビューテーブル */
+table {
+    box-sizing: border-box;
+    margin-top: 10px;
+}
+
+th {
+    font-size: 13px;
+    color: #555;
+    border-bottom: 2px solid #ddd;
+}
+
+td input[type="text"] {
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 14px;
+    outline: none;
+}
+
+td input[type="text"]:focus {
+    border-color: #3498db;
+    background-color: #fffde7; /* 修正中のセルをわかりやすくハイライト */
+}
+
+/* メインボタン（favorite-button） */
+.favorite-button {
+    background-color: #3498db;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.favorite-button:hover {
+    background-color: #2980b9;
+}
+
+.favorite-button:active {
+    transform: scale(0.99);
+}
+
+/* メッセージ表示エリア */
+#message {
+    font-size: 14px;
+    padding: 10px;
+    border-radius: 6px;
+}
