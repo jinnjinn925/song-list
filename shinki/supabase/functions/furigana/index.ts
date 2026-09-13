@@ -66,8 +66,13 @@ function readingForRange(
 
     if (tokenEnd <= startByte || tokenStart >= endByte) continue;
 
-    const reading = token.reading
-      ? katakanaToHiragana(String(token.reading))
+    // Shirabe /tokenize returns the reading in details[7]
+    // (IPAdic: ... base_form, reading, pronunciation).
+    // There is no token.reading field in the tokenize response.
+    const details = Array.isArray(token.details) ? token.details : [];
+    const tokenReading = details[7];
+    const reading = tokenReading && tokenReading !== "*"
+      ? katakanaToHiragana(String(tokenReading))
       : String(token.surface ?? "");
 
     result += reading;

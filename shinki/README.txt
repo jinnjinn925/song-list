@@ -31,3 +31,7 @@ verify_jwt = false にするとFunction URL自体は認証なしで呼び出せ�
 【ブラウザ側】
 GitHub Pagesの既存ファイル3つをこのZIPのものに置き換えてください。
 Supabase Functionをデプロイ後、ブラウザをハードリロードして確認してください。
+
+【v3 reading fix】
+Shirabe /tokenize の読みは token.reading ではなく details[7] に入る仕様に合わせて修正済みです。
+これにより漢字の読みも取得してひらがなへ変換します。
