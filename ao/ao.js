@@ -577,8 +577,11 @@ function updateSongCount() {
     const total =
         data.length;
 
+    // 現在、画面上で開いている曲だけを数える
     const visible =
-        getVisibleSongs().length;
+        document.querySelectorAll(
+            '.artist-songs:not(.collapsed) .song'
+        ).length;
 
     const complete =
         data.filter(
@@ -589,8 +592,7 @@ function updateSongCount() {
     if (searchQuery) {
 
         songCount.textContent =
-            `「${searchQuery}」を含む ${visible}曲 / ${total}曲`
-            + `　*最後まで：${complete}曲`;
+            `「${searchQuery}」を含む ${visible}曲 / ${total}曲`;
 
     } else if (
         currentRow !== null ||
@@ -599,14 +601,12 @@ function updateSongCount() {
     ) {
 
         songCount.textContent =
-            `${visible}曲 / ${total}曲`
-            + `　*最後まで：${complete}曲`;
+            `${visible}曲 / ${total}曲`;
 
     } else {
 
         songCount.textContent =
-            `曲数：${total}曲`
-            + `　*最後まで：${complete}曲`;
+            `曲数：${visible}曲`;
     }
 }
 
