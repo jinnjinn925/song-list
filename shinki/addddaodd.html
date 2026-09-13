@@ -15,23 +15,35 @@
 
 <input type="hidden" id="streamer-id">
 
-<div id="step-1">
-<p class="help">「アーティスト名,曲名」の形で1行ずつ貼り付けてください。</p>
-<p class="help small">例：ヨルシカ,言え。 / コブクロ,赤い糸</p>
+<section id="step-1">
+<p class="help">
+曲リストをそのまま貼り付けてください。
+</p>
+<p class="help small">
+対応：タブ区切り／カンマ区切り／全角カンマ／2個以上のスペース区切り／一般的な「アーティスト 曲名」形式
+</p>
 
-<textarea id="csv-input" rows="10" placeholder="ヨルシカ,言え。
-コブクロ,赤い糸
-Hump Back,拝啓、少年よ"></textarea>
+<textarea id="csv-input" rows="12" placeholder="ヨルシカ　言え。
+コブクロ　赤い糸
+Hump Back　拝啓、少年よ
+Mrs. GREEN APPLE　ダーリン"></textarea>
 
-<button type="button" id="parse-btn" class="favorite-button">
-入力内容を確認する
-</button>
+<div class="options">
+<label>
+<input type="checkbox" id="keep-invalid">
+分割できない行も確認画面に残す
+</label>
 </div>
 
-<div id="step-2">
+<button type="button" id="parse-btn" class="favorite-button">
+読み仮名を自動生成して確認する
+</button>
+</section>
+
+<section id="step-2">
 <h3>登録内容の確認・修正</h3>
 <p class="help small">
-「読み」は自動生成ではなく、必要なものだけ手入力・修正します。
+読み仮名は自動生成されています。間違っているところだけ直接修正してください。
 </p>
 
 <div class="table-wrap">
@@ -51,7 +63,7 @@ Hump Back,拝啓、少年よ"></textarea>
 <button type="button" id="submit-all-btn" class="favorite-button submit-button">
 この内容で一括登録する
 </button>
-</div>
+</section>
 
 <div id="message"></div>
 </main>
