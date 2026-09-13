@@ -513,7 +513,11 @@ function displaySongs(songs) {
 			
 			
 			// 「一覧」のときだけ最初から開く
-			if (currentRow === null && currentFavoriteArtist === null && !searchQuery) {
+			if (
+    			currentRow === null &&
+    			!showFavorites &&
+				!searchQuery
+			) {
 				// 一覧
 				newArtistSongs.classList.remove('collapsed');
     			artistDiv.classList.remove('collapsed');
