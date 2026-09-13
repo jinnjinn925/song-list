@@ -83,6 +83,8 @@ let currentRow = null;
 //let currentFavoriteArtist = null;
 let showFavorites = false;
 
+let favoriteArtistList = [];
+
 let showCompleteOnly = false;
 
 let searchQuery = '';
@@ -515,16 +517,26 @@ function displaySongs(songs) {
 			// 「一覧」のときだけ最初から開く
 			if (
     			currentRow === null &&
-    			!showFavorites &&
-				!searchQuery
+    			!searchQuery
 			) {
-				// 一覧
-				newArtistSongs.classList.remove('collapsed');
-    			artistDiv.classList.remove('collapsed');
+				// 一覧・お気に入りは最初から開く
+    			newArtistSongs.classList.remove(
+        		'collapsed'
+    			);
+
+    			artistDiv.classList.remove(
+        			'collapsed'
+    			);
+
 			} else {
-				// 50音・お気に入り・検索は閉じた状態
-				newArtistSongs.classList.add('collapsed');
-				artistDiv.classList.add('collapsed');
+    			// 50音・検索は閉じた状態
+    			newArtistSongs.classList.add(
+        		'collapsed'
+    			);
+
+    			artistDiv.classList.add(
+        			'collapsed'
+    			);
 			}
 
 
@@ -653,6 +665,8 @@ function displayFavoriteArtists(
     favoriteList
 ) {
 
+	favoriteArtistList =
+        favoriteList || [];
     favoriteArtists.innerHTML = '';
 
     if (
@@ -682,41 +696,44 @@ function displayFavoriteArtists(
 
 
     button.addEventListener(
-        'click',
-        () => {
+    	'click',
+		() => {
 
-            showFavorites =
-                !showFavorites;
+			showFavorites =
+				!showFavorites;
 
-            currentRow =
-                null;
-
-            // 50音ボタンの選択を解除
-            document
-                .querySelectorAll(
-                    '#artist-nav button'
-                )
-                .forEach(
-                    navButton => {
-
-                        navButton.classList.remove(
-                            'active'
-                        );
-
-                    }
-                );
+			currentRow = null;
 
 
-            button.classList.toggle(
-                'active',
-                showFavorites
-            );
+			// 50音ボタンの選択を解除
+
+			document
+            	.querySelectorAll(
+					'#artist-nav button'
+			)
+				.forEach(
+					navButton => {
+
+                    	navButton.classList.remove(
+                        	'active'
+                    	);
+
+                	}
+            	);
 
 
-            render();
+        	// お気に入りボタンの状態
 
-        }
-    );
+			button.classList.toggle(
+            	'active',
+            	showFavorites
+        	);
+
+
+        	render();
+
+    	}
+	);
 
 
     favoriteArtists.appendChild(
