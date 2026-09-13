@@ -7,32 +7,50 @@
 <title>レパートリー一括登録</title>
 <link rel="stylesheet" href="ao_2.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/build/kuromoji.js" defer></script>
 <script src="add.js" defer></script>
 </head>
 <body>
 <main>
 <h2>レパートリー一括登録</h2>
+
 <input type="hidden" id="streamer-id">
 
 <div id="step-1">
-<p class="help">「アーティスト名,曲名」の形で貼り付けてください。</p>
-<textarea id="csv-input" rows="8" placeholder="ヨルシカ,言え。
+<p class="help">「アーティスト名,曲名」の形で1行ずつ貼り付けてください。</p>
+<p class="help small">例：ヨルシカ,言え。 / コブクロ,赤い糸</p>
+
+<textarea id="csv-input" rows="10" placeholder="ヨルシカ,言え。
 コブクロ,赤い糸
 Hump Back,拝啓、少年よ"></textarea>
-<button type="button" id="parse-btn" class="favorite-button" disabled>ふりがなを自動生成して確認する</button>
+
+<button type="button" id="parse-btn" class="favorite-button">
+入力内容を確認する
+</button>
 </div>
 
 <div id="step-2">
 <h3>登録内容の確認・修正</h3>
-<p class="help small">読みが間違っている部分だけ、直接打ち換えて修正してください。</p>
+<p class="help small">
+「読み」は自動生成ではなく、必要なものだけ手入力・修正します。
+</p>
+
 <div class="table-wrap">
 <table>
-<thead><tr><th>アーティスト</th><th>読み（修正可）</th><th>曲名</th><th>読み（修正可）</th></tr></thead>
+<thead>
+<tr>
+<th>アーティスト</th>
+<th>アーティスト読み</th>
+<th>曲名</th>
+<th>曲名読み</th>
+</tr>
+</thead>
 <tbody id="preview-body"></tbody>
 </table>
 </div>
-<button type="button" id="submit-all-btn" class="favorite-button submit-button">この内容で一括登録する</button>
+
+<button type="button" id="submit-all-btn" class="favorite-button submit-button">
+この内容で一括登録する
+</button>
 </div>
 
 <div id="message"></div>
