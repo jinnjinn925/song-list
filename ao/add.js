@@ -5,7 +5,8 @@ const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 let tokenizer = null;
 
 // 1. ページを開いたときに URLからIDを取得 ＆ kuromojiの辞書を準備
-window.addEventListener('DOMContentLoaded', () => {
+// 【変更】'DOMContentLoaded' から 'load' に変更して、kuromoji.jsの読み込み完了を確実にする
+window.addEventListener('load', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const streamerId = urlParams.get('id');
     
@@ -15,10 +16,18 @@ window.addEventListener('DOMContentLoaded', () => {
         alert('URLに配信者ID (?id=1 など) が付いていません。');
     }
 
+    // kuromoji の存在確認をしてから初期化
+    if (typeof kuromoji === 'undefined') {
+        console.error("kuromoji.js が読み込まれていません。ネットワークやscriptタグを確認してください。");
+        document.getElementById('message').textContent = 'ライブラリの読み込みに失敗しました。ページを再読み込みしてください。';
+        return;
+    }
+
     // kuromoji の辞書データをCDNから取得して初期化
     kuromoji.builder({ DIC_URL: "https://cdn.jsdelivr.net/npm/kuromoji@0.8.0/dict/" }).build((err, _tokenizer) => {
         if (err) {
             console.error("kuromoji読み込み失敗:", err);
+            document.getElementById('message').textContent = '辞書の読み込みに失敗しました。';
         } else {
             tokenizer = _tokenizer;
             console.log("kuromoji 準備完了！");
