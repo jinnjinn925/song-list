@@ -16,21 +16,21 @@ window.addEventListener('load', () => {
         alert('URLに配信者ID (?id=1 など) が付いていません。');
     }
 
-    // kuromoji の存在確認をしてから初期化
     if (typeof kuromoji === 'undefined') {
-        console.error("kuromoji.js が読み込まれていません。ネットワークやscriptタグを確認してください。");
-        document.getElementById('message').textContent = 'ライブラリの読み込みに失敗しました。ページを再読み込みしてください。';
+        console.error("kuromoji.js の読み込みに失敗しました。");
+        document.getElementById('message').textContent = 'ライブラリの読み込みに失敗しました。';
         return;
     }
 
-    // kuromoji の辞書データをCDNから取得して初期化
-    kuromoji.builder({ DIC_URL: "https://cdn.jsdelivr.net/npm/kuromoji@latest/dict/" }).build((err, _tokenizer) => {
+    // unpkg 経由で辞書データを取得する設定
+    kuromoji.builder({ DIC_URL: "https://unpkg.com/kuromoji@0.8.0/dict/" }).build((err, _tokenizer) => {
         if (err) {
             console.error("kuromoji読み込み失敗:", err);
             document.getElementById('message').textContent = '辞書の読み込みに失敗しました。';
         } else {
             tokenizer = _tokenizer;
             console.log("kuromoji 準備完了！");
+            document.getElementById('message').textContent = '';
         }
     });
 });
