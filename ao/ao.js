@@ -670,6 +670,10 @@ function updateCompleteButton() {
 // お気に入りアーティスト表示
 // =========================
 
+// =========================
+// お気に入りアーティスト表示
+// =========================
+
 function displayFavoriteArtists(
     favoriteList
 ) {
@@ -677,7 +681,10 @@ function displayFavoriteArtists(
     favoriteArtistList =
         favoriteList || [];
 
-    favoriteArtists.innerHTML = '';
+    // ★ complete-filter以外のボタン（過去に生成したアーティストボタン）だけを削除する
+    favoriteArtists
+        .querySelectorAll('.favorite-button:not(#complete-filter)')
+        .forEach(el => el.remove());
 
 
     if (

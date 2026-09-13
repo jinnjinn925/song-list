@@ -138,72 +138,44 @@ body {
 }
 
 
-/* =========================
-   フィルターボタン
-========================= */
-
-#complete-filter {
-    width: 100%;
-    min-height: 44px;
-
-    padding: 8px 12px;
-
-    border: 1px solid #ccc;
-    border-radius: 8px;
-
-    background: #fff;
-    color: #222;
-
-    font-family: inherit;
-    font-size: 14px;
-
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-}
-
-#complete-filter.active {
-    background: #222;
-    color: #fff;
-    border-color: #222;
-}
-
 
 /* =========================
-   お気に入りアーティスト
+   お気に入り・フィルターボタンエリア
 ========================= */
 
 #favorite-section {
     width: 100%;
     max-width: 600px;
-
     margin: 0 auto;
     padding: 5px 16px 15px;
 }
 
-#favorite-section h2 {
-    margin: 0 0 8px;
-
-    font-size: 16px;
-    font-weight: 700;
-}
-
 #favorite-artists {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: wrap; /* 画面幅に応じて綺麗に折り返すか並べる */
     gap: 7px;
+    width: 100%;
 }
 
+/* 共通デザイン */
 .favorite-button {
-    padding: 7px 12px;
+    flex: 1; /* 横並び時に幅を均等に広げる */
+    min-width: 0;
+    padding: 8px 12px;
 
-    border: 1px solid #ccc;
-    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 999px; /* 角丸丸みデザイン */
 
-    background: #fff;
+    background: rgba(255, 255, 255, 0.35);
     color: #222;
 
     font-family: inherit;
-    font-size: 14px;
+    font-size: 13px; /* 3つ並んでも収まりやすいサイズ */
+    text-align: center;
+    white-space: nowrap; /* ボタン内のテキスト折り返しを防止 */
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
@@ -452,13 +424,7 @@ main {
     -webkit-backdrop-filter: blur(8px);
 }
 
-/* 最後まで歌える曲ボタン */
-#complete-filter {
-    background: rgba(255, 255, 255, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
+
 
 /* ソート関連のボタン・セレクト */
 #sort-select,
