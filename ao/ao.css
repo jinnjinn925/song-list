@@ -211,7 +211,7 @@ body {
     font-size: 18px;
     font-weight: 700;
 
-    border-bottom: 2px solid #3b82f6; //アーティスト名の下の線の色
+    border-bottom: 2px solid #060945; /*アーティスト名の下の線の色*/
 
     cursor: pointer;
 

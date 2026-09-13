@@ -657,7 +657,7 @@ function updateCompleteButton() {
     } else {
 
         completeFilter.textContent =
-            '*最後まで歌える曲だけ表示';
+            '*最後まで歌える曲';
 
         completeFilter.classList.remove(
             'active'
@@ -709,7 +709,7 @@ function displayFavoriteArtists(
         document.createElement('button');
 
     artistButton.textContent =
-        '好きなアーティスト';
+        '好きな歌手';
 
     artistButton.className =
         'favorite-button';
