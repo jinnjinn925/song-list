@@ -599,7 +599,7 @@ function updateSongCount() {
 
     } else if (
         currentRow !== null ||
-        currentFavoriteArtist !== null ||
+        showFavorites ||
         showCompleteOnly
     ) {
 
