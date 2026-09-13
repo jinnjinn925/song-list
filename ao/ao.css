@@ -477,3 +477,24 @@ main {
 #song-search::placeholder {
     color: #333;
 }
+
+#filter-buttons {
+    display: flex;
+    gap: 7px;
+    width: 100%;
+}
+
+#filter-buttons > #complete-filter {
+    flex: 1;
+    width: auto;
+}
+
+#filter-buttons > #favorite-artists {
+    display: flex;
+    flex: 2;
+    gap: 7px;
+}
+
+#filter-buttons .favorite-button {
+    flex: 1;
+}
