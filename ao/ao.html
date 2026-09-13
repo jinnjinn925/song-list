@@ -14,6 +14,16 @@
 <body>
 
     <header id="page-header">
+		<button id="menu-button" aria-label="メニュー">☰</button>
+
+		<div id="menu-panel" class="menu-panel">
+   			 <label for="song-search">曲を検索</label>
+   			 <div class="search-box">
+    		    <input id="song-search" type="search" placeholder="曲名・アーティスト名" autocomplete="off">
+    		    <button id="search-clear" type="button">クリア</button>
+   			 </div>
+		</div>
+		
         <h1 id="streamer-name"></h1>
 
         <div id="song-count">

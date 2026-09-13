@@ -74,6 +74,7 @@ let currentFavoriteArtist = null;
 
 let showCompleteOnly = false;
 
+let searchQuery = '';
 
 // =========================
 // 50音用の読みを整理
@@ -374,6 +375,10 @@ function compareReading(a, b) {
 // 表示する曲を決定
 // =========================
 
+// =========================
+// 表示する曲を決定
+// =========================
+
 function getVisibleSongs() {
 
     let songs = [...data];
@@ -416,9 +421,35 @@ function getVisibleSongs() {
     }
 
 
+    // 曲名・アーティスト名で検索
+
+    if (searchQuery) {
+
+        const query =
+            searchQuery.toLowerCase();
+
+        songs = songs.filter(song => {
+
+            const artist =
+                (song.artist || '')
+                    .toLowerCase();
+
+            const title =
+                (song.title || '')
+                    .toLowerCase();
+
+            return (
+                artist.includes(query) ||
+                title.includes(query)
+            );
+
+        });
+
+    }
+
+
     return songs;
 }
-
 
 // =========================
 // 曲一覧を表示
