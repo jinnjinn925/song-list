@@ -80,7 +80,10 @@ let data = [];
 
 let currentRow = null;
 
-let currentFavoriteArtist = null;
+//let currentFavoriteArtist = null;
+let favoriteMode = null;
+
+let favoriteArtistList = [];
 
 let showCompleteOnly = false;
 
@@ -394,15 +397,26 @@ function getVisibleSongs() {
 
     // お気に入りアーティストで絞る
 
-    if (currentFavoriteArtist) {
+    if (favoriteMode === 'artist') {
 
-        songs = songs.filter(
-            song =>
-                song.artist ===
-                currentFavoriteArtist
-        );
+    	songs = songs.filter(
+        	song =>
+            	favoriteArtistList.includes(
+                	song.artist
+            	)
+    	);
 
-    }
+	}
+
+
+	if (favoriteMode === 'confident') {
+
+    	songs = songs.filter(
+        	song =>
+            	song.confident === true
+    	);
+
+	}
 
 
     // 50音で絞る
@@ -510,14 +524,28 @@ function displaySongs(songs) {
 			
 			
 			// 「一覧」のときだけ最初から開く
-			if (currentRow === null && currentFavoriteArtist === null && !searchQuery) {
-				// 一覧
-				newArtistSongs.classList.remove('collapsed');
-    			artistDiv.classList.remove('collapsed');
+			if (
+    			currentRow === null &&
+    			!searchQuery
+			) {
+				// 一覧・お気に入りは最初から開く
+    			newArtistSongs.classList.remove(
+        		'collapsed'
+    			);
+
+    			artistDiv.classList.remove(
+        			'collapsed'
+    			);
+
 			} else {
-				// 50音・お気に入り・検索は閉じた状態
-				newArtistSongs.classList.add('collapsed');
-				artistDiv.classList.add('collapsed');
+    			// 50音・検索は閉じた状態
+    			newArtistSongs.classList.add(
+        		'collapsed'
+    			);
+
+    			artistDiv.classList.add(
+        			'collapsed'
+    			);
 			}
 
 
@@ -577,8 +605,11 @@ function updateSongCount() {
     const total =
         data.length;
 
+    // 現在、画面上で開いている曲だけを数える
     const visible =
-        getVisibleSongs().length;
+        document.querySelectorAll(
+            '.artist-songs:not(.collapsed) .song'
+        ).length;
 
     const complete =
         data.filter(
@@ -589,24 +620,21 @@ function updateSongCount() {
     if (searchQuery) {
 
         songCount.textContent =
-            `「${searchQuery}」を含む ${visible}曲 / ${total}曲`
-            + `　*最後まで：${complete}曲`;
+            `「${searchQuery}」を含む ${visible}曲 / ${total}曲`;
 
     } else if (
         currentRow !== null ||
-        currentFavoriteArtist !== null ||
+        favoriteMode ||
         showCompleteOnly
     ) {
 
         songCount.textContent =
-            `${visible}曲 / ${total}曲`
-            + `　*最後まで：${complete}曲`;
+            `${visible}曲 / ${total}曲`;
 
     } else {
 
         songCount.textContent =
-            `曲数：${total}曲`
-            + `　*最後まで：${complete}曲`;
+            `曲数：${visible}曲`;
     }
 }
 
@@ -629,7 +657,7 @@ function updateCompleteButton() {
     } else {
 
         completeFilter.textContent =
-            '*最後まで歌える曲だけ表示';
+            '*最後まで歌える曲';
 
         completeFilter.classList.remove(
             'active'
@@ -642,11 +670,21 @@ function updateCompleteButton() {
 // お気に入りアーティスト表示
 // =========================
 
+// =========================
+// お気に入りアーティスト表示
+// =========================
+
 function displayFavoriteArtists(
     favoriteList
 ) {
 
-    favoriteArtists.innerHTML = '';
+    favoriteArtistList =
+        favoriteList || [];
+
+    // ★ complete-filter以外のボタン（過去に生成したアーティストボタン）だけを削除する
+    favoriteArtists
+        .querySelectorAll('.favorite-button:not(#complete-filter)')
+        .forEach(el => el.remove());
 
 
     if (
@@ -665,96 +703,120 @@ function displayFavoriteArtists(
         'block';
 
 
-    favoriteList.forEach(artistName => {
+    // 好きなアーティスト
 
-        const button =
-            document.createElement('button');
+    const artistButton =
+        document.createElement('button');
 
-        button.textContent =
-            artistName;
+    artistButton.textContent =
+        '好きな歌手';
 
-        button.className =
-            'favorite-button';
-
-
-        button.addEventListener(
-            'click',
-            () => {
-
-                // 同じボタンをもう一度押すと解除
-
-                if (
-                    currentFavoriteArtist ===
-                    artistName
-                ) {
-
-                    currentFavoriteArtist =
-                        null;
-
-                    button.classList.remove(
-                        'active'
-                    );
-
-                } else {
-
-                    currentFavoriteArtist =
-                        artistName;
-
-                    currentRow = null;
+    artistButton.className =
+        'favorite-button';
 
 
-                    // 他のお気に入りの選択を解除
+    artistButton.addEventListener(
+    	'click',
+    	() => {
 
-                    document
-                        .querySelectorAll(
-                            '.favorite-button'
-                        )
-                        .forEach(
-                            otherButton => {
+        	if (favoriteMode === 'artist') {
+            	favoriteMode = null;
+        	} else {
+            	favoriteMode = 'artist';
+        	}
 
-                                otherButton.classList.remove(
-                                    'active'
-                                );
+        	currentRow = null;
 
-                            }
-                        );
+        	document
+            	.querySelectorAll(
+                	'#artist-nav button'
+            	)
+            	.forEach(
+                	navButton => {
 
+                    	navButton.classList.remove(
+                        	'active'
+                    	);
 
-                    button.classList.add(
-                        'active'
-                    );
+                	}
+            	);
 
-                }
+        	artistButton.classList.toggle(
+            	'active',
+            	favoriteMode === 'artist'
+        	);
 
+        	confidentButton.classList.remove(
+            	'active'
+        	);
 
-                // 50音ボタンの選択を解除
+        	render();
 
-                document
-                    .querySelectorAll(
-                        '#artist-nav button'
-                    )
-                    .forEach(
-                        navButton => {
-
-                            navButton.classList.remove(
-                                'active'
-                            );
-
-                        }
-                    );
-
-
-                render();
-
-            }
-        );
+    	}
+	);
 
 
-        favoriteArtists.appendChild(
-            button
-        );
+    // 自信曲
 
-    });
+    const confidentButton =
+        document.createElement('button');
+
+    confidentButton.textContent =
+        '自信曲';
+
+    confidentButton.className =
+        'favorite-button';
+
+
+    confidentButton.addEventListener(
+    	'click',
+    	() => {
+
+        	if (favoriteMode === 'confident') {
+            	favoriteMode = null;
+        	} else {
+            	favoriteMode = 'confident';
+        	}
+
+        	currentRow = null;
+
+        	document
+            	.querySelectorAll(
+                	'#artist-nav button'
+            	)
+            	.forEach(
+                	navButton => {
+
+                    	navButton.classList.remove(
+                        	'active'
+                    	);
+
+                	}
+				);
+
+        	confidentButton.classList.toggle(
+            	'active',
+            	favoriteMode === 'confident'
+        	);
+
+        	artistButton.classList.remove(
+            	'active'
+        	);
+
+        	render();
+
+    	}
+	);
+
+
+    favoriteArtists.appendChild(
+        artistButton
+    );
+
+    favoriteArtists.appendChild(
+        confidentButton
+    );
+
 }
 
 
@@ -796,7 +858,7 @@ initials.forEach(initial => {
 
                 currentRow = null;
 
-                currentFavoriteArtist = null;
+                favoriteMode = null;
 
 
                 document
@@ -844,7 +906,7 @@ initials.forEach(initial => {
 
             currentRow = initial;
 
-            currentFavoriteArtist = null;
+            favoriteMode = null;
 
 
             // お気に入り選択を解除
