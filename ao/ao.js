@@ -1045,6 +1045,11 @@ songSearch.addEventListener(
 
         searchQuery =
             songSearch.value.trim();
+		
+		searchClear.classList.toggle(
+			'visible',
+			searchQuery.length > 0
+		);
 
         // 検索したら50音・お気に入りを解除
 

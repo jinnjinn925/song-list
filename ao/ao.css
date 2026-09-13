@@ -110,18 +110,19 @@ body {
 }
 
 #search-clear {
+    display: none;
     height: 44px;
     padding: 0 14px;
-
     border: 1px solid #ccc;
     border-radius: 10px;
-
     background: #fff;
-
     font-family: inherit;
     font-size: 14px;
-
     cursor: pointer;
+}
+
+#search-clear.visible {
+    display: block;
 }
 
 #streamer-name {
