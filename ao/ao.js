@@ -1100,6 +1100,8 @@ searchClear.addEventListener(
         songSearch.value = '';
 
         searchQuery = '';
+		
+		searchClear.classList.remove('visible');
 
         render();
 
