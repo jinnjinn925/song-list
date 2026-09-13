@@ -1,16 +1,33 @@
-レパートリー一括登録 — Shirabe + Supabase Edge Function版
+Shirabe + Supabase Edge Function 版（CORS/JWT修正版）
 
-この版はKuromojiをブラウザで読み込みません。
-GitHub Pages → Supabase Edge Function → Shirabe Text API の順に処理します。
+【今回の修正】
+- Supabase公式の corsHeaders を使用
+- OPTIONS（CORS preflight）に204を返す
+- furigana Function の JWT検証を無効化する config.toml を追加
+- 貼り付けた全行を1回のShirabe APIリクエストで処理
+- 1回につき最大300件
 
-重要:
-1. supabase/functions/furigana/index.ts をSupabaseプロジェクトへデプロイしてください。
-2. Edge FunctionはShirabeへ「貼り付けた全曲」を1リクエストで送ります。
-3. GitHub Pages側からShirabeへ直接アクセスしないため、以前のCORS問題を避けます。
-4. Shirabeの匿名Free枠は月10,000リクエスト、1 req/sです。
-5. 英字アーティスト名はスペルだけでは正確な発音を判定できないため、単純な文字読みになる場合があります。プレビューで修正できます。
+【配置】
+GitHub Pages側：
+- addddaodd.html
+- add.js
+- ao_2.css
 
-Supabase CLI例:
-  supabase functions deploy furigana
+Supabase側：
+- supabase/functions/furigana/index.ts
+- supabase/config.toml
 
-GitHub PagesのHTMLは既存の ?id=1 等をそのまま使います。
+【Supabase CLIでデプロイする場合】
+このフォルダをSupabaseプロジェクトのルートに置いて、以下を実行：
+
+supabase functions deploy furigana
+
+config.toml の verify_jwt = false により、ブラウザから直接呼び出せる公開Functionとして動作します。
+
+【重要】
+verify_jwt = false にするとFunction URL自体は認証なしで呼び出せます。
+このFunctionはShirabeへの読み取得だけを行い、Supabaseのsongsテーブルへ直接書き込みません。
+
+【ブラウザ側】
+GitHub Pagesの既存ファイル3つをこのZIPのものに置き換えてください。
+Supabase Functionをデプロイ後、ブラウザをハードリロードして確認してください。
