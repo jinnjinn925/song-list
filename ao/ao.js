@@ -80,7 +80,8 @@ let data = [];
 
 let currentRow = null;
 
-let currentFavoriteArtist = null;
+//let currentFavoriteArtist = null;
+let showFavorites = false;
 
 let showCompleteOnly = false;
 
@@ -394,15 +395,17 @@ function getVisibleSongs() {
 
     // お気に入りアーティストで絞る
 
-    if (currentFavoriteArtist) {
+    if (showFavorites) {
 
-        songs = songs.filter(
-            song =>
-                song.artist ===
-                currentFavoriteArtist
-        );
+    	songs = songs.filter(
+        	song =>
+            	song.confident === true ||
+            	favoriteArtists.includes(
+                	song.artist
+            	)
+    	);
 
-    }
+	}
 
 
     // 50音で絞る
@@ -648,7 +651,6 @@ function displayFavoriteArtists(
 
     favoriteArtists.innerHTML = '';
 
-
     if (
         !favoriteList ||
         favoriteList.length === 0
@@ -665,96 +667,58 @@ function displayFavoriteArtists(
         'block';
 
 
-    favoriteList.forEach(artistName => {
+    const button =
+        document.createElement('button');
 
-        const button =
-            document.createElement('button');
+    button.textContent =
+        'お気に入り';
 
-        button.textContent =
-            artistName;
-
-        button.className =
-            'favorite-button';
+    button.className =
+        'favorite-button';
 
 
-        button.addEventListener(
-            'click',
-            () => {
+    button.addEventListener(
+        'click',
+        () => {
 
-                // 同じボタンをもう一度押すと解除
+            showFavorites =
+                !showFavorites;
 
-                if (
-                    currentFavoriteArtist ===
-                    artistName
-                ) {
+            currentRow =
+                null;
 
-                    currentFavoriteArtist =
-                        null;
+            // 50音ボタンの選択を解除
+            document
+                .querySelectorAll(
+                    '#artist-nav button'
+                )
+                .forEach(
+                    navButton => {
 
-                    button.classList.remove(
-                        'active'
-                    );
-
-                } else {
-
-                    currentFavoriteArtist =
-                        artistName;
-
-                    currentRow = null;
-
-
-                    // 他のお気に入りの選択を解除
-
-                    document
-                        .querySelectorAll(
-                            '.favorite-button'
-                        )
-                        .forEach(
-                            otherButton => {
-
-                                otherButton.classList.remove(
-                                    'active'
-                                );
-
-                            }
+                        navButton.classList.remove(
+                            'active'
                         );
 
-
-                    button.classList.add(
-                        'active'
-                    );
-
-                }
+                    }
+                );
 
 
-                // 50音ボタンの選択を解除
-
-                document
-                    .querySelectorAll(
-                        '#artist-nav button'
-                    )
-                    .forEach(
-                        navButton => {
-
-                            navButton.classList.remove(
-                                'active'
-                            );
-
-                        }
-                    );
+            button.classList.toggle(
+                'active',
+                showFavorites
+            );
 
 
-                render();
+            render();
 
-            }
-        );
+        }
+    );
 
 
-        favoriteArtists.appendChild(
-            button
-        );
+    favoriteArtists.appendChild(
+        button
+    );
 
-    });
 }
 
 
