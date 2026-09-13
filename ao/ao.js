@@ -556,7 +556,7 @@ function displaySongs(songs) {
 
         songDiv.textContent =
             song.title +
-            (song.complete ? ' ★' : '');
+            (song.complete ? ' *' : '');
 
         songDiv.className =
             'song';
@@ -590,7 +590,7 @@ function updateSongCount() {
 
         songCount.textContent =
             `「${searchQuery}」を含む ${visible}曲 / ${total}曲`
-            + `　★最後まで：${complete}曲`;
+            + `　*最後まで：${complete}曲`;
 
     } else if (
         currentRow !== null ||
@@ -600,13 +600,13 @@ function updateSongCount() {
 
         songCount.textContent =
             `${visible}曲 / ${total}曲`
-            + `　★最後まで：${complete}曲`;
+            + `　*最後まで：${complete}曲`;
 
     } else {
 
         songCount.textContent =
             `曲数：${total}曲`
-            + `　★最後まで：${complete}曲`;
+            + `　*最後まで：${complete}曲`;
     }
 }
 
@@ -620,7 +620,7 @@ function updateCompleteButton() {
     if (showCompleteOnly) {
 
         completeFilter.textContent =
-            '★ 最後まで歌える曲だけ表示中';
+            '*最後まで歌える曲';
 
         completeFilter.classList.add(
             'active'
@@ -629,7 +629,7 @@ function updateCompleteButton() {
     } else {
 
         completeFilter.textContent =
-            '★ 最後まで歌える曲だけ表示';
+            '*最後まで歌える曲だけ表示';
 
         completeFilter.classList.remove(
             'active'
