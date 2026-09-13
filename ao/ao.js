@@ -575,15 +575,37 @@ function updateSongCount() {
     const total =
         data.length;
 
+    const visible =
+        getVisibleSongs().length;
+
     const complete =
         data.filter(
             song => song.complete === true
         ).length;
 
 
-    songCount.textContent =
-        `曲数：${total}曲`
-        + `　★最後まで：${complete}曲`;
+    if (searchQuery) {
+
+        songCount.textContent =
+            `「${searchQuery}」を含む ${visible}曲 / ${total}曲`
+            + `　★最後まで：${complete}曲`;
+
+    } else if (
+        currentRow !== null ||
+        currentFavoriteArtist !== null ||
+        showCompleteOnly
+    ) {
+
+        songCount.textContent =
+            `${visible}曲 / ${total}曲`
+            + `　★最後まで：${complete}曲`;
+
+    } else {
+
+        songCount.textContent =
+            `曲数：${total}曲`
+            + `　★最後まで：${complete}曲`;
+    }
 }
 
 
