@@ -408,8 +408,8 @@ main {
 }
 /* 曲リストの半透明パネル */
 #song-list {
-    background: rgba(255, 255, 255, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    background: rgba(155, 155, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 18px;
     padding: 10px 16px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
@@ -421,7 +421,7 @@ main {
 #search-clear,
 .favorite-button {
     background: rgba(255, 255, 255, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
