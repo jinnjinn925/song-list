@@ -1,357 +1,343 @@
 const supabaseUrl = 'https://dgssybbbgnnygmccjltn.supabase.co';
 const supabaseKey = 'sb_publishable_JNz1mi6gysaFjOa0A4I5ow_iDe3PQbd';
-
-let supabaseClient = null;
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 const FURIGANA_API = 'https://shirabe.dev/api/v1/text/furigana';
-const SEPARATOR = '｜';
+const API_INTERVAL_MS = 1100; // Shirabe Free は 1 req/s
 
-function showMessage(text, color = '') {
-    const el = document.getElementById('message');
-    el.textContent = text;
-    el.style.color = color;
+// カタカナ → ひらがな
+function katakanaToHiragana(src) {
+    return String(src || '').replace(/[\u30a1-\u30f6]/g, ch =>
+        String.fromCharCode(ch.charCodeAt(0) - 0x60)
+    );
 }
 
-function katakanaToHiragana(text) {
-    return text.replace(/[\u30a1-\u30f6]/g,
-        ch => String.fromCharCode(ch.charCodeAt(0) - 0x60));
+// 英字を「文字の日本語読み」にするフォールバック。
+// APIが英字をそのまま返した場合でも、最終結果を必ずひらがなにする。
+const LETTER_READING = {
+    A:'えー', B:'びー', C:'しー', D:'でぃー', E:'いー', F:'えふ',
+    G:'じー', H:'えいち', I:'あい', J:'じぇい', K:'けー', L:'える',
+    M:'えむ', N:'えぬ', O:'おー', P:'ぴー', Q:'きゅー', R:'あーる',
+    S:'えす', T:'てぃー', U:'ゆー', V:'ぶい', W:'だぶりゅー', X:'えっくす',
+    Y:'わい', Z:'ぜっと'
+};
+
+function spellAsciiLetters(text) {
+    return String(text).replace(/[A-Za-z]+/g, word =>
+        [...word.toUpperCase()].map(ch => LETTER_READING[ch] || ch).join('')
+    );
 }
 
-function localReading(text) {
-    if (!text) return '';
-    // APIが読みを返さない英字・数字・記号・かなはそのまま。
-    return katakanaToHiragana(text);
-}
+// 整数の日本語読み（0〜999999999999程度）
+const DIGIT = ['ぜろ','いち','に','さん','よん','ご','ろく','なな','はち','きゅう'];
+const SMALL_UNIT = ['', 'じゅう', 'ひゃく', 'せん'];
+const LARGE_UNIT = ['', 'まん', 'おく', 'ちょう'];
 
-/*
- * コピペされた1行を
- *   アーティスト / 曲名
- * に分離する。
- *
- * 優先順位：
- * 1. タブ
- * 2. 半角/全角カンマ
- * 3. 2個以上の空白
- * 4. 最初の空白（最後の保険）
- */
-function splitLine(line) {
-    const cleaned = line
-        .replace(/\u00a0/g, ' ')
-        .replace(/\u3000/g, '　')
-        .trim();
-
-    if (!cleaned) return null;
-
-    // タブ
-    if (cleaned.includes('\t')) {
-        const p = cleaned.split(/\t+/).map(v => v.trim()).filter(Boolean);
-        if (p.length >= 2) {
-            return { artist: p[0], title: p.slice(1).join(' '), ok: true };
+function readFourDigits(n) {
+    if (n === 0) return '';
+    let out = '';
+    const s = String(n).padStart(4, '0');
+    for (let i = 0; i < 4; i++) {
+        const d = Number(s[i]);
+        if (!d) continue;
+        const pos = 3 - i;
+        if (d === 1 && pos > 0) {
+            out += SMALL_UNIT[pos];
+        } else {
+            out += DIGIT[d] + SMALL_UNIT[pos];
         }
     }
-
-    // カンマ
-    const comma = cleaned.split(/[,，]/);
-    if (comma.length >= 2) {
-        const artist = comma.shift().trim();
-        const title = comma.join(',').trim();
-        if (artist && title) {
-            return { artist, title, ok: true };
-        }
-    }
-
-    // 2個以上の半角/全角スペース
-    const wideSpace = cleaned.split(/\s{2,}|　{1,}/).map(v => v.trim()).filter(Boolean);
-    if (wideSpace.length >= 2) {
-        return { artist: wideSpace[0], title: wideSpace.slice(1).join(' '), ok: true };
-    }
-
-    // 最後の保険：最初の空白で分ける。
-    // 例「ヨルシカ 言え。」「Hump Back 拝啓、少年よ」
-    const oneSpace = cleaned.match(/^(\S+)\s+(.+)$/);
-    if (oneSpace) {
-        return {
-            artist: oneSpace[1].trim(),
-            title: oneSpace[2].trim(),
-            ok: true
-        };
-    }
-
-    return { artist: cleaned, title: '', ok: false };
+    return out;
 }
 
-/*
- * アーティスト＋区切り＋曲名を1回のAPI呼び出しで解析する。
- * Shirabeはトークンごとのreadingを返すので、
- * 区切り文字の前後をそれぞれ結合する。
- */
-async function makeReadings(artist, title) {
-    const combined = artist + SEPARATOR + title;
+function numberToJapanese(n) {
+    n = Number(n);
+    if (!Number.isFinite(n) || n < 0 || !Number.isInteger(n)) {
+        return String(n).split('').map(ch => DIGIT[Number(ch)] ?? ch).join('');
+    }
+    if (n === 0) return 'ぜろ';
 
+    let out = '';
+    let groupIndex = 0;
+    while (n > 0) {
+        const group = n % 10000;
+        if (group) {
+            out = readFourDigits(group) + LARGE_UNIT[groupIndex] + out;
+        }
+        n = Math.floor(n / 10000);
+        groupIndex++;
+    }
+    return out;
+}
+
+// 連続する数字を日本語読みへ。
+// 例: 366 → さんびゃくろくじゅうろく
+function spellNumbers(text) {
+    return String(text).replace(/\d+/g, m => {
+        if (m.length > 12) {
+            return [...m].map(ch => DIGIT[Number(ch)]).join('');
+        }
+        return numberToJapanese(m);
+    });
+}
+
+function normalizeReading(text) {
+    let s = katakanaToHiragana(text || '');
+
+    // APIが英字・数字をそのまま返した場合の最終処理
+    s = spellNumbers(s);
+    s = spellAsciiLetters(s);
+
+    // ひらがな・記号以外に残ったカタカナも念のため変換
+    s = katakanaToHiragana(s);
+    return s;
+}
+
+// APIを1回呼んで、artist｜title の2部分をまとめて取得。
+// 1曲につき1リクエストなので、Freeの1 req/s制限にも対応しやすい。
+async function fetchReadingPair(artist, title) {
+    const separator = '｜';
     const response = await fetch(FURIGANA_API, {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ text: combined })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: `${artist}${separator}${title}` })
     });
 
     if (!response.ok) {
-        throw new Error(`ふりがなAPI HTTP ${response.status}`);
+        let detail = '';
+        try {
+            const err = await response.json();
+            detail = err?.error?.message ? `: ${err.error.message}` : '';
+        } catch (_) {}
+        throw new Error(`読みAPIエラー (${response.status})${detail}`);
     }
 
     const data = await response.json();
-
-    if (data.error) {
-        throw new Error(data.error.message || 'ふりがなAPIエラー');
-    }
-
     if (!Array.isArray(data.tokens)) {
-        throw new Error('ふりがなAPIの応答形式が不正です');
+        throw new Error('読みAPIの応答形式が不正です。');
     }
 
-    let artistReading = '';
-    let titleReading = '';
-    let afterSeparator = false;
+    // separator を境界として、tokenごとのreadingを結合
+    let left = '';
+    let right = '';
+    let seenSeparator = false;
 
     for (const token of data.tokens) {
         const surface = token.surface ?? '';
+        const reading = token.reading ?? surface;
 
-        if (surface === SEPARATOR) {
-            afterSeparator = true;
+        if (!seenSeparator && surface === separator) {
+            seenSeparator = true;
             continue;
         }
 
-        const reading = token.reading
-            ? katakanaToHiragana(token.reading)
-            : localReading(surface);
-
-        if (afterSeparator) {
-            titleReading += reading;
+        if (seenSeparator) {
+            right += reading;
         } else {
-            artistReading += reading;
+            left += reading;
+        }
+    }
+
+    // APIが区切り記号を独立tokenにしなかった場合の保険
+    if (!seenSeparator) {
+        const reconstructed = data.tokens
+            .map(t => t.surface ?? '')
+            .join('');
+        const idx = reconstructed.indexOf(separator);
+
+        if (idx >= 0) {
+            let leftReading = '';
+            let rightReading = '';
+            let pos = 0;
+            for (const token of data.tokens) {
+                const surface = token.surface ?? '';
+                const reading = token.reading ?? surface;
+                const end = pos + surface.length;
+
+                if (end <= idx) {
+                    leftReading += reading;
+                } else if (pos >= idx + separator.length) {
+                    rightReading += reading;
+                }
+                pos = end;
+            }
+            left = leftReading;
+            right = rightReading;
         }
     }
 
     return {
-        artist: artistReading,
-        title: titleReading
+        artist: normalizeReading(left),
+        title: normalizeReading(right)
     };
 }
 
-function addInputCell(tr, className, value) {
-    const td = document.createElement('td');
-    const input = document.createElement('input');
-
-    input.type = 'text';
-    input.className = className;
-    input.value = value || '';
-
-    td.appendChild(input);
-    tr.appendChild(td);
+// APIに失敗した場合のローカル最低限フォールバック。
+// 漢字の読みは取得できないが、英字・数字・カタカナはひらがな化する。
+function localFallback(text) {
+    return normalizeReading(text);
 }
 
-function addPreviewRow(item) {
-    const tr = document.createElement('tr');
-
-    addInputCell(tr, 'artist', item.artist);
-    addInputCell(tr, 'artist-initial', item.artistReading);
-    addInputCell(tr, 'title', item.title);
-    addInputCell(tr, 'title-initial', item.titleReading);
-
-    document.getElementById('preview-body').appendChild(tr);
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-window.addEventListener('DOMContentLoaded', () => {
-    const streamerId = new URLSearchParams(location.search).get('id');
+// HTML属性へ安全に入れるためのエスケープ
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+// 入力1行を artist/title に分割
+function parseLine(line) {
+    const trimmed = line.trim();
+    if (!trimmed) return null;
+
+    // まずタブ、半角/全角カンマ
+    let parts = trimmed.split(/[\t,，]/);
+    if (parts.length >= 2) {
+        return {
+            artist: parts[0].trim(),
+            title: parts.slice(1).join(',').trim()
+        };
+    }
+
+    // 全角スペース、2つ以上の半角スペース
+    const wsParts = trimmed.split(/(?:　+|\s{2,})/);
+    if (wsParts.length >= 2) {
+        return {
+            artist: wsParts[0].trim(),
+            title: wsParts.slice(1).join(' ').trim()
+        };
+    }
+
+    // 最後の保険：最初の半角スペースで分割
+    const firstSpace = trimmed.search(/\s/);
+    if (firstSpace >= 0) {
+        return {
+            artist: trimmed.slice(0, firstSpace).trim(),
+            title: trimmed.slice(firstSpace + 1).trim()
+        };
+    }
+
+    return { artist: trimmed, title: '' };
+}
+
+window.addEventListener('load', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const streamerId = urlParams.get('id');
 
     if (streamerId) {
         document.getElementById('streamer-id').value = streamerId;
     } else {
-        showMessage('URLに配信者ID（?id=1 など）が付いていません。', 'red');
+        alert('URLに配信者ID (?id=1 など) が付いていません。');
     }
-
-    if (!window.supabase) {
-        showMessage('Supabaseの読み込みに失敗しました。', 'red');
-        return;
-    }
-
-    supabaseClient = window.supabase.createClient(
-        supabaseUrl,
-        supabaseKey
-    );
-
-    showMessage('準備完了。曲リストを貼り付けてください。', 'green');
 });
 
 document.getElementById('parse-btn').addEventListener('click', async () => {
-    const raw = document.getElementById('csv-input').value.trim();
-
-    if (!raw) {
+    const textInput = document.getElementById('csv-input').value.trim();
+    if (!textInput) {
         alert('曲リストを貼り付けてください。');
         return;
     }
 
-    const lines = raw.split(/\r?\n/);
-    const parsed = [];
-    const invalid = [];
+    const lines = textInput.split(/\r?\n/);
+    const items = lines.map(parseLine).filter(item => item && (item.artist || item.title));
 
-    for (let i = 0; i < lines.length; i++) {
-        if (!lines[i].trim()) continue;
-
-        const item = splitLine(lines[i]);
-
-        if (!item || !item.ok) {
-            invalid.push(i + 1);
-            if (document.getElementById('keep-invalid').checked) {
-                parsed.push({
-                    artist: lines[i].trim(),
-                    title: '',
-                    artistReading: '',
-                    titleReading: ''
-                });
-            }
-            continue;
-        }
-
-        parsed.push({
-            artist: item.artist,
-            title: item.title,
-            artistReading: '',
-            titleReading: ''
-        });
-    }
-
-    if (!parsed.length) {
-        alert('曲名を読み取れる行がありませんでした。');
+    if (!items.length) {
+        alert('解析できる曲がありません。');
         return;
     }
 
-    const button = document.getElementById('parse-btn');
-    button.disabled = true;
+    const previewBody = document.getElementById('preview-body');
+    const message = document.getElementById('message');
+    previewBody.innerHTML = '';
+    document.getElementById('step-2').style.display = 'block';
 
-    const body = document.getElementById('preview-body');
-    body.innerHTML = '';
+    let successCount = 0;
 
-    let completed = 0;
+    for (let i = 0; i < items.length; i++) {
+        const { artist, title } = items[i];
 
-    try {
-        for (const item of parsed) {
-            if (!item.title) {
-                addPreviewRow(item);
-                continue;
-            }
+        message.style.color = '';
+        message.textContent = `読みを生成中… ${i + 1} / ${items.length}`;
 
-            showMessage(
-                `読み仮名を生成しています… ${completed + 1} / ${parsed.filter(x => x.title).length}`
-            );
+        let artistInitial = localFallback(artist);
+        let titleInitial = localFallback(title);
 
-            try {
-                const readings = await makeReadings(item.artist, item.title);
-                item.artistReading = readings.artist;
-                item.titleReading = readings.title;
-            } catch (error) {
-                console.error(error);
-                // API失敗時も入力自体は残す。
-                item.artistReading = localReading(item.artist);
-                item.titleReading = localReading(item.title);
-            }
-
-            addPreviewRow(item);
-            completed++;
+        try {
+            const reading = await fetchReadingPair(artist, title);
+            artistInitial = reading.artist || artistInitial;
+            titleInitial = reading.title || titleInitial;
+        } catch (error) {
+            console.warn(`読み生成失敗 (${artist} / ${title}):`, error);
         }
 
-        document.getElementById('step-2').style.display = 'block';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="padding:6px;"><input type="text" class="row-artist" value="${escapeHtml(artist)}" style="width:90%;"></td>
+            <td style="padding:6px;"><input type="text" class="row-artist-initial" value="${escapeHtml(artistInitial)}" style="width:90%;"></td>
+            <td style="padding:6px;"><input type="text" class="row-title" value="${escapeHtml(title)}" style="width:90%;"></td>
+            <td style="padding:6px;"><input type="text" class="row-title-initial" value="${escapeHtml(titleInitial)}" style="width:90%;"></td>
+        `;
+        previewBody.appendChild(tr);
+        successCount++;
 
-        let message = `${parsed.length} 件を読み込みました。読み仮名を確認してください。`;
-
-        if (invalid.length) {
-            message += `（${invalid.length} 行は区切りを判定できませんでした）`;
+        // Free枠の1 req/sを超えないように待つ（最後の行では不要）
+        if (i < items.length - 1) {
+            await sleep(API_INTERVAL_MS);
         }
-
-        showMessage(message, 'green');
-
-    } finally {
-        button.disabled = false;
     }
+
+    message.style.color = 'green';
+    message.textContent = `${successCount} 件を解析しました。読みを確認してください。`;
 });
 
 document.getElementById('submit-all-btn').addEventListener('click', async () => {
-    const streamerId = parseInt(
-        document.getElementById('streamer-id').value,
-        10
-    );
-
-    if (!supabaseClient) {
-        showMessage('Supabaseの準備ができていません。', 'red');
-        return;
-    }
-
-    if (!Number.isInteger(streamerId)) {
-        showMessage(
-            '配信者IDが正しくありません。URLの ?id=数字 を確認してください。',
-            'red'
-        );
-        return;
-    }
-
+    const streamerId = parseInt(document.getElementById('streamer-id').value, 10);
+    const rows = document.querySelectorAll('#preview-body tr');
     const insertData = [];
 
-    document.querySelectorAll('#preview-body tr').forEach(tr => {
-        const artist = tr.querySelector('.artist').value.trim();
-        const artistInitial = tr.querySelector('.artist-initial').value.trim();
-        const title = tr.querySelector('.title').value.trim();
-        const titleInitial = tr.querySelector('.title-initial').value.trim();
+    rows.forEach(tr => {
+        const artist = tr.querySelector('.row-artist').value.trim();
+        const artistInitial = tr.querySelector('.row-artist-initial').value.trim();
+        const title = tr.querySelector('.row-title').value.trim();
+        const titleInitial = tr.querySelector('.row-title-initial').value.trim();
 
-        if (!artist || !title) return;
-
-        insertData.push({
-            streamer_id: streamerId,
-            artist,
-            artist_initial: artistInitial,
-            title,
-            title_initial: titleInitial,
-            complete: true,
-            confident: false
-        });
+        if (artist && title) {
+            insertData.push({
+                streamer_id: streamerId,
+                artist,
+                artist_initial: artistInitial,
+                title,
+                title_initial: titleInitial,
+                complete: true,
+                confident: false
+            });
+        }
     });
 
     if (!insertData.length) {
-        showMessage('登録できる曲がありません。', 'red');
+        alert('登録する曲がありません。');
         return;
     }
 
-    const button = document.getElementById('submit-all-btn');
-    button.disabled = true;
-    showMessage(`${insertData.length} 件を登録中…`);
+    const message = document.getElementById('message');
+    message.style.color = '';
+    message.textContent = '送信中...';
 
-    try {
-        const { error } = await supabaseClient
-            .from('songs')
-            .insert(insertData);
+    const { error } = await supabaseClient.from('songs').insert(insertData);
 
-        if (error) {
-            console.error(error);
-            showMessage('登録エラー: ' + error.message, 'red');
-            return;
-        }
-
-        showMessage(
-            `🎉 ${insertData.length} 件を一括登録しました！`,
-            'green'
-        );
-
+    if (error) {
+        message.style.color = 'red';
+        message.textContent = 'エラー: ' + error.message;
+    } else {
+        message.style.color = 'green';
+        message.textContent = `🎉 ${insertData.length} 件を一括登録しました！`;
         document.getElementById('csv-input').value = '';
-        document.getElementById('preview-body').innerHTML = '';
         document.getElementById('step-2').style.display = 'none';
-
-    } catch (error) {
-        console.error(error);
-        showMessage(
-            '通信エラーが発生しました。Consoleを確認してください。',
-            'red'
-        );
-    } finally {
-        button.disabled = false;
     }
 });
