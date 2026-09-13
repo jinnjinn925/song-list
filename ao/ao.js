@@ -383,9 +383,7 @@ function compareReading(a, b) {
 }
 
 
-// =========================
-// 表示する曲を決定
-// =========================
+
 
 // =========================
 // 表示する曲を決定
@@ -437,27 +435,35 @@ function getVisibleSongs() {
 
     if (searchQuery) {
 
-        const query =
-            searchQuery.toLowerCase();
+		const query =
+			  searchQuery.toLowerCase();
 
-        songs = songs.filter(song => {
+		songs = songs.filter(song => {
 
-            const artist =
-                (song.artist || '')
-                    .toLowerCase();
+			const artist =
+				  (song.artist || '')
+						.toLowerCase();
 
-            const title =
-                (song.title || '')
-                    .toLowerCase();
+			const title =
+				  (song.title || '')
+						.toLowerCase();
 
-            return (
-                artist.includes(query) ||
-                title.includes(query)
-            );
+			const artistInitial =
+				  (song.artist_initial || '')
+						.toLowerCase();
 
-        });
+			const titleInitial =
+				  (song.title_initial || '')
+						.toLowerCase();
 
-    }
+			return (
+				artist.includes(query) ||
+				title.includes(query) ||
+				artistInitial.includes(query) ||
+				titleInitial.includes(query)
+			);
+		});
+	}
 
 
     return songs;
