@@ -624,7 +624,7 @@ function updateSongCount() {
 
     } else if (
         currentRow !== null ||
-        showFavorites ||
+        favoriteMode ||
         showCompleteOnly
     ) {
 
