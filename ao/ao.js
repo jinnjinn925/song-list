@@ -42,8 +42,6 @@ const favoriteSection =
 const favoriteArtists =
     document.getElementById('favorite-artists');
 
-const menuButton =
-    document.getElementById('menu-button');
 
 const menuPanel =
     document.getElementById('menu-panel');
@@ -1038,14 +1036,7 @@ async function loadSongs() {
 // 検索メニュー
 // =========================
 
-menuButton.addEventListener(
-    'click',
-    () => {
 
-        menuPanel.classList.toggle('open');
-
-    }
-);
 
 
 songSearch.addEventListener(
