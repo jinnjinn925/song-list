@@ -408,8 +408,8 @@ main {
 }
 /* 曲リストの半透明パネル */
 #song-list {
-    background: rgba(155, 155, 255, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.5);
+    background: rgba(155, 155, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0);
     border-radius: 18px;
     padding: 10px 16px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
@@ -429,4 +429,30 @@ main {
 /* フォーカス時も透明感を維持 */
 #song-search:focus {
     background: rgba(255, 255, 255, 0.45);
+}
+
+/* 下部固定エリアを半透明にする */
+#bottom-controls {
+    background: rgba(255, 255, 255, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* 最後まで歌える曲ボタン */
+#complete-filter {
+    background: rgba(255, 255, 255, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* ソート関連のボタン・セレクト */
+#sort-select,
+#sort-button,
+#view-toggle {
+    background: rgba(255, 255, 255, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
