@@ -22,7 +22,9 @@ window.addEventListener('load', () => {
     }
 
     // ★ cdnjs の辞書フォルダ（dict/）を指定
-    kuromoji.builder({ DIC_URL: "https://cdnjs.cloudflare.com/ajax/libs/kuromoji.js/0.8.0/dict/" }).build((err, _tokenizer) => {
+    kuromoji.builder({
+    		DIC_URL: "https://cdn.jsdelivr.net/npm/kuromoji@0.1.2/dict/"
+		}).build((err, _tokenizer) => {
         if (err) {
             console.error("kuromoji読み込み失敗:", err);
             document.getElementById('message').textContent = '辞書の読み込みに失敗しました。';
