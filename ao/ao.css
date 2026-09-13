@@ -91,22 +91,30 @@ body {
     flex: 1;
     min-width: 0;
 
-    padding: 10px 12px;
+    height: 44px;
+    padding: 0 14px;
 
     border: 1px solid #ccc;
-    border-radius: 8px;
+    border-radius: 10px;
 
     background: #fff;
 
     font-family: inherit;
     font-size: 16px;
+
+    outline: none;
+}
+
+#song-search:focus {
+    border-color: #888;
 }
 
 #search-clear {
-    padding: 0 12px;
+    height: 44px;
+    padding: 0 14px;
 
     border: 1px solid #ccc;
-    border-radius: 8px;
+    border-radius: 10px;
 
     background: #fff;
 
