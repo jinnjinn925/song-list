@@ -1,18 +1,16 @@
-# レパートリー一括登録 v3
+レパートリー一括登録 — Shirabe + Supabase Edge Function版
 
-Kuromoji.js の辞書ロードと解析を Web Worker に分離した版です。
-前版のようにページ本体を固まらせない構成です。
+この版はKuromojiをブラウザで読み込みません。
+GitHub Pages → Supabase Edge Function → Shirabe Text API の順に処理します。
 
-依存:
-- Supabase JS: jsDelivr
-- Kuromoji.js 0.1.2: jsDelivr
-- Kuromoji IPA辞書: jsDelivr
+重要:
+1. supabase/functions/furigana/index.ts をSupabaseプロジェクトへデプロイしてください。
+2. Edge FunctionはShirabeへ「貼り付けた全曲」を1リクエストで送ります。
+3. GitHub Pages側からShirabeへ直接アクセスしないため、以前のCORS問題を避けます。
+4. Shirabeの匿名Free枠は月10,000リクエスト、1 req/sです。
+5. 英字アーティスト名はスペルだけでは正確な発音を判定できないため、単純な文字読みになる場合があります。プレビューで修正できます。
 
-GitHub Pagesに以下4ファイルを同じフォルダへ置いてください。
-- addddaodd.html
-- add.js
-- furigana-worker.js
-- ao_2.css
+Supabase CLI例:
+  supabase functions deploy furigana
 
-URL例:
-addddaodd.html?id=1
+GitHub PagesのHTMLは既存の ?id=1 等をそのまま使います。

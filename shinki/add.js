@@ -2,216 +2,126 @@ const supabaseUrl = 'https://dgssybbbgnnygmccjltn.supabase.co';
 const supabaseKey = 'sb_publishable_JNz1mi6gysaFjOa0A4I5ow_iDe3PQbd';
 const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-const $ = id => document.getElementById(id);
-let worker = null;
-let workerReady = false;
-let requestId = 0;
-const pending = new Map();
+// Supabase Edge Function endpoint.
+// Deploy the function in supabase/functions/furigana.
+const FURIGANA_FUNCTION_URL =
+    `${supabaseUrl}/functions/v1/furigana`;
 
-function setMessage(text, color = '') {
-    $('message').textContent = text;
-    $('message').style.color = color;
+window.addEventListener('load', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const streamerId = urlParams.get('id');
+
+    if (streamerId) {
+        document.getElementById('streamer-id').value = streamerId;
+    } else {
+        alert('URLに配信者ID (?id=1 など) が付いていません。');
+    }
+});
+
+function parseInput(text) {
+    return text.split(/\r?\n/).map(line => line.trim()).filter(Boolean).map(line => {
+        // tab / comma / full-width comma / 2+ spaces
+        const parts = line.split(/\t|,|，|\s{2,}/);
+        return {
+            artist: (parts[0] || '').trim(),
+            title: (parts.slice(1).join(',') || '').trim()
+        };
+    }).filter(row => row.artist || row.title);
 }
 
 function escapeHtml(value) {
-    return String(value ?? '').replace(/[&<>"']/g, ch => ({
-        '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
-    }[ch]));
+    return String(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
 }
 
-function parseLine(line) {
-    const s = line.trim();
-    if (!s) return null;
-
-    const parts = s.split(/[\t,，]/);
-    if (parts.length >= 2) {
-        return {
-            artist: parts[0].trim(),
-            title: parts.slice(1).join(',').trim()
-        };
-    }
-
-    const ws = s.split(/\s{2,}/);
-    if (ws.length >= 2) {
-        return {
-            artist: ws[0].trim(),
-            title: ws.slice(1).join(' ').trim()
-        };
-    }
-
-    return null;
-}
-
-function startWorker() {
-    if (worker) return;
-
-    worker = new Worker('furigana-worker.js');
-
-    worker.onmessage = event => {
-        const data = event.data || {};
-
-        if (data.type === 'starting') {
-            setMessage('日本語辞書を読み込んでいます。初回は少し時間がかかります…');
-            return;
-        }
-
-        if (data.type === 'ready') {
-            workerReady = true;
-            setMessage('日本語辞書の準備が完了しました。');
-            return;
-        }
-
-        if (data.type === 'result' || data.type === 'error') {
-            const p = pending.get(data.id);
-            if (!p) return;
-            pending.delete(data.id);
-
-            if (data.type === 'error') p.reject(new Error(data.message));
-            else p.resolve(data.reading);
-        }
-    };
-
-    worker.onerror = event => {
-        console.error('Furigana Worker error:', event);
-        workerReady = false;
-        setMessage('ふりがなエンジンの読み込みに失敗しました。CDNへの接続を確認してください。', 'red');
-        for (const p of pending.values()) p.reject(new Error('Worker error'));
-        pending.clear();
-    };
-}
-
-function waitForWorkerReady(timeoutMs = 60000) {
-    startWorker();
-
-    if (workerReady) return Promise.resolve();
-
-    return new Promise((resolve, reject) => {
-        const start = Date.now();
-
-        const timer = setInterval(() => {
-            if (workerReady) {
-                clearInterval(timer);
-                resolve();
-                return;
-            }
-            if (Date.now() - start >= timeoutMs) {
-                clearInterval(timer);
-                reject(new Error('辞書の読み込みがタイムアウトしました。'));
-            }
-        }, 100);
+async function generateReadings(rows) {
+    const res = await fetch(FURIGANA_FUNCTION_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rows })
     });
-}
 
-function convertToHiragana(text) {
-    return new Promise((resolve, reject) => {
-        const id = ++requestId;
-        pending.set(id, { resolve, reject });
-        worker.postMessage({ type: 'convert', id, text });
-    });
-}
+    let data = null;
+    try {
+        data = await res.json();
+    } catch (_) {}
 
-function buildRow(artist, artistReading, title, titleReading) {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-        <td style="padding:6px;">
-            <input type="text" class="row-artist" value="${escapeHtml(artist)}" style="width:100%;">
-        </td>
-        <td style="padding:6px;">
-            <input type="text" class="row-artist-initial" value="${escapeHtml(artistReading)}" style="width:100%;">
-        </td>
-        <td style="padding:6px;">
-            <input type="text" class="row-title" value="${escapeHtml(title)}" style="width:100%;">
-        </td>
-        <td style="padding:6px;">
-            <input type="text" class="row-title-initial" value="${escapeHtml(titleReading)}" style="width:100%;">
-        </td>
-    `;
-    return tr;
-}
-
-window.addEventListener('load', () => {
-    const streamerId = new URLSearchParams(location.search).get('id');
-
-    if (streamerId) {
-        $('streamer-id').value = streamerId;
-    } else {
-        setMessage('URLに配信者ID（?id=1 など）が付いていません。', 'red');
+    if (!res.ok) {
+        const detail = data?.error || `HTTP ${res.status}`;
+        throw new Error(detail);
     }
 
-    // ここでは辞書をロードしない。
-    // ボタンを押した時だけWorkerを起動するので、ページが固まらない。
-});
+    if (!Array.isArray(data?.rows)) {
+        throw new Error('Edge Functionから不正な形式の結果が返りました。');
+    }
 
-$('parse-btn').addEventListener('click', async () => {
-    const textInput = $('csv-input').value.trim();
+    return data.rows;
+}
+
+document.getElementById('parse-btn').addEventListener('click', async () => {
+    const textInput = document.getElementById('csv-input').value.trim();
     if (!textInput) {
         alert('曲リストを貼り付けてください。');
         return;
     }
 
-    const lines = textInput.split(/\r?\n/);
-    const parsedRows = [];
-    let skipped = 0;
-
-    for (const line of lines) {
-        const parsed = parseLine(line);
-        if (!parsed || !parsed.artist || !parsed.title) {
-            if (line.trim()) skipped++;
-            continue;
-        }
-        parsedRows.push(parsed);
-    }
-
-    if (!parsedRows.length) {
-        setMessage('「アーティスト,曲名」の形式で入力してください。', 'red');
+    const rows = parseInput(textInput);
+    if (!rows.length) {
+        alert('アーティスト名と曲名を確認してください。');
         return;
     }
 
-    const parseButton = $('parse-btn');
-    parseButton.disabled = true;
-    parseButton.style.opacity = '0.6';
+    const button = document.getElementById('parse-btn');
+    const message = document.getElementById('message');
+    button.disabled = true;
+    message.style.color = '';
+    message.textContent = `${rows.length} 件の読みを生成しています…`;
 
     try {
-        await waitForWorkerReady();
+        const resultRows = await generateReadings(rows);
 
-        const body = $('preview-body');
-        body.innerHTML = '';
+        const previewBody = document.getElementById('preview-body');
+        previewBody.innerHTML = '';
 
-        for (let i = 0; i < parsedRows.length; i++) {
-            const row = parsedRows[i];
-            setMessage(`ふりがなを生成中… ${i + 1} / ${parsedRows.length}`);
+        resultRows.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="padding:6px;">
+                    <input type="text" class="row-artist" value="${escapeHtml(row.artist)}" style="width:90%;">
+                </td>
+                <td style="padding:6px;">
+                    <input type="text" class="row-artist-initial" value="${escapeHtml(row.artist_initial)}" style="width:90%;">
+                </td>
+                <td style="padding:6px;">
+                    <input type="text" class="row-title" value="${escapeHtml(row.title)}" style="width:90%;">
+                </td>
+                <td style="padding:6px;">
+                    <input type="text" class="row-title-initial" value="${escapeHtml(row.title_initial)}" style="width:90%;">
+                </td>
+            `;
+            previewBody.appendChild(tr);
+        });
 
-            const [artistReading, titleReading] = await Promise.all([
-                convertToHiragana(row.artist),
-                convertToHiragana(row.title)
-            ]);
-
-            body.appendChild(buildRow(
-                row.artist, artistReading,
-                row.title, titleReading
-            ));
-        }
-
-        $('step-2').style.display = 'block';
-        setMessage(
-            `${parsedRows.length} 件を解析しました。読みを確認してください。` +
-            (skipped ? `（${skipped} 行は形式を認識できず無視）` : ''),
-            'green'
-        );
-    } catch (err) {
-        console.error(err);
-        setMessage('ふりがなの生成に失敗しました: ' + err.message, 'red');
+        document.getElementById('step-2').style.display = 'block';
+        message.style.color = 'green';
+        message.textContent = `${resultRows.length} 件を解析しました。読みを確認してください。`;
+    } catch (error) {
+        console.error(error);
+        message.style.color = 'red';
+        message.textContent = '読みの生成に失敗しました: ' + error.message;
     } finally {
-        parseButton.disabled = false;
-        parseButton.style.opacity = '';
+        button.disabled = false;
     }
 });
 
-$('submit-all-btn').addEventListener('click', async () => {
-    const streamerId = parseInt($('streamer-id').value, 10);
-
+document.getElementById('submit-all-btn').addEventListener('click', async () => {
+    const streamerId = parseInt(document.getElementById('streamer-id').value, 10);
     if (!Number.isInteger(streamerId)) {
-        alert('配信者IDが正しくありません。URLを確認してください。');
+        alert('配信者IDが正しくありません。');
         return;
     }
 
@@ -242,24 +152,18 @@ $('submit-all-btn').addEventListener('click', async () => {
         return;
     }
 
-    const button = $('submit-all-btn');
-    button.disabled = true;
-    button.style.opacity = '0.6';
-    setMessage('Supabaseへ登録中…');
+    const message = document.getElementById('message');
+    message.textContent = '送信中...';
 
-    try {
-        const { error } = await supabaseClient.from('songs').insert(insertData);
-        if (error) throw error;
+    const { error } = await supabaseClient.from('songs').insert(insertData);
 
-        setMessage(`🎉 ${insertData.length} 件を一括登録しました！`, 'green');
-        $('csv-input').value = '';
-        $('preview-body').innerHTML = '';
-        $('step-2').style.display = 'none';
-    } catch (error) {
-        console.error('Supabase insert error:', error);
-        setMessage('登録エラー: ' + (error.message || error), 'red');
-    } finally {
-        button.disabled = false;
-        button.style.opacity = '';
+    if (error) {
+        message.style.color = 'red';
+        message.textContent = 'エラー: ' + error.message;
+    } else {
+        message.style.color = 'green';
+        message.textContent = `🎉 ${insertData.length} 件を一括登録しました！`;
+        document.getElementById('csv-input').value = '';
+        document.getElementById('step-2').style.display = 'none';
     }
 });
