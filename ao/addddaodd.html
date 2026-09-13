@@ -11,7 +11,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <!-- 2. kuromoji.js（deferを付けて先に読み込みを確保） -->
-    <script src="https://cdn.jsdelivr.net/npm/kuromoji@0.8.0/build/kuromoji.min.js" defer></script>
+    <!-- npm/kuromoji/build/kuromoji.js に変更（バージョン番号を外す） -->
+	<script src="https://cdn.jsdelivr.net/npm/kuromoji@latest/build/kuromoji.js" defer></script>
     
     <!-- 3. 自作のJS（deferを付けてkuromojiの後に実行させる） -->
     <script src="add.js" defer></script>
