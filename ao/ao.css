@@ -394,17 +394,30 @@ body {
     }
 }
 /* 背景写真 */
+/* 既存の body から背景プロパティを外す */
 body {
-    background-image: url("background.jpg");
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    background-repeat: no-repeat;
+  /* background-image などの指定を削除 */
+  position: relative;
+}
+
+/* 擬似要素で固定背景を作成 */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url("background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: -1; /* コンテンツの背面に配置 */
 }
 
 /* メイン部分を少し透過 */
 main {
-    background: rgba(255, 255, 255, 20);
+    background: rgba(255, 255, 255, 0.2);
 }
 /* 曲リストの半透明パネル */
 #song-list {
