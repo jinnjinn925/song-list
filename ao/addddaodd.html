@@ -7,13 +7,13 @@
     <title>レパートリー一括登録</title>
     <link rel="stylesheet" href="ao_2.css">
 
-    <!-- 1. Supabase SDK -->
+    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <!-- 2. kuromoji.js 本体（deferを外して確実に先に読み込ませる） -->
-    <script src="https://unpkg.com/kuromoji@0.8.0/build/kuromoji.js"></script>
 
-    <!-- 3. 自作の処理スクリプト -->
+    <!-- ★ cdnjs から kuromoji.js を読み込む -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/kuromoji.js/0.8.0/kuromoji.min.js"></script>
+
+    <!-- 処理スクリプト -->
     <script src="add.js" defer></script>
 </head>
 <body>
