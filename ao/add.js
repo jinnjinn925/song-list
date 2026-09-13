@@ -4,8 +4,7 @@ const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 let tokenizer = null;
 
-// 1. ページを開いたときに URLからIDを取得 ＆ kuromojiの辞書を準備
-// 【変更】'DOMContentLoaded' から 'load' に変更して、kuromoji.jsの読み込み完了を確実にする
+// ページと外部スクリプトがすべて読み込まれたら実行
 window.addEventListener('load', () => {
     const urlParams = new URLSearchParams(window.location.search);
     const streamerId = urlParams.get('id');
@@ -16,14 +15,17 @@ window.addEventListener('load', () => {
         alert('URLに配信者ID (?id=1 など) が付いていません。');
     }
 
-    if (typeof kuromoji === 'undefined') {
-        console.error("kuromoji.js の読み込みに失敗しました。");
-        document.getElementById('message').textContent = 'ライブラリの読み込みに失敗しました。';
+    // kuromoji の存在チェック（window.kuromoji）
+    if (typeof window.kuromoji === 'undefined' && typeof kuromoji === 'undefined') {
+        console.error("kuromoji.js が読み込まれていません。");
+        document.getElementById('message').textContent = 'ライブラリの読み込みに失敗しました。ページを再読み込みしてください。';
         return;
     }
 
-    // unpkg 経由で辞書データを取得する設定
-    kuromoji.builder({ DIC_URL: "https://unpkg.com/kuromoji@0.8.0/dict/" }).build((err, _tokenizer) => {
+    const k = window.kuromoji || kuromoji;
+
+    // unpkg から辞書を取得
+    k.builder({ DIC_URL: "https://unpkg.com/kuromoji@0.8.0/dict/" }).build((err, _tokenizer) => {
         if (err) {
             console.error("kuromoji読み込み失敗:", err);
             document.getElementById('message').textContent = '辞書の読み込みに失敗しました。';
