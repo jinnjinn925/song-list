@@ -31,9 +31,9 @@ const message =
     document.getElementById('message');
 
 
-// =========================
-// 驟堺ｿ｡閠・D
-// =========================
+// ========================================
+// Get streamer ID from URL
+// ========================================
 
 window.addEventListener('load', () => {
 
@@ -54,12 +54,11 @@ window.addEventListener('load', () => {
     } else {
 
         alert(
-            'URL縺ｫ驟堺ｿ｡閠・D・・id=1 縺ｪ縺ｩ・峨′莉倥＞縺ｦ縺・∪縺帙ｓ縲・
+            'Streamer ID is missing from the URL.'
         );
 
     }
 
-    // 譛蛻昴°繧・陦檎畑諢・
     for (let i = 0; i < 5; i++) {
         addInputRow();
     }
@@ -67,9 +66,9 @@ window.addEventListener('load', () => {
 });
 
 
-// =========================
-// 豁後∴繧狗憾諷・
-// =========================
+// ========================================
+// Create complete status select
+// ========================================
 
 function createStatusSelect(
     value = 'complete'
@@ -81,29 +80,55 @@ function createStatusSelect(
     select.className =
         'row-complete';
 
-    select.innerHTML = `
-        <option value="complete">
-            譛蠕後∪縺ｧ豁後∴繧・
-        </option>
+    const optionComplete =
+        document.createElement('option');
 
-        <option value="partial">
-            騾比ｸｭ縺ｾ縺ｧ豁後∴繧・
-        </option>
+    optionComplete.value =
+        'complete';
 
-        <option value="practice">
-            邱ｴ鄙剃ｸｭ
-        </option>
-    `;
+    optionComplete.textContent =
+        'Complete';
 
-    select.value = value;
+    const optionPartial =
+        document.createElement('option');
+
+    optionPartial.value =
+        'partial';
+
+    optionPartial.textContent =
+        'Partial';
+
+    const optionPractice =
+        document.createElement('option');
+
+    optionPractice.value =
+        'practice';
+
+    optionPractice.textContent =
+        'Practice';
+
+    select.appendChild(
+        optionComplete
+    );
+
+    select.appendChild(
+        optionPartial
+    );
+
+    select.appendChild(
+        optionPractice
+    );
+
+    select.value =
+        value;
 
     return select;
 }
 
 
-// =========================
-// 蜈･蜉幄｡後ｒ霑ｽ蜉
-// =========================
+// ========================================
+// Add input row
+// ========================================
 
 function addInputRow(
     artist = '',
@@ -117,7 +142,7 @@ function addInputRow(
         document.createElement('tr');
 
 
-    // 繧｢繝ｼ繝・ぅ繧ｹ繝・
+    // Artist
 
     const artistTd =
         document.createElement('td');
@@ -132,7 +157,7 @@ function addInputRow(
         'row-artist';
 
     artistInput.placeholder =
-        '繧｢繝ｼ繝・ぅ繧ｹ繝・;
+        'Artist';
 
     artistInput.value =
         artist;
@@ -142,7 +167,7 @@ function addInputRow(
     );
 
 
-    // 譖ｲ蜷・
+    // Title
 
     const titleTd =
         document.createElement('td');
@@ -157,7 +182,7 @@ function addInputRow(
         'row-title';
 
     titleInput.placeholder =
-        '譖ｲ蜷・;
+        'Title';
 
     titleInput.value =
         title;
@@ -167,7 +192,7 @@ function addInputRow(
     );
 
 
-    // 豁後∴繧狗憾諷・
+    // Complete status
 
     const completeTd =
         document.createElement('td');
@@ -179,7 +204,7 @@ function addInputRow(
     );
 
 
-    // 閾ｪ菫｡譖ｲ
+    // Confident
 
     const confidentTd =
         document.createElement('td');
@@ -204,7 +229,7 @@ function addInputRow(
     );
 
 
-    // 繧､繝ｳ繝医Ο
+    // Intro
 
     const introTd =
         document.createElement('td');
@@ -219,7 +244,7 @@ function addInputRow(
         'row-intro';
 
     introInput.placeholder =
-        '莉ｻ諢・;
+        'Optional';
 
     introInput.value =
         intro;
@@ -229,7 +254,7 @@ function addInputRow(
     );
 
 
-    // 蜑企勁
+    // Delete
 
     const deleteTd =
         document.createElement('td');
@@ -244,7 +269,7 @@ function addInputRow(
         'button';
 
     deleteButton.textContent =
-        'ﾃ・;
+        'X';
 
     deleteButton.className =
         'delete-button';
@@ -255,7 +280,6 @@ function addInputRow(
 
             tr.remove();
 
-            // 譛菴・陦後・谿九☆
             if (
                 inputBody.children.length === 0
             ) {
@@ -303,9 +327,9 @@ function addInputRow(
 }
 
 
-// =========================
-// 蜈･蜉帛・螳ｹ繧貞叙蠕・
-// =========================
+// ========================================
+// Collect input rows
+// ========================================
 
 function collectInputRows() {
 
@@ -345,8 +369,6 @@ function collectInputRows() {
             ).value.trim();
 
 
-        // 螳悟・縺ｫ遨ｺ縺ｮ陦後・辟｡隕・
-
         if (
             !artist &&
             !title
@@ -359,11 +381,20 @@ function collectInputRows() {
 
         result.push({
 
-            artist,
-            title,
-            complete,
-            confident,
-            intro
+            artist:
+                artist,
+
+            title:
+                title,
+
+            complete:
+                complete,
+
+            confident:
+                confident,
+
+            intro:
+                intro
 
         });
 
@@ -375,9 +406,9 @@ function collectInputRows() {
 }
 
 
-// =========================
-// 縺ｲ繧峨′縺ｪ逕滓・
-// =========================
+// ========================================
+// Generate readings
+// ========================================
 
 async function generateReadings(rows) {
 
@@ -431,7 +462,6 @@ async function generateReadings(rows) {
     } catch (error) {
 
         console.error(
-            'JSON隗｣譫舌お繝ｩ繝ｼ:',
             error
         );
 
@@ -458,7 +488,7 @@ async function generateReadings(rows) {
     ) {
 
         throw new Error(
-            'Edge Function縺九ｉ豁｣縺励＞蠖｢蠑上・邨先棡縺瑚ｿ斐＆繧後∪縺帙ｓ縺ｧ縺励◆縲・
+            'Invalid response from furigana function.'
         );
 
     }
@@ -469,9 +499,9 @@ async function generateReadings(rows) {
 }
 
 
-// =========================
-// 繝励Ξ繝薙Η繝ｼ陦後ｒ菴懈・
-// =========================
+// ========================================
+// Create preview row
+// ========================================
 
 function createPreviewRow(
     row,
@@ -482,7 +512,7 @@ function createPreviewRow(
         document.createElement('tr');
 
 
-    // 繧｢繝ｼ繝・ぅ繧ｹ繝・
+    // Artist
 
     const artistTd =
         document.createElement('td');
@@ -504,7 +534,7 @@ function createPreviewRow(
     );
 
 
-    // 繧｢繝ｼ繝・ぅ繧ｹ繝郁ｪｭ縺ｿ
+    // Artist reading
 
     const artistInitialTd =
         document.createElement('td');
@@ -526,7 +556,7 @@ function createPreviewRow(
     );
 
 
-    // 譖ｲ蜷・
+    // Title
 
     const titleTd =
         document.createElement('td');
@@ -548,7 +578,7 @@ function createPreviewRow(
     );
 
 
-    // 譖ｲ蜷崎ｪｭ縺ｿ
+    // Title reading
 
     const titleInitialTd =
         document.createElement('td');
@@ -570,7 +600,7 @@ function createPreviewRow(
     );
 
 
-    // 豁後∴繧狗憾諷・
+    // Complete status
 
     const completeTd =
         document.createElement('td');
@@ -582,7 +612,7 @@ function createPreviewRow(
     );
 
 
-    // 閾ｪ菫｡譖ｲ
+    // Confident
 
     const confidentTd =
         document.createElement('td');
@@ -607,7 +637,7 @@ function createPreviewRow(
     );
 
 
-    // 繧､繝ｳ繝医Ο
+    // Intro
 
     const introTd =
         document.createElement('td');
@@ -622,17 +652,17 @@ function createPreviewRow(
         'row-intro';
 
     introInput.placeholder =
-        '莉ｻ諢・;
+        'Optional';
 
     introInput.value =
-        row.intro;
+        row.intro || '';
 
     introTd.appendChild(
         introInput
     );
 
 
-    // 蜑企勁
+    // Delete
 
     const deleteTd =
         document.createElement('td');
@@ -647,7 +677,7 @@ function createPreviewRow(
         'button';
 
     deleteButton.textContent =
-        'ﾃ・;
+        'X';
 
     deleteButton.className =
         'delete-button';
@@ -706,9 +736,9 @@ function createPreviewRow(
 }
 
 
-// =========================
-// ・玖｡後ｒ霑ｽ蜉
-// =========================
+// ========================================
+// Add row button
+// ========================================
 
 document
     .getElementById('add-row-btn')
@@ -723,8 +753,13 @@ document
                     'tr'
                 );
 
-            rows[rows.length - 1]
-                ?.scrollIntoView({
+            if (
+                rows.length > 0
+            ) {
+
+                rows[
+                    rows.length - 1
+                ].scrollIntoView({
 
                     behavior:
                         'smooth',
@@ -734,13 +769,15 @@ document
 
                 });
 
+            }
+
         }
     );
 
 
-// =========================
-// CSV雋ｼ繧贋ｻ倥￠
-// =========================
+// ========================================
+// Paste CSV
+// ========================================
 
 document
     .getElementById('paste-btn')
@@ -757,7 +794,7 @@ document
             if (!text) {
 
                 alert(
-                    '譖ｲ繝ｪ繧ｹ繝医ｒ雋ｼ繧贋ｻ倥￠縺ｦ縺上□縺輔＞縲・
+                    'Please paste the song list.'
                 );
 
                 return;
@@ -781,15 +818,15 @@ document
 
 
                     if (!trimmed) {
+
                         return;
+
                     }
 
 
-                    // 繧ｿ繝悶・蜊願ｧ偵き繝ｳ繝槭・蜈ｨ隗偵き繝ｳ繝・
-
                     const parts =
                         trimmed.split(
-                            /\t|,|・・
+                            /\t|,|，/
                         );
 
 
@@ -831,7 +868,8 @@ document
 
             document.getElementById(
                 'csv-input'
-            ).value = '';
+            ).value =
+                '';
 
 
             message.style.color =
@@ -839,15 +877,16 @@ document
 
 
             message.textContent =
-                `${addedCount}譖ｲ繧定｡ｨ縺ｫ霑ｽ蜉縺励∪縺励◆縲Ａ;
+                addedCount +
+                ' rows added.';
 
         }
     );
 
 
-// =========================
-// 蜈ｨ譖ｲ縺ｮ縺ｲ繧峨′縺ｪ逕滓・
-// =========================
+// ========================================
+// Generate all readings
+// ========================================
 
 document
     .getElementById('generate-btn')
@@ -862,15 +901,13 @@ document
             if (!rows.length) {
 
                 alert(
-                    '譖ｲ繧・譖ｲ莉･荳雁・蜉帙＠縺ｦ縺上□縺輔＞縲・
+                    'Please enter at least one song.'
                 );
 
                 return;
 
             }
 
-
-            // 遨ｺ谺・′豺ｷ縺悶▲縺ｦ縺・↑縺・°遒ｺ隱・
 
             const invalidRow =
                 rows.find(
@@ -883,7 +920,7 @@ document
             if (invalidRow) {
 
                 alert(
-                    '繧｢繝ｼ繝・ぅ繧ｹ繝医→譖ｲ蜷阪・荳｡譁ｹ繧貞・蜉帙＠縺ｦ縺上□縺輔＞縲・
+                    'Both artist and title are required.'
                 );
 
                 return;
@@ -906,7 +943,7 @@ document
 
 
             message.textContent =
-                `${rows.length}譖ｲ縺ｮ隱ｭ縺ｿ繧堤函謌舌＠縺ｦ縺・∪縺吮ｦ`;
+                'Generating readings...';
 
 
             try {
@@ -923,7 +960,7 @@ document
                 ) {
 
                     throw new Error(
-                        '逕滓・縺輔ｌ縺溯ｪｭ縺ｿ縺ｮ莉ｶ謨ｰ縺梧峇謨ｰ縺ｨ荳閾ｴ縺励∪縺帙ｓ縲・
+                        'Reading count does not match song count.'
                     );
 
                 }
@@ -970,7 +1007,7 @@ document
 
 
                 message.textContent =
-                    `${rows.length}譖ｲ縺ｮ隱ｭ縺ｿ繧堤函謌舌＠縺ｾ縺励◆縲ら｢ｺ隱阪＠縺ｦ縺上□縺輔＞縲Ａ;
+                    'Readings generated. Please review them.';
 
 
                 window.scrollTo({
@@ -996,7 +1033,7 @@ document
 
 
                 message.textContent =
-                    '隱ｭ縺ｿ縺ｮ逕滓・縺ｫ螟ｱ謨励＠縺ｾ縺励◆・・ +
+                    'Reading generation failed: ' +
                     error.message;
 
 
@@ -1011,9 +1048,9 @@ document
     );
 
 
-// =========================
-// 蜈･蜉帙↓謌ｻ繧・
-// =========================
+// ========================================
+// Back button
+// ========================================
 
 document
     .getElementById('back-btn')
@@ -1049,9 +1086,9 @@ document
     );
 
 
-// =========================
-// Supabase縺ｸ荳諡ｬ逋ｻ骭ｲ
-// =========================
+// ========================================
+// Insert into Supabase
+// ========================================
 
 document
     .getElementById('submit-all-btn')
@@ -1075,7 +1112,7 @@ document
             ) {
 
                 alert(
-                    '驟堺ｿ｡閠・D縺梧ｭ｣縺励￥縺ゅｊ縺ｾ縺帙ｓ縲・
+                    'Streamer ID is invalid.'
                 );
 
                 return;
@@ -1147,10 +1184,8 @@ document
                     }
 
 
-                    // DB縺ｮcomplete縺ｯ
-                    // true / false / null
-
-                    let complete = null;
+                    let complete =
+                        null;
 
 
                     if (
@@ -1170,8 +1205,6 @@ document
                             false;
 
                     } else {
-
-                        // partial
 
                         complete =
                             null;
@@ -1216,7 +1249,7 @@ document
             ) {
 
                 alert(
-                    '逋ｻ骭ｲ縺ｧ縺阪ｋ譖ｲ縺後≠繧翫∪縺帙ｓ縲・
+                    'There are no songs to register.'
                 );
 
                 return;
@@ -1239,7 +1272,7 @@ document
 
 
             message.textContent =
-                `${insertData.length}譖ｲ繧堤匳骭ｲ縺励※縺・∪縺吮ｦ`;
+                'Registering...';
 
 
             try {
@@ -1266,10 +1299,9 @@ document
 
 
                 message.textContent =
-                    `脂 ${insertData.length}譖ｲ繧剃ｸ諡ｬ逋ｻ骭ｲ縺励∪縺励◆・～;
+                    insertData.length +
+                    ' songs registered successfully.';
 
-
-                // 蜈･蜉帙ｒ繝ｪ繧ｻ繝・ヨ
 
                 inputBody.innerHTML =
                     '';
@@ -1280,8 +1312,6 @@ document
                 generatedRows =
                     [];
 
-
-                // 5陦後↓謌ｻ縺・
 
                 for (
                     let i = 0;
@@ -1324,7 +1354,7 @@ document
 
 
                 message.textContent =
-                    '逋ｻ骭ｲ繧ｨ繝ｩ繝ｼ・・ +
+                    'Registration error: ' +
                     error.message;
 
 
