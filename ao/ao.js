@@ -537,6 +537,7 @@ function displaySongs(songs) {
 			// 最初の開閉状態
 			const shouldOpen =
     			!searchQuery &&
+    			currentRow === null &&
     			(
         			favoriteMode === null ||
         			favoriteMode === 'confident'
