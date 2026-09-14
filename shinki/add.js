@@ -2,7 +2,7 @@ const supabaseUrl =
     'https://dgssybbbgnnygmccjltn.supabase.co';
 
 const supabaseKey =
-    'sb_publishable_JNz1mi6gysaFjOa0I4I5ow_iDe3PQbd';
+    'sb_publishable_JNz1mi6gysaFjOa0A4I5ow_iDe3PQbd';
 
 const supabaseClient =
     window.supabase.createClient(
