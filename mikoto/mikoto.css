@@ -16,7 +16,7 @@ body {
     margin: 0;
     padding: 0 0 120px 0;
     background: #f8f8f8;
-    color: #f8f8f8;
+    color: #222;
 
     font-family:
         "Noto Sans JP",
@@ -64,9 +64,19 @@ body {
 }
 
 .menu-panel {
-    display: block;
+    position: sticky;
+    top: 0;
+    z-index: 900;
 
-    margin-top: 10px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+
+    padding: 8px 16px;
+
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .menu-panel.open {
@@ -156,6 +166,17 @@ body {
     flex-wrap: wrap; /* 画面幅に応じて綺麗に折り返すか並べる */
     gap: 7px;
     width: 100%;
+}
+
+#complete-filter-buttons {
+    display: flex;
+    gap: 7px;
+    width: 100%;
+    margin-bottom: 7px;
+}
+
+#complete-filter-buttons .favorite-button {
+    flex: 1;
 }
 
 /* 共通デザイン */
@@ -252,7 +273,7 @@ body {
     font-size: 16px;/* 曲名の文字サイズ */
 	color: #222;     /* ← 曲名の文字色を変更したい場合はここを追加 */
 
-    border-bottom: 1px solid #e5e5e5;/* 各曲の間の区切り線の色 */
+    /*border-bottom: 1px solid #e5e5e5;/* 各曲の間の区切り線の色 */
 }
 
 
@@ -297,7 +318,7 @@ body {
     border-radius: 8px;/* 角の丸み */
 	color: #222;        /* 文字色 */
 
-    background: rgba(255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.4);
     color: #222;
 
     font-family: inherit;
