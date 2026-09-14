@@ -32,7 +32,7 @@ const message =
 
 
 // =========================
-// 配信者ID
+// 配信老ED
 // =========================
 
 window.addEventListener('load', () => {
@@ -54,12 +54,12 @@ window.addEventListener('load', () => {
     } else {
 
         alert(
-            'URLに配信者ID（?id=1 など）が付いていません。'
+            'URLに配信老ED�E�Eid=1 など�E�が付いてぁE��せん、E
         );
 
     }
 
-    // 最初から5行用意
+    // 最初かめE行用愁E
     for (let i = 0; i < 5; i++) {
         addInputRow();
     }
@@ -68,7 +68,7 @@ window.addEventListener('load', () => {
 
 
 // =========================
-// 歌える状態
+// 歌える状慁E
 // =========================
 
 function createStatusSelect(
@@ -83,11 +83,11 @@ function createStatusSelect(
 
     select.innerHTML = `
         <option value="complete">
-            最後まで歌える
+            最後まで歌えめE
         </option>
 
         <option value="partial">
-            途中まで歌える
+            途中まで歌えめE
         </option>
 
         <option value="practice">
@@ -117,7 +117,7 @@ function addInputRow(
         document.createElement('tr');
 
 
-    // アーティスト
+    // アーチE��スチE
 
     const artistTd =
         document.createElement('td');
@@ -132,7 +132,7 @@ function addInputRow(
         'row-artist';
 
     artistInput.placeholder =
-        'アーティスト';
+        'アーチE��スチE;
 
     artistInput.value =
         artist;
@@ -142,7 +142,7 @@ function addInputRow(
     );
 
 
-    // 曲名
+    // 曲吁E
 
     const titleTd =
         document.createElement('td');
@@ -157,7 +157,7 @@ function addInputRow(
         'row-title';
 
     titleInput.placeholder =
-        '曲名';
+        '曲吁E;
 
     titleInput.value =
         title;
@@ -167,7 +167,7 @@ function addInputRow(
     );
 
 
-    // 歌える状態
+    // 歌える状慁E
 
     const completeTd =
         document.createElement('td');
@@ -219,7 +219,7 @@ function addInputRow(
         'row-intro';
 
     introInput.placeholder =
-        '任意';
+        '任愁E;
 
     introInput.value =
         intro;
@@ -244,7 +244,7 @@ function addInputRow(
         'button';
 
     deleteButton.textContent =
-        '×';
+        'ÁE;
 
     deleteButton.className =
         'delete-button';
@@ -255,7 +255,7 @@ function addInputRow(
 
             tr.remove();
 
-            // 最低1行は残す
+            // 最佁E行�E残す
             if (
                 inputBody.children.length === 0
             ) {
@@ -304,7 +304,7 @@ function addInputRow(
 
 
 // =========================
-// 入力内容を取得
+// 入力�E容を取征E
 // =========================
 
 function collectInputRows() {
@@ -345,7 +345,7 @@ function collectInputRows() {
             ).value.trim();
 
 
-        // 完全に空の行は無視
+        // 完�Eに空の行�E無要E
 
         if (
             !artist &&
@@ -376,7 +376,7 @@ function collectInputRows() {
 
 
 // =========================
-// ひらがな生成
+// ひらがな生�E
 // =========================
 
 async function generateReadings(rows) {
@@ -458,7 +458,7 @@ async function generateReadings(rows) {
     ) {
 
         throw new Error(
-            'Edge Functionから正しい形式の結果が返されませんでした。'
+            'Edge Functionから正しい形式�E結果が返されませんでした、E
         );
 
     }
@@ -470,7 +470,7 @@ async function generateReadings(rows) {
 
 
 // =========================
-// プレビュー行を作成
+// プレビュー行を作�E
 // =========================
 
 function createPreviewRow(
@@ -482,7 +482,7 @@ function createPreviewRow(
         document.createElement('tr');
 
 
-    // アーティスト
+    // アーチE��スチE
 
     const artistTd =
         document.createElement('td');
@@ -504,7 +504,7 @@ function createPreviewRow(
     );
 
 
-    // アーティスト読み
+    // アーチE��スト読み
 
     const artistInitialTd =
         document.createElement('td');
@@ -526,7 +526,7 @@ function createPreviewRow(
     );
 
 
-    // 曲名
+    // 曲吁E
 
     const titleTd =
         document.createElement('td');
@@ -570,7 +570,7 @@ function createPreviewRow(
     );
 
 
-    // 歌える状態
+    // 歌える状慁E
 
     const completeTd =
         document.createElement('td');
@@ -622,7 +622,7 @@ function createPreviewRow(
         'row-intro';
 
     introInput.placeholder =
-        '任意';
+        '任愁E;
 
     introInput.value =
         row.intro;
@@ -647,7 +647,7 @@ function createPreviewRow(
         'button';
 
     deleteButton.textContent =
-        '×';
+        'ÁE;
 
     deleteButton.className =
         'delete-button';
@@ -707,7 +707,7 @@ function createPreviewRow(
 
 
 // =========================
-// ＋行を追加
+// �E�行を追加
 // =========================
 
 document
@@ -757,7 +757,7 @@ document
             if (!text) {
 
                 alert(
-                    '曲リストを貼り付けてください。'
+                    '曲リストを貼り付けてください、E
                 );
 
                 return;
@@ -785,11 +785,11 @@ document
                     }
 
 
-                    // タブ・半角カンマ・全角カンマ
+                    // タブ�E半角カンマ�E全角カンチE
 
                     const parts =
                         trimmed.split(
-                            /\t|,|，/
+                            /\t|,|�E�E
                         );
 
 
@@ -846,7 +846,7 @@ document
 
 
 // =========================
-// 全曲のひらがな生成
+// 全曲のひらがな生�E
 // =========================
 
 document
@@ -862,7 +862,7 @@ document
             if (!rows.length) {
 
                 alert(
-                    '曲を1曲以上入力してください。'
+                    '曲めE曲以上�E力してください、E
                 );
 
                 return;
@@ -870,7 +870,7 @@ document
             }
 
 
-            // 空欄が混ざっていないか確認
+            // 空欁E��混ざってぁE��ぁE��確誁E
 
             const invalidRow =
                 rows.find(
@@ -883,7 +883,7 @@ document
             if (invalidRow) {
 
                 alert(
-                    'アーティストと曲名の両方を入力してください。'
+                    'アーチE��ストと曲名�E両方を�E力してください、E
                 );
 
                 return;
@@ -906,7 +906,7 @@ document
 
 
             message.textContent =
-                `${rows.length}曲の読みを生成しています…`;
+                `${rows.length}曲の読みを生成してぁE��す…`;
 
 
             try {
@@ -923,7 +923,7 @@ document
                 ) {
 
                     throw new Error(
-                        '生成された読みの件数が曲数と一致しません。'
+                        '生�Eされた読みの件数が曲数と一致しません、E
                     );
 
                 }
@@ -996,7 +996,7 @@ document
 
 
                 message.textContent =
-                    '読みの生成に失敗しました：' +
+                    '読みの生�Eに失敗しました�E�E +
                     error.message;
 
 
@@ -1012,7 +1012,7 @@ document
 
 
 // =========================
-// 入力に戻る
+// 入力に戻めE
 // =========================
 
 document
@@ -1075,7 +1075,7 @@ document
             ) {
 
                 alert(
-                    '配信者IDが正しくありません。'
+                    '配信老EDが正しくありません、E
                 );
 
                 return;
@@ -1216,7 +1216,7 @@ document
             ) {
 
                 alert(
-                    '登録できる曲がありません。'
+                    '登録できる曲がありません、E
                 );
 
                 return;
@@ -1239,7 +1239,7 @@ document
 
 
             message.textContent =
-                `${insertData.length}曲を登録しています…`;
+                `${insertData.length}曲を登録してぁE��す…`;
 
 
             try {
@@ -1266,10 +1266,10 @@ document
 
 
                 message.textContent =
-                    `🎉 ${insertData.length}曲を一括登録しました！`;
+                    `🎉 ${insertData.length}曲を一括登録しました�E�`;
 
 
-                // 入力をリセット
+                // 入力をリセチE��
 
                 inputBody.innerHTML =
                     '';
@@ -1281,7 +1281,7 @@ document
                     [];
 
 
-                // 5行に戻す
+                // 5行に戻ぁE
 
                 for (
                     let i = 0;
@@ -1324,7 +1324,7 @@ document
 
 
                 message.textContent =
-                    '登録エラー：' +
+                    '登録エラー�E�E +
                     error.message;
 
 
