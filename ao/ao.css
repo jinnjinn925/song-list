@@ -67,6 +67,16 @@ body {
     display: block;
 
     margin-top: 10px;
+
+    position: sticky;
+    top: 0;
+    z-index: 900;
+
+    padding: 8px 0;
+
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .menu-panel.open {
@@ -297,7 +307,7 @@ body {
     border-radius: 8px;/* 角の丸み */
 	color: #222;        /* 文字色 */
 
-    background: rgba(255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.4);
     color: #222;
 
     font-family: inherit;
