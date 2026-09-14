@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex,nofollow">
 
-    <title>レパートリー一括登録</title>
+    <title>レパートリー管理</title>
 
     <link rel="stylesheet" href="ao_2.css">
 
@@ -21,52 +21,33 @@
 
 <main class="add-main">
 
-    <h2>レパートリー一括登録</h2>
+    <h2>レパートリー管理</h2>
 
     <input type="hidden" id="streamer-id">
 
+
     <!-- =========================
-         入力
+         曲を追加
     ========================== -->
 
     <section id="input-section">
 
         <div class="section-header">
+
             <div>
-                <h3>曲を入力</h3>
+                <h3>曲を追加</h3>
+
                 <p>
                     1行に1曲ずつ入力してください。
                     「＋行を追加」で曲を増やせます。
                 </p>
             </div>
+
         </div>
-
-        <!-- CSV貼り付け -->
-        <details class="paste-area">
-            <summary>曲リストをまとめて貼り付ける</summary>
-
-            <p>
-                「アーティスト名,曲名」の形式で複数行貼り付けできます。
-            </p>
-
-            <textarea
-                id="csv-input"
-                rows="7"
-                placeholder="ヨルシカ,言え。
-コブクロ,赤い糸
-Ado,唱
-Hump Back,拝啓、少年よ"></textarea>
-
-            <button
-                type="button"
-                id="paste-btn"
-                class="sub-button">
-                表に追加する
-            </button>
-        </details>
 
 
         <!-- 曲入力テーブル -->
+
         <div class="table-scroll">
 
             <table class="song-table input-table">
@@ -168,6 +149,81 @@ Hump Back,拝啓、少年よ"></textarea>
             id="submit-all-btn"
             class="main-button">
             この内容で一括登録する
+        </button>
+
+    </section>
+
+
+    <!-- =========================
+         登録済みの曲を削除
+    ========================== -->
+
+    <section id="registered-section">
+
+        <div class="section-header">
+
+            <div>
+                <h3>登録済みの曲を削除</h3>
+
+                <p>
+                    削除したい曲にチェックを入れてください。
+                </p>
+            </div>
+
+        </div>
+
+
+        <!-- 全選択 -->
+
+        <div class="registered-controls">
+
+            <label class="select-all-label">
+                <input
+                    type="checkbox"
+                    id="select-all-songs">
+                すべて選択
+            </label>
+
+            <button
+                type="button"
+                id="reload-songs-btn"
+                class="sub-button">
+                曲一覧を更新
+            </button>
+
+        </div>
+
+
+        <!-- 登録済み曲一覧 -->
+
+        <div class="table-scroll">
+
+            <table class="song-table registered-table">
+
+                <thead>
+                    <tr>
+                        <th>選択</th>
+                        <th>アーティスト</th>
+                        <th>曲名</th>
+                        <th>歌える状態</th>
+                        <th>自信曲</th>
+                        <th>イントロ</th>
+                    </tr>
+                </thead>
+
+                <tbody id="registered-body">
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <button
+            type="button"
+            id="delete-selected-btn"
+            class="delete-button">
+            選択した曲を削除
         </button>
 
     </section>

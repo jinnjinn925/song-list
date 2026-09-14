@@ -87,7 +87,7 @@ function createStatusSelect(
         'complete';
 
     optionComplete.textContent =
-        'Complete';
+        'ç≈å„Ç‹Ç≈âÃÇ¶ÇÈ';
 
     const optionPartial =
         document.createElement('option');
@@ -96,7 +96,7 @@ function createStatusSelect(
         'partial';
 
     optionPartial.textContent =
-        'Partial';
+        'ìríÜÇ‹Ç≈';
 
     const optionPractice =
         document.createElement('option');
@@ -105,7 +105,7 @@ function createStatusSelect(
         'practice';
 
     optionPractice.textContent =
-        'Practice';
+        'ó˚èKíÜ';
 
     select.appendChild(
         optionComplete
