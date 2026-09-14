@@ -1,4 +1,3 @@
-```js
 const supabaseUrl =
     'https://dgssybbbgnnygmccjltn.supabase.co';
 
@@ -14,7 +13,6 @@ const supabaseClient =
 const FURIGANA_FUNCTION_URL =
     `${supabaseUrl}/functions/v1/furigana`;
 
-let inputRows = [];
 let generatedRows = [];
 
 const inputBody =
@@ -32,6 +30,10 @@ const previewSection =
 const message =
     document.getElementById('message');
 
+
+// =========================
+// 配信者ID
+// =========================
 
 window.addEventListener('load', () => {
 
@@ -52,11 +54,12 @@ window.addEventListener('load', () => {
     } else {
 
         alert(
-            '\u914d\u4fe1\u8005ID\u304c\u3042\u308a\u307e\u305b\u3093\u3002'
+            'URLに配信者ID（?id=1 など）が付いていません。'
         );
 
     }
 
+    // 最初から5行用意
     for (let i = 0; i < 5; i++) {
         addInputRow();
     }
@@ -64,17 +67,9 @@ window.addEventListener('load', () => {
 });
 
 
-function escapeHtml(value) {
-
-    return String(value || '')
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#39;');
-
-}
-
+// =========================
+// 歌える状態
+// =========================
 
 function createStatusSelect(
     value = 'complete'
@@ -88,15 +83,15 @@ function createStatusSelect(
 
     select.innerHTML = `
         <option value="complete">
-            \u6700\u5f8c\u307e\u3067\u6b4c\u3048\u308b
+            最後まで歌える
         </option>
 
         <option value="partial">
-            \u9014\u4e2d\u307e\u3067\u6b4c\u3048\u308b
+            途中まで歌える
         </option>
 
         <option value="practice">
-            \u7df4\u7fd2\u4e2d
+            練習中
         </option>
     `;
 
@@ -105,6 +100,10 @@ function createStatusSelect(
     return select;
 }
 
+
+// =========================
+// 入力行を追加
+// =========================
 
 function addInputRow(
     artist = '',
@@ -118,22 +117,32 @@ function addInputRow(
         document.createElement('tr');
 
 
+    // アーティスト
+
     const artistTd =
         document.createElement('td');
 
     const artistInput =
         document.createElement('input');
 
-    artistInput.type = 'text';
-    artistInput.className = 'row-artist';
+    artistInput.type =
+        'text';
+
+    artistInput.className =
+        'row-artist';
+
     artistInput.placeholder =
-        '\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8';
-    artistInput.value = artist;
+        'アーティスト';
+
+    artistInput.value =
+        artist;
 
     artistTd.appendChild(
         artistInput
     );
 
+
+    // 曲名
 
     const titleTd =
         document.createElement('td');
@@ -141,24 +150,36 @@ function addInputRow(
     const titleInput =
         document.createElement('input');
 
-    titleInput.type = 'text';
-    titleInput.className = 'row-title';
+    titleInput.type =
+        'text';
+
+    titleInput.className =
+        'row-title';
+
     titleInput.placeholder =
-        '\u66f2\u540d';
-    titleInput.value = title;
+        '曲名';
+
+    titleInput.value =
+        title;
 
     titleTd.appendChild(
         titleInput
     );
 
 
+    // 歌える状態
+
     const completeTd =
         document.createElement('td');
 
     completeTd.appendChild(
-        createStatusSelect(complete)
+        createStatusSelect(
+            complete
+        )
     );
 
+
+    // 自信曲
 
     const confidentTd =
         document.createElement('td');
@@ -183,18 +204,22 @@ function addInputRow(
     );
 
 
+    // イントロ
+
     const introTd =
         document.createElement('td');
 
     const introInput =
         document.createElement('input');
 
-    introInput.type = 'text';
+    introInput.type =
+        'text';
+
     introInput.className =
         'row-intro';
 
     introInput.placeholder =
-        '\u4efb\u610f';
+        '任意';
 
     introInput.value =
         intro;
@@ -203,6 +228,8 @@ function addInputRow(
         introInput
     );
 
+
+    // 削除
 
     const deleteTd =
         document.createElement('td');
@@ -217,7 +244,7 @@ function addInputRow(
         'button';
 
     deleteButton.textContent =
-        '\u00d7';
+        '×';
 
     deleteButton.className =
         'delete-button';
@@ -228,10 +255,13 @@ function addInputRow(
 
             tr.remove();
 
+            // 最低1行は残す
             if (
                 inputBody.children.length === 0
             ) {
+
                 addInputRow();
+
             }
 
         }
@@ -242,17 +272,40 @@ function addInputRow(
     );
 
 
-    tr.appendChild(artistTd);
-    tr.appendChild(titleTd);
-    tr.appendChild(completeTd);
-    tr.appendChild(confidentTd);
-    tr.appendChild(introTd);
-    tr.appendChild(deleteTd);
+    tr.appendChild(
+        artistTd
+    );
 
-    inputBody.appendChild(tr);
+    tr.appendChild(
+        titleTd
+    );
+
+    tr.appendChild(
+        completeTd
+    );
+
+    tr.appendChild(
+        confidentTd
+    );
+
+    tr.appendChild(
+        introTd
+    );
+
+    tr.appendChild(
+        deleteTd
+    );
+
+    inputBody.appendChild(
+        tr
+    );
 
 }
 
+
+// =========================
+// 入力内容を取得
+// =========================
 
 function collectInputRows() {
 
@@ -262,6 +315,7 @@ function collectInputRows() {
         );
 
     const result = [];
+
 
     rows.forEach(tr => {
 
@@ -291,32 +345,51 @@ function collectInputRows() {
             ).value.trim();
 
 
-        if (!artist && !title) {
+        // 完全に空の行は無視
+
+        if (
+            !artist &&
+            !title
+        ) {
+
             return;
+
         }
 
 
         result.push({
+
             artist,
             title,
             complete,
             confident,
             intro
+
         });
 
     });
+
 
     return result;
 
 }
 
 
+// =========================
+// ひらがな生成
+// =========================
+
 async function generateReadings(rows) {
 
     const requestRows =
         rows.map(row => ({
-            artist: row.artist,
-            title: row.title
+
+            artist:
+                row.artist,
+
+            title:
+                row.title
+
         }));
 
 
@@ -324,28 +397,44 @@ async function generateReadings(rows) {
         await fetch(
             FURIGANA_FUNCTION_URL,
             {
-                method: 'POST',
+
+                method:
+                    'POST',
 
                 headers: {
+
                     'Content-Type':
                         'application/json'
+
                 },
 
-                body: JSON.stringify({
-                    rows: requestRows
-                })
+                body:
+                    JSON.stringify({
+
+                        rows:
+                            requestRows
+
+                    })
+
             }
         );
 
 
     let data = null;
 
+
     try {
 
         data =
             await response.json();
 
-    } catch (_) {
+    } catch (error) {
+
+        console.error(
+            'JSON解析エラー:',
+            error
+        );
+
     }
 
 
@@ -355,14 +444,21 @@ async function generateReadings(rows) {
             data?.error ||
             `HTTP ${response.status}`;
 
-        throw new Error(detail);
+        throw new Error(
+            detail
+        );
+
     }
 
 
-    if (!Array.isArray(data?.rows)) {
+    if (
+        !Array.isArray(
+            data?.rows
+        )
+    ) {
 
         throw new Error(
-            '\u8aad\u307f\u306e\u751f\u6210\u7d50\u679c\u304c\u6b63\u3057\u304f\u3042\u308a\u307e\u305b\u3093\u3002'
+            'Edge Functionから正しい形式の結果が返されませんでした。'
         );
 
     }
@@ -373,6 +469,10 @@ async function generateReadings(rows) {
 }
 
 
+// =========================
+// プレビュー行を作成
+// =========================
+
 function createPreviewRow(
     row,
     reading
@@ -382,13 +482,17 @@ function createPreviewRow(
         document.createElement('tr');
 
 
+    // アーティスト
+
     const artistTd =
         document.createElement('td');
 
     const artistInput =
         document.createElement('input');
 
-    artistInput.type = 'text';
+    artistInput.type =
+        'text';
+
     artistInput.className =
         'row-artist';
 
@@ -399,6 +503,8 @@ function createPreviewRow(
         artistInput
     );
 
+
+    // アーティスト読み
 
     const artistInitialTd =
         document.createElement('td');
@@ -420,13 +526,16 @@ function createPreviewRow(
     );
 
 
+    // 曲名
+
     const titleTd =
         document.createElement('td');
 
     const titleInput =
         document.createElement('input');
 
-    titleInput.type = 'text';
+    titleInput.type =
+        'text';
 
     titleInput.className =
         'row-title';
@@ -438,6 +547,8 @@ function createPreviewRow(
         titleInput
     );
 
+
+    // 曲名読み
 
     const titleInitialTd =
         document.createElement('td');
@@ -459,6 +570,8 @@ function createPreviewRow(
     );
 
 
+    // 歌える状態
+
     const completeTd =
         document.createElement('td');
 
@@ -468,6 +581,8 @@ function createPreviewRow(
         )
     );
 
+
+    // 自信曲
 
     const confidentTd =
         document.createElement('td');
@@ -492,19 +607,22 @@ function createPreviewRow(
     );
 
 
+    // イントロ
+
     const introTd =
         document.createElement('td');
 
     const introInput =
         document.createElement('input');
 
-    introInput.type = 'text';
+    introInput.type =
+        'text';
 
     introInput.className =
         'row-intro';
 
     introInput.placeholder =
-        '\u4efb\u610f';
+        '任意';
 
     introInput.value =
         row.intro;
@@ -513,6 +631,8 @@ function createPreviewRow(
         introInput
     );
 
+
+    // 削除
 
     const deleteTd =
         document.createElement('td');
@@ -527,7 +647,7 @@ function createPreviewRow(
         'button';
 
     deleteButton.textContent =
-        '\u00d7';
+        '×';
 
     deleteButton.className =
         'delete-button';
@@ -535,7 +655,9 @@ function createPreviewRow(
     deleteButton.addEventListener(
         'click',
         () => {
+
             tr.remove();
+
         }
     );
 
@@ -544,20 +666,49 @@ function createPreviewRow(
     );
 
 
-    tr.appendChild(artistTd);
-    tr.appendChild(artistInitialTd);
-    tr.appendChild(titleTd);
-    tr.appendChild(titleInitialTd);
-    tr.appendChild(completeTd);
-    tr.appendChild(confidentTd);
-    tr.appendChild(introTd);
-    tr.appendChild(deleteTd);
+    tr.appendChild(
+        artistTd
+    );
+
+    tr.appendChild(
+        artistInitialTd
+    );
+
+    tr.appendChild(
+        titleTd
+    );
+
+    tr.appendChild(
+        titleInitialTd
+    );
+
+    tr.appendChild(
+        completeTd
+    );
+
+    tr.appendChild(
+        confidentTd
+    );
+
+    tr.appendChild(
+        introTd
+    );
+
+    tr.appendChild(
+        deleteTd
+    );
 
 
-    previewBody.appendChild(tr);
+    previewBody.appendChild(
+        tr
+    );
 
 }
 
+
+// =========================
+// ＋行を追加
+// =========================
 
 document
     .getElementById('add-row-btn')
@@ -574,13 +725,22 @@ document
 
             rows[rows.length - 1]
                 ?.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
+
+                    behavior:
+                        'smooth',
+
+                    block:
+                        'center'
+
                 });
 
         }
     );
 
+
+// =========================
+// CSV貼り付け
+// =========================
 
 document
     .getElementById('paste-btn')
@@ -597,58 +757,76 @@ document
             if (!text) {
 
                 alert(
-                    '\u66f2\u30ea\u30b9\u30c8\u3092\u8cbc\u308a\u4ed8\u3051\u3066\u304f\u3060\u3055\u3044\u3002'
+                    '曲リストを貼り付けてください。'
                 );
 
                 return;
+
             }
 
 
             const lines =
-                text.split(/\r?\n/);
+                text.split(
+                    /\r?\n/
+                );
 
             let addedCount = 0;
 
 
-            lines.forEach(line => {
+            lines.forEach(
+                line => {
 
-                const trimmed =
-                    line.trim();
-
-                if (!trimmed) {
-                    return;
-                }
+                    const trimmed =
+                        line.trim();
 
 
-                const parts =
-                    trimmed.split(
-                        /\t|,|�C/
+                    if (!trimmed) {
+                        return;
+                    }
+
+
+                    // タブ・半角カンマ・全角カンマ
+
+                    const parts =
+                        trimmed.split(
+                            /\t|,|，/
+                        );
+
+
+                    const artist =
+                        (
+                            parts[0] ||
+                            ''
+                        ).trim();
+
+
+                    const title =
+                        parts
+                            .slice(1)
+                            .join(',')
+                            .trim();
+
+
+                    if (
+                        !artist &&
+                        !title
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    addInputRow(
+                        artist,
+                        title
                     );
 
 
-                const artist =
-                    (parts[0] || '').trim();
+                    addedCount++;
 
-                const title =
-                    parts
-                        .slice(1)
-                        .join(',')
-                        .trim();
-
-
-                if (!artist && !title) {
-                    return;
                 }
-
-
-                addInputRow(
-                    artist,
-                    title
-                );
-
-                addedCount++;
-
-            });
+            );
 
 
             document.getElementById(
@@ -659,12 +837,17 @@ document
             message.style.color =
                 'green';
 
+
             message.textContent =
-                `${addedCount}\u66f2\u3092\u8868\u306b\u8ffd\u52a0\u3057\u307e\u3057\u305f\u3002`;
+                `${addedCount}曲を表に追加しました。`;
 
         }
     );
 
+
+// =========================
+// 全曲のひらがな生成
+// =========================
 
 document
     .getElementById('generate-btn')
@@ -679,12 +862,15 @@ document
             if (!rows.length) {
 
                 alert(
-                    '\u66f2\u3092\u0031\u66f2\u4ee5\u4e0a\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044\u3002'
+                    '曲を1曲以上入力してください。'
                 );
 
                 return;
+
             }
 
+
+            // 空欄が混ざっていないか確認
 
             const invalidRow =
                 rows.find(
@@ -697,10 +883,11 @@ document
             if (invalidRow) {
 
                 alert(
-                    '\u30a2\u30fc\u30c6\u30a3\u30b9\u30c8\u3068\u66f2\u540d\u306e\u4e21\u65b9\u3092\u5165\u529b\u3057\u3066\u304f\u3060\u3055\u3044\u3002'
+                    'アーティストと曲名の両方を入力してください。'
                 );
 
                 return;
+
             }
 
 
@@ -709,14 +896,17 @@ document
                     'generate-btn'
                 );
 
-            button.disabled = true;
+
+            button.disabled =
+                true;
 
 
             message.style.color =
                 '';
 
+
             message.textContent =
-                `${rows.length}\u66f2\u306e\u8aad\u307f\u3092\u751f\u6210\u3057\u3066\u3044\u307e\u3059...`;
+                `${rows.length}曲の読みを生成しています…`;
 
 
             try {
@@ -733,7 +923,7 @@ document
                 ) {
 
                     throw new Error(
-                        '\u751f\u6210\u3055\u308c\u305f\u8aad\u307f\u306e\u4ef6\u6570\u304c\u66f2\u6570\u3068\u4e00\u81f4\u3057\u307e\u305b\u3093\u3002'
+                        '生成された読みの件数が曲数と一致しません。'
                     );
 
                 }
@@ -742,9 +932,12 @@ document
                 generatedRows =
                     rows.map(
                         (row, index) => ({
+
                             ...row,
+
                             reading:
                                 readings[index]
+
                         })
                     );
 
@@ -775,26 +968,37 @@ document
                 message.style.color =
                     'green';
 
+
                 message.textContent =
-                    `${rows.length}\u662f\u306e\u8aad\u307f\u3092\u751f\u6210\u3057\u307e\u3057\u305f\u3002\u78ba\u8a8d\u3057\u3066\u304f\u3060\u3055\u3044\u3002`;
+                    `${rows.length}曲の読みを生成しました。確認してください。`;
 
 
                 window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
+
+                    top:
+                        0,
+
+                    behavior:
+                        'smooth'
+
                 });
 
 
             } catch (error) {
 
-                console.error(error);
+                console.error(
+                    error
+                );
+
 
                 message.style.color =
                     'red';
 
+
                 message.textContent =
-                    '\u8aad\u307f\u306e\u751f\u6210\u306b\u5931\u6557\u3057\u307e\u3057\u305f\uff1a' +
+                    '読みの生成に失敗しました：' +
                     error.message;
+
 
             } finally {
 
@@ -806,6 +1010,10 @@ document
         }
     );
 
+
+// =========================
+// 入力に戻る
+// =========================
 
 document
     .getElementById('back-btn')
@@ -819,6 +1027,7 @@ document
             previewSection.style.display =
                 'none';
 
+
             message.style.color =
                 '';
 
@@ -827,13 +1036,22 @@ document
 
 
             window.scrollTo({
-                top: 0,
-                behavior: 'smooth'
+
+                top:
+                    0,
+
+                behavior:
+                    'smooth'
+
             });
 
         }
     );
 
+
+// =========================
+// Supabaseへ一括登録
+// =========================
 
 document
     .getElementById('submit-all-btn')
@@ -857,10 +1075,11 @@ document
             ) {
 
                 alert(
-                    '\u914d\u4fe1\u8005ID\u304c\u6b63\u3057\u304f\u3042\u308a\u307e\u305b\u3093\u3002'
+                    '配信者IDが正しくありません。'
                 );
 
                 return;
+
             }
 
 
@@ -869,120 +1088,139 @@ document
                     '#preview-body tr'
                 );
 
+
             const insertData = [];
 
 
-            rows.forEach(tr => {
+            rows.forEach(
+                tr => {
 
-                const artist =
-                    tr.querySelector(
-                        '.row-artist'
-                    ).value.trim();
-
-
-                const artistInitial =
-                    tr.querySelector(
-                        '.row-artist-initial'
-                    ).value.trim();
+                    const artist =
+                        tr.querySelector(
+                            '.row-artist'
+                        ).value.trim();
 
 
-                const title =
-                    tr.querySelector(
-                        '.row-title'
-                    ).value.trim();
+                    const artistInitial =
+                        tr.querySelector(
+                            '.row-artist-initial'
+                        ).value.trim();
 
 
-                const titleInitial =
-                    tr.querySelector(
-                        '.row-title-initial'
-                    ).value.trim();
+                    const title =
+                        tr.querySelector(
+                            '.row-title'
+                        ).value.trim();
 
 
-                const completeValue =
-                    tr.querySelector(
-                        '.row-complete'
-                    ).value;
+                    const titleInitial =
+                        tr.querySelector(
+                            '.row-title-initial'
+                        ).value.trim();
 
 
-                const confident =
-                    tr.querySelector(
-                        '.row-confident'
-                    ).checked;
+                    const completeValue =
+                        tr.querySelector(
+                            '.row-complete'
+                        ).value;
 
 
-                const intro =
-                    tr.querySelector(
-                        '.row-intro'
-                    ).value.trim();
+                    const confident =
+                        tr.querySelector(
+                            '.row-confident'
+                        ).checked;
 
 
-                if (!artist || !title) {
-                    return;
+                    const intro =
+                        tr.querySelector(
+                            '.row-intro'
+                        ).value.trim();
+
+
+                    if (
+                        !artist ||
+                        !title
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    // DBのcompleteは
+                    // true / false / null
+
+                    let complete = null;
+
+
+                    if (
+                        completeValue ===
+                        'complete'
+                    ) {
+
+                        complete =
+                            true;
+
+                    } else if (
+                        completeValue ===
+                        'practice'
+                    ) {
+
+                        complete =
+                            false;
+
+                    } else {
+
+                        // partial
+
+                        complete =
+                            null;
+
+                    }
+
+
+                    insertData.push({
+
+                        streamer_id:
+                            streamerId,
+
+                        artist:
+                            artist,
+
+                        artist_initial:
+                            artistInitial,
+
+                        title:
+                            title,
+
+                        title_initial:
+                            titleInitial,
+
+                        complete:
+                            complete,
+
+                        confident:
+                            confident,
+
+                        intro:
+                            intro || null
+
+                    });
+
                 }
+            );
 
 
-                let complete = null;
-
-
-                if (
-                    completeValue ===
-                    'complete'
-                ) {
-
-                    complete = true;
-
-                } else if (
-                    completeValue ===
-                    'practice'
-                ) {
-
-                    complete = false;
-
-                } else {
-
-                    complete = null;
-
-                }
-
-
-                insertData.push({
-
-                    streamer_id:
-                        streamerId,
-
-                    artist:
-                        artist,
-
-                    artist_initial:
-                        artistInitial,
-
-                    title:
-                        title,
-
-                    title_initial:
-                        titleInitial,
-
-                    complete:
-                        complete,
-
-                    confident:
-                        confident,
-
-                    intro:
-                        intro || null
-
-                });
-
-            });
-
-
-            if (!insertData.length) {
+            if (
+                !insertData.length
+            ) {
 
                 alert(
-                    '\u767b\u9332\u3067\u304d\u308b\u66f2\u304c\u3042\u308a\u307e\u305b\u3093\u3002'
+                    '登録できる曲がありません。'
                 );
 
                 return;
+
             }
 
 
@@ -991,6 +1229,7 @@ document
                     'submit-all-btn'
                 );
 
+
             button.disabled =
                 true;
 
@@ -998,8 +1237,9 @@ document
             message.style.color =
                 '';
 
+
             message.textContent =
-                `${insertData.length}\u66f2\u3092\u767b\u9332\u3057\u3066\u3044\u307e\u3059...`;
+                `${insertData.length}曲を登録しています…`;
 
 
             try {
@@ -1015,16 +1255,21 @@ document
 
 
                 if (error) {
+
                     throw error;
+
                 }
 
 
                 message.style.color =
                     'green';
 
-                message.textContent =
-                    `\ud83c\udf89 ${insertData.length}\u662f\u3092\u4e00\u62ec\u767b\u9332\u3057\u307e\u3057\u305f\uff01`;
 
+                message.textContent =
+                    `🎉 ${insertData.length}曲を一括登録しました！`;
+
+
+                // 入力をリセット
 
                 inputBody.innerHTML =
                     '';
@@ -1035,6 +1280,8 @@ document
                 generatedRows =
                     [];
 
+
+                // 5行に戻す
 
                 for (
                     let i = 0;
@@ -1055,21 +1302,31 @@ document
 
 
                 window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
+
+                    top:
+                        0,
+
+                    behavior:
+                        'smooth'
+
                 });
 
 
             } catch (error) {
 
-                console.error(error);
+                console.error(
+                    error
+                );
+
 
                 message.style.color =
                     'red';
 
+
                 message.textContent =
-                    '\u767b\u9332\u30a8\u30e9\u30fc\uff1a' +
+                    '登録エラー：' +
                     error.message;
+
 
             } finally {
 
@@ -1080,4 +1337,3 @@ document
 
         }
     );
-```
