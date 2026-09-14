@@ -580,17 +580,37 @@ function displaySongs(songs) {
 
         // 曲名
         const songDiv =
-            document.createElement('div');
+    		document.createElement('div');
 
-        songDiv.textContent =
-            song.title +
-            (song.complete ? ' *' : '');
+		songDiv.className =
+    		'song';
 
-        songDiv.className =
-            'song';
+		// 曲名
+		const titleDiv =
+    		document.createElement('div');
 
+		titleDiv.textContent =
+    		song.title +
+    		(song.complete ? ' *' : '');
 
-        artistSongs.appendChild(songDiv);
+		songDiv.appendChild(titleDiv);
+
+		// 歌いだし（登録されている場合だけ）
+		if (song.intro) {
+
+    		const introDiv =
+        		document.createElement('div');
+
+    		introDiv.textContent =
+        		song.intro;
+
+    		introDiv.className =
+        		'song-intro';
+
+    		songDiv.appendChild(introDiv);
+		}
+
+		artistSongs.appendChild(songDiv);
 
     });
 }
