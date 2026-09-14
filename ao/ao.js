@@ -33,8 +33,14 @@ const streamerName =
 const songCount =
     document.getElementById('song-count');
 
-const completeFilter =
-    document.getElementById('complete-filter');
+const filterAll =
+    document.getElementById('filter-all');
+
+const filterComplete =
+    document.getElementById('filter-complete');
+
+const filterPractice =
+    document.getElementById('filter-practice');
 
 const favoriteSection =
     document.getElementById('favorite-section');
@@ -85,7 +91,7 @@ let favoriteMode = null;
 
 let favoriteArtistList = [];
 
-let showCompleteOnly = false;
+let completeFilter = 'all';
 
 let searchQuery = '';
 
@@ -434,13 +440,17 @@ function getVisibleSongs() {
 
     // 最後まで歌える曲だけ
 
-    if (showCompleteOnly) {
+    if (completeFilter === 'complete') {
+    	songs = songs.filter(
+        	song => song.complete === true
+    	);
+	}
 
-        songs = songs.filter(
-            song => song.complete === true
-        );
-
-    }
+	if (completeFilter === 'practice') {
+    	songs = songs.filter(
+        	song => song.complete === false
+    	);
+	}
 
 
     // 曲名・アーティスト名で検索
@@ -651,7 +661,7 @@ function updateSongCount() {
     } else if (
         currentRow !== null ||
         favoriteMode ||
-        showCompleteOnly
+        completeFilter !== 'all'
     ) {
 
         songCount.textContent =
@@ -671,24 +681,20 @@ function updateSongCount() {
 
 function updateCompleteButton() {
 
-    if (showCompleteOnly) {
+    filterAll.classList.toggle(
+        'active',
+        completeFilter === 'all'
+    );
 
-        completeFilter.textContent =
-            '*最後まで歌える曲';
+    filterComplete.classList.toggle(
+        'active',
+        completeFilter === 'complete'
+    );
 
-        completeFilter.classList.add(
-            'active'
-        );
-
-    } else {
-
-        completeFilter.textContent =
-            '*最後まで歌える曲';
-
-        completeFilter.classList.remove(
-            'active'
-        );
-    }
+    filterPractice.classList.toggle(
+        'active',
+        completeFilter === 'practice'
+    );
 }
 
 
@@ -989,12 +995,45 @@ initials.forEach(initial => {
 // 最後まで歌えるフィルター
 // =========================
 
-completeFilter.addEventListener(
+filterAll.addEventListener(
     'click',
     () => {
 
-        showCompleteOnly =
-            !showCompleteOnly;
+        completeFilter = 'all';
+
+        filterAll.classList.add('active');
+        filterComplete.classList.remove('active');
+        filterPractice.classList.remove('active');
+
+        render();
+
+    }
+);
+
+filterComplete.addEventListener(
+    'click',
+    () => {
+
+        completeFilter = 'complete';
+
+        filterAll.classList.remove('active');
+        filterComplete.classList.add('active');
+        filterPractice.classList.remove('active');
+
+        render();
+
+    }
+);
+
+filterPractice.addEventListener(
+    'click',
+    () => {
+
+        completeFilter = 'practice';
+
+        filterAll.classList.remove('active');
+        filterComplete.classList.remove('active');
+        filterPractice.classList.add('active');
 
         render();
 

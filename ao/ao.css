@@ -168,6 +168,17 @@ body {
     width: 100%;
 }
 
+#complete-filter-buttons {
+    display: flex;
+    gap: 7px;
+    width: 100%;
+    margin-bottom: 7px;
+}
+
+#complete-filter-buttons .favorite-button {
+    flex: 1;
+}
+
 /* 共通デザイン */
 .favorite-button {
     flex: 1; /* 横並び時に幅を均等に広げる */
