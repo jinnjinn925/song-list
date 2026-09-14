@@ -16,7 +16,7 @@ body {
     margin: 0;
     padding: 0 0 120px 0;
     background: #f8f8f8;
-    color: #f8f8f8;
+    color: #222;
 
     font-family:
         "Noto Sans JP",
@@ -234,7 +234,7 @@ body {
     font-weight: 700;
 	color: #222;      /* ← 文字色を変更したい場合はここを追加（例: color: #fff; で白） */
 
-    border-bottom: 2px solid #184F88; /*アーティスト名の下の線の色*/
+    /*border-bottom: 2px solid #184F88; /*アーティスト名の下の線の色*/
 
     cursor: pointer;
 
