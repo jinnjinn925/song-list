@@ -94,3 +94,57 @@ td input[type="text"]:focus {
     padding: 10px;
     border-radius: 6px;
 }
+
+#single-register {
+    margin-bottom: 24px;
+}
+
+#single-register h3 {
+    margin-top: 0;
+}
+
+.form-group {
+    margin-top: 14px;
+}
+
+.form-group > label:first-child {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #444;
+}
+
+.form-group input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+.radio-label,
+.checkbox-label {
+    display: block;
+    margin-top: 7px;
+    font-size: 14px;
+    font-weight: normal;
+}
+
+.radio-label input,
+.checkbox-label input {
+    margin-right: 6px;
+}
+
+#single-submit-btn {
+    width: 100%;
+    margin-top: 18px;
+    padding: 12px;
+}
+
+#single-message {
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: bold;
+}

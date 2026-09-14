@@ -14,14 +14,14 @@ window.addEventListener('load', () => {
     if (streamerId) {
         document.getElementById('streamer-id').value = streamerId;
     } else {
-        alert('URLに配信者ID (?id=1 など) が付いていません。');
+        alert('URLに配信老ED (?id=1 など) が付いてぁE��せん、E);
     }
 });
 
 function parseInput(text) {
     return text.split(/\r?\n/).map(line => line.trim()).filter(Boolean).map(line => {
         // tab / comma / full-width comma / 2+ spaces
-        const parts = line.split(/\t|,|，|\s{2,}/);
+        const parts = line.split(/\t|,|�E�|\s{2,}/);
         return {
             artist: (parts[0] || '').trim(),
             title: (parts.slice(1).join(',') || '').trim()
@@ -56,22 +56,139 @@ async function generateReadings(rows) {
     }
 
     if (!Array.isArray(data?.rows)) {
-        throw new Error('Edge Functionから不正な形式の結果が返りました。');
+        throw new Error('Edge Functionから不正な形式�E結果が返りました、E);
     }
 
     return data.rows;
 }
 
+document
+    .getElementById('single-submit-btn')
+    .addEventListener('click', async () => {
+
+        const streamerId =
+            parseInt(
+                document.getElementById('streamer-id').value,
+                10
+            );
+
+        const artist =
+            document
+                .getElementById('single-artist')
+                .value
+                .trim();
+
+        const title =
+            document
+                .getElementById('single-title')
+                .value
+                .trim();
+
+        const completeValue =
+            document.querySelector(
+                'input[name="single-complete"]:checked'
+            ).value;
+
+        const confident =
+            document.getElementById(
+                'single-confident'
+            ).checked;
+
+        const intro =
+            document
+                .getElementById('single-intro')
+                .value
+                .trim();
+
+        const message =
+            document.getElementById(
+                'single-message'
+            );
+
+        if (!artist || !title) {
+
+            message.textContent =
+                '�A�[�e�B�X�g���ƋȖ�����͂��Ă��������B';
+
+            message.style.color =
+                '#c0392b';
+
+            return;
+        }
+
+        message.textContent =
+            '�ӂ肪�Ȃ𐶐���...';
+
+        message.style.color =
+            '#555';
+
+        try {
+
+            const rows = [
+                {
+                    artist: artist,
+                    title: title
+                }
+            ];
+
+            const result =
+                await generateReadings(rows);
+
+            if (
+                !result ||
+                result.length === 0
+            ) {
+                throw new Error(
+                    '�ӂ肪�Ȃ̐������ʂ��擾�ł��܂���ł����B'
+                );
+            }
+
+            const reading =
+                result[0];
+
+            document
+                .getElementById(
+                    'single-artist-initial'
+                )
+                .value =
+                reading.artist_initial || '';
+
+            document
+                .getElementById(
+                    'single-title-initial'
+                )
+                .value =
+                reading.title_initial || '';
+
+            message.textContent =
+                '�ӂ肪�Ȃ𐶐����܂����B���e���m�F���Ă���o�^���Ă��������B';
+
+            message.style.color =
+                '#555';
+
+        } catch (error) {
+
+            console.error(error);
+
+            message.textContent =
+                '�ӂ肪�Ȃ̐����Ɏ��s���܂����F' +
+                error.message;
+
+            message.style.color =
+                '#c0392b';
+        }
+    });
+
 document.getElementById('parse-btn').addEventListener('click', async () => {
     const textInput = document.getElementById('csv-input').value.trim();
     if (!textInput) {
-        alert('曲リストを貼り付けてください。');
+        alert('曲リストを貼り付けてください、E);
         return;
     }
 
     const rows = parseInput(textInput);
     if (!rows.length) {
-        alert('アーティスト名と曲名を確認してください。');
+        alert('アーチE��スト名と曲名を確認してください、E);
         return;
     }
 
@@ -79,7 +196,7 @@ document.getElementById('parse-btn').addEventListener('click', async () => {
     const message = document.getElementById('message');
     button.disabled = true;
     message.style.color = '';
-    message.textContent = `${rows.length} 件の読みを生成しています…`;
+    message.textContent = `${rows.length} 件の読みを生成してぁE��す…`;
 
     try {
         const resultRows = await generateReadings(rows);
@@ -112,7 +229,7 @@ document.getElementById('parse-btn').addEventListener('click', async () => {
     } catch (error) {
         console.error(error);
         message.style.color = 'red';
-        message.textContent = '読みの生成に失敗しました: ' + error.message;
+        message.textContent = '読みの生�Eに失敗しました: ' + error.message;
     } finally {
         button.disabled = false;
     }
@@ -121,7 +238,7 @@ document.getElementById('parse-btn').addEventListener('click', async () => {
 document.getElementById('submit-all-btn').addEventListener('click', async () => {
     const streamerId = parseInt(document.getElementById('streamer-id').value, 10);
     if (!Number.isInteger(streamerId)) {
-        alert('配信者IDが正しくありません。');
+        alert('配信老EDが正しくありません、E);
         return;
     }
 
@@ -148,7 +265,7 @@ document.getElementById('submit-all-btn').addEventListener('click', async () => 
     });
 
     if (!insertData.length) {
-        alert('登録できる曲がありません。');
+        alert('登録できる曲がありません、E);
         return;
     }
 
@@ -162,7 +279,7 @@ document.getElementById('submit-all-btn').addEventListener('click', async () => 
         message.textContent = 'エラー: ' + error.message;
     } else {
         message.style.color = 'green';
-        message.textContent = `🎉 ${insertData.length} 件を一括登録しました！`;
+        message.textContent = `🎉 ${insertData.length} 件を一括登録しました�E�`;
         document.getElementById('csv-input').value = '';
         document.getElementById('step-2').style.display = 'none';
     }

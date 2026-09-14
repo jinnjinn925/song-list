@@ -18,6 +18,109 @@
     <h2>レパートリー一括登録</h2>
 
     <input type="hidden" id="streamer-id">
+	
+	<section id="single-register">
+    <h3>1曲ずつ登録</h3>
+
+    <div class="form-group">
+        <label for="single-artist">アーティスト</label>
+        <input
+            type="text"
+            id="single-artist"
+            placeholder="例：ヨルシカ"
+        >
+    </div>
+
+    <div class="form-group">
+        <label for="single-artist-initial">アーティスト読み</label>
+        <input
+            type="text"
+            id="single-artist-initial"
+            placeholder="例：よるしか"
+        >
+    </div>
+
+    <div class="form-group">
+        <label for="single-title">曲名</label>
+        <input
+            type="text"
+            id="single-title"
+            placeholder="例：言って。"
+        >
+    </div>
+
+    <div class="form-group">
+        <label for="single-title-initial">曲名読み</label>
+        <input
+            type="text"
+            id="single-title-initial"
+            placeholder="例：いって"
+        >
+    </div>
+
+    <div class="form-group">
+        <label>歌える状態</label>
+
+        <label class="radio-label">
+            <input
+                type="radio"
+                name="single-complete"
+                value="true"
+                checked
+            >
+            最後まで歌える
+        </label>
+
+        <label class="radio-label">
+            <input
+                type="radio"
+                name="single-complete"
+                value="false"
+            >
+            練習中
+        </label>
+
+        <label class="radio-label">
+            <input
+                type="radio"
+                name="single-complete"
+                value="null"
+            >
+            途中まで歌える
+        </label>
+    </div>
+
+    <div class="form-group">
+        <label class="checkbox-label">
+            <input
+                type="checkbox"
+                id="single-confident"
+            >
+            自信曲
+        </label>
+    </div>
+
+    <div class="form-group">
+        <label for="single-intro">イントロ（任意）</label>
+        <input
+            type="text"
+            id="single-intro"
+            placeholder="例：ギターから"
+        >
+    </div>
+
+    <button
+    	type="button"
+    	id="single-submit-btn"
+    	class="favorite-button"
+	>
+    	ふりがなを生成する
+	</button>
+
+    <div id="single-message"></div>
+</section>
+
+<hr>
 
     <div id="step-1">
         <p style="font-size:14px; color:#555;">
