@@ -1,170 +1,183 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex,nofollow">
+
     <title>レパートリー一括登録</title>
+
     <link rel="stylesheet" href="ao_2.css">
 
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    <!-- KuromojiはWeb Worker内で読み込みます。ページを固まらせません。 -->
+    <!-- 処理スクリプト -->
     <script src="add.js" defer></script>
 </head>
+
 <body>
-<main style="max-width: 900px; margin: 20px auto; padding: 20px;">
+
+<main class="add-main">
+
     <h2>レパートリー一括登録</h2>
 
     <input type="hidden" id="streamer-id">
-	
-	<section id="single-register">
-    <h3>1曲ずつ登録</h3>
 
-    <div class="form-group">
-        <label for="single-artist">アーティスト</label>
-        <input
-            type="text"
-            id="single-artist"
-            placeholder="例：ヨルシカ"
-        >
-    </div>
+    <!-- =========================
+         入力
+    ========================== -->
 
-    <div class="form-group">
-        <label for="single-artist-initial">アーティスト読み</label>
-        <input
-            type="text"
-            id="single-artist-initial"
-            placeholder="例：よるしか"
-        >
-    </div>
+    <section id="input-section">
 
-    <div class="form-group">
-        <label for="single-title">曲名</label>
-        <input
-            type="text"
-            id="single-title"
-            placeholder="例：言って。"
-        >
-    </div>
-
-    <div class="form-group">
-        <label for="single-title-initial">曲名読み</label>
-        <input
-            type="text"
-            id="single-title-initial"
-            placeholder="例：いって"
-        >
-    </div>
-
-    <div class="form-group">
-        <label>歌える状態</label>
-
-        <label class="radio-label">
-            <input
-                type="radio"
-                name="single-complete"
-                value="true"
-                checked
-            >
-            最後まで歌える
-        </label>
-
-        <label class="radio-label">
-            <input
-                type="radio"
-                name="single-complete"
-                value="false"
-            >
-            練習中
-        </label>
-
-        <label class="radio-label">
-            <input
-                type="radio"
-                name="single-complete"
-                value="null"
-            >
-            途中まで歌える
-        </label>
-    </div>
-
-    <div class="form-group">
-        <label class="checkbox-label">
-            <input
-                type="checkbox"
-                id="single-confident"
-            >
-            自信曲
-        </label>
-    </div>
-
-    <div class="form-group">
-        <label for="single-intro">イントロ（任意）</label>
-        <input
-            type="text"
-            id="single-intro"
-            placeholder="例：ギターから"
-        >
-    </div>
-
-    <button
-    	type="button"
-    	id="single-submit-btn"
-    	class="favorite-button"
-	>
-    	ふりがなを生成する
-	</button>
-
-    <div id="single-message"></div>
-</section>
-
-<hr>
-
-    <div id="step-1">
-        <p style="font-size:14px; color:#555;">
-            「アーティスト名,曲名」の形で貼り付けてください。タブ区切りにも対応しています。
-        </p>
-
-        <textarea id="csv-input" rows="10" style="width:100%; padding:10px;"
-            placeholder="ヨルシカ,言え。
-コブクロ,赤い糸
-Hump Back,拝啓、少年よ"></textarea>
-
-        <button type="button" id="parse-btn" class="favorite-button"
-            style="width:100%; margin-top:10px; padding:12px;">
-            ふりがなを自動生成して確認する
-        </button>
-    </div>
-
-    <div id="step-2" style="display:none; margin-top:24px;">
-        <h3>登録内容の確認・修正</h3>
-        <p style="font-size:13px; color:#666;">
-            自動生成された読みは必ず確認してください。間違っている箇所は直接修正できます。
-        </p>
-
-        <div style="overflow-x:auto;">
-            <table style="width:100%; border-collapse:collapse; margin-top:10px; min-width:760px;">
-                <thead>
-                    <tr style="background:#f0f0f0; text-align:left;">
-                        <th style="padding:8px;">アーティスト</th>
-                        <th style="padding:8px;">読み</th>
-                        <th style="padding:8px;">曲名</th>
-                        <th style="padding:8px;">読み</th>
-                    </tr>
-                </thead>
-                <tbody id="preview-body"></tbody>
-            </table>
+        <div class="section-header">
+            <div>
+                <h3>曲を入力</h3>
+                <p>
+                    1行に1曲ずつ入力してください。
+                    「＋行を追加」で曲を増やせます。
+                </p>
+            </div>
         </div>
 
-        <button type="button" id="submit-all-btn" class="favorite-button"
-            style="width:100%; margin-top:16px; padding:12px; font-weight:bold;">
+        <!-- CSV貼り付け -->
+        <details class="paste-area">
+            <summary>曲リストをまとめて貼り付ける</summary>
+
+            <p>
+                「アーティスト名,曲名」の形式で複数行貼り付けできます。
+            </p>
+
+            <textarea
+                id="csv-input"
+                rows="7"
+                placeholder="ヨルシカ,言え。
+コブクロ,赤い糸
+Ado,唱
+Hump Back,拝啓、少年よ"></textarea>
+
+            <button
+                type="button"
+                id="paste-btn"
+                class="sub-button">
+                表に追加する
+            </button>
+        </details>
+
+
+        <!-- 曲入力テーブル -->
+        <div class="table-scroll">
+
+            <table class="song-table input-table">
+
+                <thead>
+                    <tr>
+                        <th>アーティスト</th>
+                        <th>曲名</th>
+                        <th>歌える状態</th>
+                        <th>自信曲</th>
+                        <th>イントロ</th>
+                        <th class="delete-column"></th>
+                    </tr>
+                </thead>
+
+                <tbody id="input-body">
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <button
+            type="button"
+            id="add-row-btn"
+            class="add-row-button">
+            ＋ 行を追加
+        </button>
+
+
+        <button
+            type="button"
+            id="generate-btn"
+            class="main-button">
+            全曲のひらがなを生成
+        </button>
+
+    </section>
+
+
+    <!-- =========================
+         読み確認
+    ========================== -->
+
+    <section
+        id="preview-section"
+        style="display:none;">
+
+        <div class="section-header">
+
+            <div>
+                <h3>読みを確認</h3>
+
+                <p>
+                    自動生成された読みを確認してください。
+                    間違っているところは直接修正できます。
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="table-scroll">
+
+            <table class="song-table preview-table">
+
+                <thead>
+                    <tr>
+                        <th>アーティスト</th>
+                        <th>アーティスト読み</th>
+                        <th>曲名</th>
+                        <th>曲名読み</th>
+                        <th>歌える状態</th>
+                        <th>自信曲</th>
+                        <th>イントロ</th>
+                        <th class="delete-column"></th>
+                    </tr>
+                </thead>
+
+                <tbody id="preview-body">
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <button
+            type="button"
+            id="back-btn"
+            class="sub-button">
+            入力に戻る
+        </button>
+
+
+        <button
+            type="button"
+            id="submit-all-btn"
+            class="main-button">
             この内容で一括登録する
         </button>
-    </div>
 
-    <div id="message" style="margin-top:15px; font-weight:bold;"></div>
+    </section>
+
+
+    <!-- メッセージ -->
+
+    <div id="message"></div>
+
 </main>
+
 </body>
 </html>
