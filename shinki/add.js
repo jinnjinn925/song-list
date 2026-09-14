@@ -14,8 +14,8 @@ window.addEventListener('load', () => {
     if (streamerId) {
         document.getElementById('streamer-id').value = streamerId;
     } else {
-        alert('URL縺ｫ驟堺ｿ｡閠・D (?id=1 縺ｪ縺ｩ) 縺御ｻ倥＞縺ｦ縺・∪縺帙ｓ縲・);
-    }
+    	alert('URLに配信者ID（?id=1 など）が付いていません。');
+	}
 });
 
 function parseInput(text) {
