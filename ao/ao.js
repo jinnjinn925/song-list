@@ -526,11 +526,15 @@ function displaySongs(songs) {
 			// 「一覧」のときだけ最初から開く
 			if (
     			currentRow === null &&
-    			!searchQuery
+    			!searchQuery &&
+    			(
+        			favoriteMode === null ||
+        			favoriteMode === 'confident'
+    			)
 			) {
-				// 一覧・お気に入りは最初から開く
+    			// 一覧・自信曲は最初から開く
     			newArtistSongs.classList.remove(
-        		'collapsed'
+        			'collapsed'
     			);
 
     			artistDiv.classList.remove(
@@ -538,9 +542,9 @@ function displaySongs(songs) {
     			);
 
 			} else {
-    			// 50音・検索は閉じた状態
+    			// 50音・検索・好きなアーティストは閉じた状態
     			newArtistSongs.classList.add(
-        		'collapsed'
+        			'collapsed'
     			);
 
     			artistDiv.classList.add(
