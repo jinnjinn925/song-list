@@ -62,6 +62,8 @@ window.addEventListener('load', () => {
     for (let i = 0; i < 5; i++) {
         addInputRow();
     }
+	
+	loadRegisteredSongs();
 
 });
 
@@ -87,7 +89,7 @@ function createStatusSelect(
         'complete';
 
     optionComplete.textContent =
-        '�Ō�܂ŉ̂���';
+        '最後まで';
 
     const optionPartial =
         document.createElement('option');
@@ -96,7 +98,7 @@ function createStatusSelect(
         'partial';
 
     optionPartial.textContent =
-        '�r���܂�';
+        '途中まで';
 
     const optionPractice =
         document.createElement('option');
@@ -105,7 +107,7 @@ function createStatusSelect(
         'practice';
 
     optionPractice.textContent =
-        '���K��';
+        '練習中';
 
     select.appendChild(
         optionComplete
@@ -124,7 +126,6 @@ function createStatusSelect(
 
     return select;
 }
-
 
 // ========================================
 // Add input row
@@ -775,114 +776,6 @@ document
     );
 
 
-// ========================================
-// Paste CSV
-// ========================================
-
-document
-    .getElementById('paste-btn')
-    .addEventListener(
-        'click',
-        () => {
-
-            const text =
-                document.getElementById(
-                    'csv-input'
-                ).value.trim();
-
-
-            if (!text) {
-
-                alert(
-                    'Please paste the song list.'
-                );
-
-                return;
-
-            }
-
-
-            const lines =
-                text.split(
-                    /\r?\n/
-                );
-
-            let addedCount = 0;
-
-
-            lines.forEach(
-                line => {
-
-                    const trimmed =
-                        line.trim();
-
-
-                    if (!trimmed) {
-
-                        return;
-
-                    }
-
-
-                    const parts =
-                        trimmed.split(
-                            /\t|,|�C/
-                        );
-
-
-                    const artist =
-                        (
-                            parts[0] ||
-                            ''
-                        ).trim();
-
-
-                    const title =
-                        parts
-                            .slice(1)
-                            .join(',')
-                            .trim();
-
-
-                    if (
-                        !artist &&
-                        !title
-                    ) {
-
-                        return;
-
-                    }
-
-
-                    addInputRow(
-                        artist,
-                        title
-                    );
-
-
-                    addedCount++;
-
-                }
-            );
-
-
-            document.getElementById(
-                'csv-input'
-            ).value =
-                '';
-
-
-            message.style.color =
-                'green';
-
-
-            message.textContent =
-                addedCount +
-                ' rows added.';
-
-        }
-    );
-
 
 // ========================================
 // Generate all readings
@@ -1367,3 +1260,401 @@ document
 
         }
     );
+
+
+// ========================================
+// Load registered songs
+// ========================================
+
+const registeredBody =
+    document.getElementById(
+        'registered-body'
+    );
+
+const selectAllSongs =
+    document.getElementById(
+        'select-all-songs'
+    );
+
+const reloadSongsBtn =
+    document.getElementById(
+        'reload-songs-btn'
+    );
+
+const deleteSelectedBtn =
+    document.getElementById(
+        'delete-selected-btn'
+    );
+
+
+// ----------------------------------------
+// Complete status label
+// ----------------------------------------
+
+function getStatusLabel(complete) {
+
+    if (complete === true) {
+        return '最後まで';
+    }
+
+    if (complete === false) {
+        return '練習中';
+    }
+
+    return '途中まで';
+}
+
+
+// ----------------------------------------
+// Load songs
+// ----------------------------------------
+
+async function loadRegisteredSongs() {
+
+    const streamerId =
+        parseInt(
+            document.getElementById(
+                'streamer-id'
+            ).value,
+            10
+        );
+
+    if (!Number.isInteger(streamerId)) {
+        return;
+    }
+
+    registeredBody.innerHTML = '';
+
+    registeredBody.innerHTML =
+        '<tr><td colspan="6">読み込み中...</td></tr>';
+
+    const {
+        data: songs,
+        error
+    } =
+        await supabaseClient
+            .from('songs')
+            .select(
+                'id, artist, title, complete, confident, intro'
+            )
+            .eq(
+                'streamer_id',
+                streamerId
+            )
+            .order(
+                'artist',
+                { ascending: true }
+            )
+            .order(
+                'title',
+                { ascending: true }
+            );
+
+    if (error) {
+
+        console.error(error);
+
+        registeredBody.innerHTML =
+            '<tr><td colspan="6">曲一覧の取得に失敗しました。</td></tr>';
+
+        message.style.color = 'red';
+
+        message.textContent =
+            '曲一覧の取得に失敗しました：' +
+            error.message;
+
+        return;
+    }
+
+
+    registeredBody.innerHTML = '';
+
+
+    if (!songs || songs.length === 0) {
+
+        registeredBody.innerHTML =
+            '<tr><td colspan="6">登録されている曲はありません。</td></tr>';
+
+        selectAllSongs.checked = false;
+
+        return;
+    }
+
+
+    songs.forEach(song => {
+
+        const tr =
+            document.createElement('tr');
+
+
+        // --------------------------------
+        // Checkbox
+        // --------------------------------
+
+        const checkTd =
+            document.createElement('td');
+
+        checkTd.className =
+            'checkbox-cell';
+
+        const checkbox =
+            document.createElement('input');
+
+        checkbox.type =
+            'checkbox';
+
+        checkbox.className =
+            'registered-song-checkbox';
+
+        checkbox.dataset.id =
+            song.id;
+
+        checkTd.appendChild(
+            checkbox
+        );
+
+
+        // --------------------------------
+        // Artist
+        // --------------------------------
+
+        const artistTd =
+            document.createElement('td');
+
+        artistTd.textContent =
+            song.artist || '';
+
+
+        // --------------------------------
+        // Title
+        // --------------------------------
+
+        const titleTd =
+            document.createElement('td');
+
+        titleTd.textContent =
+            song.title || '';
+
+
+        // --------------------------------
+        // Status
+        // --------------------------------
+
+        const statusTd =
+            document.createElement('td');
+
+        statusTd.textContent =
+            getStatusLabel(
+                song.complete
+            );
+
+
+        // --------------------------------
+        // Confident
+        // --------------------------------
+
+        const confidentTd =
+            document.createElement('td');
+
+        confidentTd.className =
+            'checkbox-cell';
+
+        confidentTd.textContent =
+            song.confident === true
+                ? '✓'
+                : '';
+
+
+        // --------------------------------
+        // Intro
+        // --------------------------------
+
+        const introTd =
+            document.createElement('td');
+
+        introTd.textContent =
+            song.intro || '';
+
+
+        tr.appendChild(
+            checkTd
+        );
+
+        tr.appendChild(
+            artistTd
+        );
+
+        tr.appendChild(
+            titleTd
+        );
+
+        tr.appendChild(
+            statusTd
+        );
+
+        tr.appendChild(
+            confidentTd
+        );
+
+        tr.appendChild(
+            introTd
+        );
+
+
+        registeredBody.appendChild(
+            tr
+        );
+
+    });
+
+
+    selectAllSongs.checked = false;
+}
+
+
+// ========================================
+// Select all
+// ========================================
+
+selectAllSongs.addEventListener(
+    'change',
+    () => {
+
+        const checkboxes =
+            document.querySelectorAll(
+                '.registered-song-checkbox'
+            );
+
+        checkboxes.forEach(
+            checkbox => {
+
+                checkbox.checked =
+                    selectAllSongs.checked;
+
+            }
+        );
+
+    }
+);
+
+
+// ========================================
+// Reload
+// ========================================
+
+reloadSongsBtn.addEventListener(
+    'click',
+    async () => {
+
+        await loadRegisteredSongs();
+
+    }
+);
+
+
+// ========================================
+// Delete selected songs
+// ========================================
+
+deleteSelectedBtn.addEventListener(
+    'click',
+    async () => {
+
+        const selected =
+            Array.from(
+                document.querySelectorAll(
+                    '.registered-song-checkbox:checked'
+                )
+            );
+
+
+        if (selected.length === 0) {
+
+            alert(
+                '削除する曲を選択してください。'
+            );
+
+            return;
+        }
+
+
+        const ids =
+            selected.map(
+                checkbox =>
+                    parseInt(
+                        checkbox.dataset.id,
+                        10
+                    )
+            );
+
+
+        const confirmed =
+            confirm(
+                `${ids.length}曲を削除します。\n\nこの操作は元に戻せません。`
+            );
+
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        deleteSelectedBtn.disabled =
+            true;
+
+
+        message.style.color = '';
+
+        message.textContent =
+            '削除しています...';
+
+
+        try {
+
+            const {
+                error
+            } =
+                await supabaseClient
+                    .from('songs')
+                    .delete()
+                    .in(
+                        'id',
+                        ids
+                    );
+
+
+            if (error) {
+                throw error;
+            }
+
+
+            message.style.color =
+                'green';
+
+            message.textContent =
+                `${ids.length}曲を削除しました。`;
+
+
+            await loadRegisteredSongs();
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            message.style.color =
+                'red';
+
+            message.textContent =
+                '削除に失敗しました：' +
+                error.message;
+
+        } finally {
+
+            deleteSelectedBtn.disabled =
+                false;
+
+        }
+
+    }
+);
