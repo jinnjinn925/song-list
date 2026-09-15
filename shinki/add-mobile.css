@@ -435,8 +435,9 @@ textarea {
 
 .registered-action-row {
     display: flex;
-    align-items: center;
-    gap: 8px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
     width: 100%;
     box-sizing: border-box;
 }
@@ -444,26 +445,27 @@ textarea {
 .registered-action-row .select-all-label {
     display: flex;
     align-items: center;
-    gap: 6px;
-    flex: 1;
-    min-width: 0;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
     margin: 0;
+    padding: 4px 0;
+    font-size: 15px;
     white-space: nowrap;
 }
 
 .registered-action-row .select-all-label input[type="checkbox"] {
     flex-shrink: 0;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     margin: 0;
 }
 
 .registered-action-row #reload-songs-btn {
-    flex: 0 0 auto;
-    width: 140px;
-    min-height: 44px;
+    width: 100%;
+    min-height: 46px;
     box-sizing: border-box;
-    padding: 10px 14px;
-    white-space: nowrap;
+    padding: 10px 16px;
     margin: 0;
+    white-space: nowrap;
 }
