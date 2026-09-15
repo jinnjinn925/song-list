@@ -30,6 +30,9 @@ const previewSection =
 const message =
     document.getElementById('message');
 
+const managementKeyInput =
+    document.getElementById('management-key');
+
 
 // ========================================
 // Get streamer ID from URL
