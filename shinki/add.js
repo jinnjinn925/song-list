@@ -1242,6 +1242,10 @@ document
                 submitError.style.color =
     				'green';
 
+				message.textContent =
+    				insertData.length +
+    				' songs registered successfully.';
+
 				submitError.textContent =
     				insertData.length +
     				'曲を登録しました。';
