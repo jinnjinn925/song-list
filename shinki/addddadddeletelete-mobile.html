@@ -163,15 +163,47 @@
         </div>
 
         <div class="registered-controls">
-            <label class="select-all-label">
-                <input type="checkbox" id="select-all-songs">
-                <span>すべて選択</span>
-            </label>
 
-            <button type="button" id="reload-songs-btn" class="sub-button">
-                曲一覧を更新
-            </button>
-        </div>
+		<div class="registered-search-row">
+
+			<input
+				type="search"
+				id="registered-search"
+				placeholder="アーティスト・曲名を検索"
+				autocomplete="off"
+			>
+
+			<select id="registered-sort">
+				<option value="artist">アーティスト順</option>
+				<option value="title">曲名順</option>
+				<option value="newest">登録が新しい順</option>
+			</select>
+
+		</div>
+
+
+		<div class="registered-action-row">
+
+			<label class="select-all-label">
+				<input
+					type="checkbox"
+					id="select-all-songs"
+				>
+				表示中をすべて選択
+			</label>
+
+
+			<button
+				type="button"
+				id="reload-songs-btn"
+				class="sub-button"
+			>
+				曲一覧を更新
+			</button>
+
+		</div>
+
+	</div>
 
         <div class="mobile-table">
             <table class="song-table registered-table">
