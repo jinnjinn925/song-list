@@ -716,7 +716,7 @@ h3 {
 .registered-action-row #reload-songs-btn {
     flex: 0 0 auto;
     box-sizing: border-box;
-    width: 140px;
+    width: 360px;
     min-height: 44px;
     padding: 10px 16px;
     white-space: nowrap;
