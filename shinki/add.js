@@ -1398,7 +1398,7 @@ async function loadRegisteredSongs() {
         await supabaseClient
             .from('songs')
             .select(
-                'id, artist, title, complete, confident, intro'
+                'id, artist, title, complete, confident, intro, artist_initial, title_initial'
             )
             .eq(
                 'streamer_id',
@@ -1493,47 +1493,110 @@ async function loadRegisteredSongs() {
 
         filteredSongs.sort((a, b) => {
 
-            if (sortType === 'title') {
+			// --------------------------------
+			// 曲名順
+			// --------------------------------
 
-                return (
-                    (a.title || '')
-                        .localeCompare(
-                            b.title || '',
-                            'ja'
-                        )
-                );
-            }
+			if (sortType === 'title') {
 
-            if (sortType === 'newest') {
+				const aInitial =
+					(a.title_initial || '').trim();
 
-                return (
-                    Number(b.id) -
-                    Number(a.id)
-                );
-            }
+				const bInitial =
+					(b.title_initial || '').trim();
 
-            const artistCompare =
-                (a.artist || '')
-                    .localeCompare(
-                        b.artist || '',
-                        'ja'
-                    );
+				const initialCompare =
+					aInitial.localeCompare(
+						bInitial,
+						'ja'
+					);
 
-            if (artistCompare !== 0) {
-                return artistCompare;
-            }
+				if (initialCompare !== 0) {
+					return initialCompare;
+				}
 
-            return (
-                (a.title || '')
-                    .localeCompare(
-                        b.title || '',
-                        'ja'
-                    )
-            );
-        });
+				return (
+					(a.title || '').localeCompare(
+						b.title || '',
+						'ja'
+					)
+				);
+			}
 
 
-        registeredBody.innerHTML = '';
+			// --------------------------------
+			// 登録が新しい順
+			// --------------------------------
+
+			if (sortType === 'newest') {
+
+				return (
+					Number(b.id) -
+					Number(a.id)
+				);
+			}
+
+
+			// --------------------------------
+			// アーティスト順
+			// --------------------------------
+
+			const aArtistInitial =
+				(a.artist_initial || '').trim();
+
+			const bArtistInitial =
+				(b.artist_initial || '').trim();
+
+
+			const artistInitialCompare =
+				aArtistInitial.localeCompare(
+					bArtistInitial,
+					'ja'
+				);
+
+			if (artistInitialCompare !== 0) {
+				return artistInitialCompare;
+			}
+
+
+			const artistCompare =
+				(a.artist || '').localeCompare(
+					b.artist || '',
+					'ja'
+				);
+
+			if (artistCompare !== 0) {
+				return artistCompare;
+			}
+
+
+			// 同じアーティストなら曲名順
+			const aTitleInitial =
+				(a.title_initial || '').trim();
+
+			const bTitleInitial =
+				(b.title_initial || '').trim();
+
+
+			const titleInitialCompare =
+				aTitleInitial.localeCompare(
+					bTitleInitial,
+					'ja'
+				);
+
+			if (titleInitialCompare !== 0) {
+				return titleInitialCompare;
+			}
+
+
+			return (
+				(a.title || '').localeCompare(
+					b.title || '',
+					'ja'
+				)
+			);
+
+		});
 
 
         // --------------------------------
