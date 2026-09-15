@@ -232,7 +232,7 @@ body {
 
     font-size: 18px;/* アーティスト名の文字サイズ */
     font-weight: 700;
-	color: #222;      /* ← 文字色を変更したい場合はここを追加（例: color: #fff; で白） */
+	color: #DDDDDD;      /* ← 文字色を変更したい場合はここを追加（例: color: #fff; で白） */
 
     border-bottom: 2px solid #184F88; /*アーティスト名の下の線の色*/
 
@@ -271,7 +271,7 @@ body {
     padding: 9px 5px;
 
     font-size: 16px;/* 曲名の文字サイズ */
-	color: #222;     /* ← 曲名の文字色を変更したい場合はここを追加 */
+	color: #dddddd;     /* ← 曲名の文字色を変更したい場合はここを追加 */
 
     /*border-bottom: 1px solid #e5e5e5;/* 各曲の間の区切り線の色 */
 }
