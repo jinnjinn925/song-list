@@ -1163,6 +1163,9 @@ document
         			'submit-error'
     			);
 
+			submitError.textContent = '';
+			submitError.style.color = '';
+
 
             button.disabled =
                 true;
