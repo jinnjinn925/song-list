@@ -1761,3 +1761,210 @@ deleteSelectedBtn.addEventListener(
 
     }
 );
+
+// ========================================
+// 管理キー再設定
+// ========================================
+
+const showResetBtn =
+    document.getElementById(
+        'show-reset-btn'
+    );
+
+const resetForm =
+    document.getElementById(
+        'reset-form'
+    );
+
+const resetManagementKeyBtn =
+    document.getElementById(
+        'reset-management-key-btn'
+    );
+
+if (showResetBtn) {
+
+    showResetBtn.addEventListener(
+        'click',
+        () => {
+
+            resetForm.style.display =
+                resetForm.style.display === 'none'
+                    ? 'block'
+                    : 'none';
+
+        }
+    );
+
+}
+
+
+if (resetManagementKeyBtn) {
+
+    resetManagementKeyBtn.addEventListener(
+        'click',
+        async () => {
+
+            const streamerId =
+                parseInt(
+                    document.getElementById(
+                        'streamer-id'
+                    ).value,
+                    10
+                );
+
+            const resetKey =
+                document.getElementById(
+                    'reset-key'
+                ).value.trim();
+
+            const newKey =
+                document.getElementById(
+                    'new-management-key'
+                ).value.trim();
+
+            const confirmKey =
+                document.getElementById(
+                    'new-management-key-confirm'
+                ).value.trim();
+
+            const resetMessage =
+                document.getElementById(
+                    'reset-message'
+                );
+
+
+            resetMessage.textContent = '';
+
+
+            if (!resetKey) {
+
+                resetMessage.textContent =
+                    '再設定コードを入力してください。';
+
+                return;
+
+            }
+
+
+            if (!newKey) {
+
+                resetMessage.textContent =
+                    '新しい管理キーを入力してください。';
+
+                return;
+
+            }
+
+
+            if (newKey !== confirmKey) {
+
+                resetMessage.textContent =
+                    '新しい管理キーが一致していません。';
+
+                return;
+
+            }
+
+
+            if (newKey.length < 8) {
+
+                resetMessage.textContent =
+                    '管理キーは8文字以上にしてください。';
+
+                return;
+
+            }
+
+
+            resetManagementKeyBtn.disabled =
+                true;
+
+            resetMessage.textContent =
+                '再設定しています……';
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        `${supabaseUrl}/functions/v1/management`,
+                        {
+                            method: 'POST',
+
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
+
+                            body: JSON.stringify({
+                                action: 'reset',
+                                streamer_id:
+                                    Number(streamerId),
+                                reset_key:
+                                    resetKey,
+                                new_management_key:
+                                    newKey
+                            })
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        data?.error ||
+                        '管理キーの再設定に失敗しました。'
+                    );
+
+                }
+
+
+                resetMessage.style.color =
+                    'green';
+
+                resetMessage.textContent =
+                    '管理キーを再設定しました。新しい管理キーを使ってください。';
+
+
+                document.getElementById(
+                    'management-key'
+                ).value = newKey;
+
+                document.getElementById(
+                    'reset-key'
+                ).value = '';
+
+                document.getElementById(
+                    'new-management-key'
+                ).value = '';
+
+                document.getElementById(
+                    'new-management-key-confirm'
+                ).value = '';
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                resetMessage.style.color =
+                    'crimson';
+
+                resetMessage.textContent =
+                    error.message;
+
+            } finally {
+
+                resetManagementKeyBtn.disabled =
+                    false;
+
+            }
+
+        }
+    );
+
+}
