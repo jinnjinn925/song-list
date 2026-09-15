@@ -490,29 +490,30 @@ function addInputRow(
 
 
     // ========================================
-    // Intro
-    // ========================================
+	// Intro
+	// ========================================
 
-    const introTd =
-        document.createElement('td');
+	const introTd =
+		document.createElement('td');
 
+	const introInput =
+		document.createElement('input');
 
-    introInput.type =
-        'text';
+	introInput.type =
+		'text';
 
-    introInput.className =
-        'row-intro';
+	introInput.className =
+		'row-intro';
 
-    introInput.placeholder =
-        'Optional';
+	introInput.placeholder =
+		'Optional';
 
-    introInput.value =
-        intro;
+	introInput.value =
+		intro;
 
-    introTd.appendChild(
-        introInput
-    );
-
+	introTd.appendChild(
+		introInput
+	);
 
     // ========================================
     // Delete
