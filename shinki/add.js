@@ -57,6 +57,34 @@ async function loadExistingArtists() {
 
 }
 
+function createArtistDatalist() {
+
+    let datalist =
+        document.getElementById('artist-list');
+
+    if (datalist) {
+        datalist.remove();
+    }
+
+    datalist =
+        document.createElement('datalist');
+
+    datalist.id = 'artist-list';
+
+    existingArtists.forEach(artist => {
+
+        const option =
+            document.createElement('option');
+
+        option.value =
+            artist.name;
+
+        datalist.appendChild(option);
+    });
+
+    document.body.appendChild(datalist);
+}
+
 const inputBody =
     document.getElementById('input-body');
 
@@ -105,6 +133,7 @@ window.addEventListener('load', async () => {
     }
 	
 	await loadExistingArtists();
+	createArtistDatalist();
 
     for (let i = 0; i < 3; i++) {
         addInputRow();
@@ -205,10 +234,15 @@ function addInputRow(
         'row-artist';
 
     artistInput.placeholder =
-        'Artist';
+        'アーティスト';
 
     artistInput.value =
         artist;
+
+    artistInput.setAttribute(
+        'list',
+        'artist-list'
+    );
 
     artistTd.appendChild(
         artistInput
@@ -217,27 +251,123 @@ function addInputRow(
 
     // Title
 
-    const titleTd =
-        document.createElement('td');
-
     const titleInput =
-        document.createElement('input');
+    document.createElement('input');
 
-    titleInput.type =
-        'text';
+	titleInput.type =
+		'text';
 
-    titleInput.className =
-        'row-title';
+	titleInput.className =
+		'row-title';
 
-    titleInput.placeholder =
-        'Title';
+	titleInput.placeholder =
+		'曲名';
 
-    titleInput.value =
-        title;
+	titleInput.value =
+		title;
 
-    titleTd.appendChild(
-        titleInput
-    );
+
+	// この行専用の曲名候補
+	const songListId =
+		'song-list-' +
+		Date.now() +
+		'-' +
+		Math.random()
+			.toString(36)
+			.substring(2, 8);
+
+	titleInput.setAttribute(
+		'list',
+		songListId
+	);
+
+	const songDatalist =
+		document.createElement('datalist');
+
+	songDatalist.id =
+		songListId;
+
+	document.body.appendChild(
+		songDatalist
+	);
+
+	titleTd.appendChild(
+		titleInput
+	);
+		
+	
+	artistInput.addEventListener(
+    'change',
+    async () => {
+
+        songDatalist.innerHTML = '';
+
+        const artistName =
+            artistInput.value.trim();
+
+        if (!artistName) {
+            return;
+        }
+
+        const selectedArtist =
+            existingArtists.find(
+                item =>
+                    item.name === artistName
+            );
+
+        // 新規アーティストなら候補なし
+        if (!selectedArtist) {
+            return;
+        }
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from('songs')
+                .select(`
+                    id,
+                    title,
+                    intro
+                `)
+                .eq(
+                    'artist_id',
+                    selectedArtist.id
+                )
+                .order(
+                    'title',
+                    {
+                        ascending: true
+                    }
+                );
+
+        if (error) {
+
+            console.error(
+                '曲一覧の取得に失敗しました。',
+                error
+            );
+
+            return;
+        }
+
+        (data || []).forEach(song => {
+
+            const option =
+                document.createElement(
+                    'option'
+                );
+
+            option.value =
+                song.title;
+
+            songDatalist.appendChild(
+                option
+            );
+        });
+    }
+);
 
 
     // Complete status
@@ -344,6 +474,8 @@ function addInputRow(
     );
 
 
+    // Row
+
     tr.appendChild(
         artistTd
     );
@@ -368,12 +500,11 @@ function addInputRow(
         deleteTd
     );
 
+
     inputBody.appendChild(
         tr
     );
-
 }
-
 
 // ========================================
 // Collect input rows
