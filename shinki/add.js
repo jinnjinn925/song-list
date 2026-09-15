@@ -801,21 +801,16 @@ async function generateReadings(rows) {
 
                         body: JSON.stringify({
 
-                            // 既存アーティストなら
-                            // 空文字 → 生成しない
-                            artist:
-                                artistInitial
-                                    ? ''
-                                    : artistName,
+							artist:
+								artistInitial
+									? null
+									: artistName,
 
-                            // 既存曲なら
-                            // 空文字 → 生成しない
-                            title:
-                                titleInitial
-                                    ? ''
-                                    : titleName
-
-                        })
+							title:
+								titleInitial
+									? null
+									: titleName
+						})
                     }
                 );
 
