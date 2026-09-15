@@ -1341,6 +1341,16 @@ const deleteSelectedBtn =
         'delete-selected-btn'
     );
 
+const registeredSearchInput =
+    document.getElementById(
+        'registered-search'
+    );
+
+const registeredSortSelect =
+    document.getElementById(
+        'registered-sort'
+    );
+
 
 // ----------------------------------------
 // Complete status label
@@ -1377,8 +1387,6 @@ async function loadRegisteredSongs() {
     if (!Number.isInteger(streamerId)) {
         return;
     }
-
-    registeredBody.innerHTML = '';
 
     registeredBody.innerHTML =
         '<tr><td colspan="6">読み込み中...</td></tr>';
@@ -1421,9 +1429,7 @@ async function loadRegisteredSongs() {
         return;
     }
 
-
     registeredBody.innerHTML = '';
-
 
     if (!songs || songs.length === 0) {
 
@@ -1436,136 +1442,297 @@ async function loadRegisteredSongs() {
     }
 
 
-    songs.forEach(song => {
+    // --------------------------------
+    // 検索・ソート用の表示関数
+    // --------------------------------
 
-        const tr =
-            document.createElement('tr');
+    function renderRegisteredSongs() {
 
+        const searchText =
+            registeredSearchInput
+                ? registeredSearchInput.value
+                    .trim()
+                    .toLowerCase()
+                : '';
 
-        // --------------------------------
-        // Checkbox
-        // --------------------------------
-
-        const checkTd =
-            document.createElement('td');
-
-        checkTd.className =
-            'checkbox-cell';
-
-        const checkbox =
-            document.createElement('input');
-
-        checkbox.type =
-            'checkbox';
-
-        checkbox.className =
-            'registered-song-checkbox';
-
-        checkbox.dataset.id =
-            song.id;
-
-        checkTd.appendChild(
-            checkbox
-        );
+        const sortType =
+            registeredSortSelect
+                ? registeredSortSelect.value
+                : 'artist';
 
 
         // --------------------------------
-        // Artist
+        // 検索
         // --------------------------------
 
-        const artistTd =
-            document.createElement('td');
+        let filteredSongs =
+            songs.filter(song => {
 
-        artistTd.textContent =
-            song.artist || '';
+                if (!searchText) {
+                    return true;
+                }
+
+                const artist =
+                    (song.artist || '')
+                        .toLowerCase();
+
+                const title =
+                    (song.title || '')
+                        .toLowerCase();
+
+                return (
+                    artist.includes(searchText) ||
+                    title.includes(searchText)
+                );
+            });
 
 
         // --------------------------------
-        // Title
+        // ソート
         // --------------------------------
 
-        const titleTd =
-            document.createElement('td');
+        filteredSongs.sort((a, b) => {
 
-        titleTd.textContent =
-            song.title || '';
+            if (sortType === 'title') {
+
+                return (
+                    (a.title || '')
+                        .localeCompare(
+                            b.title || '',
+                            'ja'
+                        )
+                );
+            }
+
+            if (sortType === 'newest') {
+
+                return (
+                    Number(b.id) -
+                    Number(a.id)
+                );
+            }
+
+            const artistCompare =
+                (a.artist || '')
+                    .localeCompare(
+                        b.artist || '',
+                        'ja'
+                    );
+
+            if (artistCompare !== 0) {
+                return artistCompare;
+            }
+
+            return (
+                (a.title || '')
+                    .localeCompare(
+                        b.title || '',
+                        'ja'
+                    )
+            );
+        });
+
+
+        registeredBody.innerHTML = '';
 
 
         // --------------------------------
-        // Status
+        // 検索結果なし
         // --------------------------------
 
-        const statusTd =
-            document.createElement('td');
+        if (filteredSongs.length === 0) {
 
-        statusTd.textContent =
-            getStatusLabel(
-                song.complete
+            registeredBody.innerHTML =
+                '<tr><td colspan="6">該当する曲がありません。</td></tr>';
+
+            selectAllSongs.checked = false;
+
+            return;
+        }
+
+
+        // --------------------------------
+        // 曲を表示
+        // --------------------------------
+
+        filteredSongs.forEach(song => {
+
+            const tr =
+                document.createElement('tr');
+
+
+            // --------------------------------
+            // Checkbox
+            // --------------------------------
+
+            const checkTd =
+                document.createElement('td');
+
+            checkTd.className =
+                'checkbox-cell';
+
+            const checkbox =
+                document.createElement('input');
+
+            checkbox.type =
+                'checkbox';
+
+            checkbox.className =
+                'registered-song-checkbox';
+
+            checkbox.dataset.id =
+                song.id;
+
+            checkTd.appendChild(
+                checkbox
             );
 
 
+            // --------------------------------
+            // Artist
+            // --------------------------------
+
+            const artistTd =
+                document.createElement('td');
+
+            artistTd.textContent =
+                song.artist || '';
+
+
+            // --------------------------------
+            // Title
+            // --------------------------------
+
+            const titleTd =
+                document.createElement('td');
+
+            titleTd.textContent =
+                song.title || '';
+
+
+            // --------------------------------
+            // Status
+            // --------------------------------
+
+            const statusTd =
+                document.createElement('td');
+
+            statusTd.textContent =
+                getStatusLabel(
+                    song.complete
+                );
+
+
+            // --------------------------------
+            // Confident
+            // --------------------------------
+
+            const confidentTd =
+                document.createElement('td');
+
+            confidentTd.className =
+                'checkbox-cell';
+
+            confidentTd.textContent =
+                song.confident === true
+                    ? '✓'
+                    : '';
+
+
+            // --------------------------------
+            // Intro
+            // --------------------------------
+
+            const introTd =
+                document.createElement('td');
+
+            introTd.textContent =
+                song.intro || '';
+
+
+            tr.appendChild(
+                checkTd
+            );
+
+            tr.appendChild(
+                artistTd
+            );
+
+            tr.appendChild(
+                titleTd
+            );
+
+            tr.appendChild(
+                statusTd
+            );
+
+            tr.appendChild(
+                confidentTd
+            );
+
+            tr.appendChild(
+                introTd
+            );
+
+
+            registeredBody.appendChild(
+                tr
+            );
+
+        });
+
+
         // --------------------------------
-        // Confident
+        // 表示中の曲がすべて選択されているか
         // --------------------------------
 
-        const confidentTd =
-            document.createElement('td');
+        const visibleCheckboxes =
+            registeredBody.querySelectorAll(
+                '.registered-song-checkbox'
+            );
 
-        confidentTd.className =
-            'checkbox-cell';
-
-        confidentTd.textContent =
-            song.confident === true
-                ? '✓'
-                : '';
-
-
-        // --------------------------------
-        // Intro
-        // --------------------------------
-
-        const introTd =
-            document.createElement('td');
-
-        introTd.textContent =
-            song.intro || '';
+        selectAllSongs.checked =
+            visibleCheckboxes.length > 0 &&
+            Array.from(
+                visibleCheckboxes
+            ).every(
+                checkbox =>
+                    checkbox.checked
+            );
+    }
 
 
-        tr.appendChild(
-            checkTd
-        );
+    // --------------------------------
+    // 初回表示
+    // --------------------------------
 
-        tr.appendChild(
-            artistTd
-        );
-
-        tr.appendChild(
-            titleTd
-        );
-
-        tr.appendChild(
-            statusTd
-        );
-
-        tr.appendChild(
-            confidentTd
-        );
-
-        tr.appendChild(
-            introTd
-        );
+    renderRegisteredSongs();
 
 
-        registeredBody.appendChild(
-            tr
-        );
+    // --------------------------------
+    // 検索
+    // --------------------------------
 
-    });
+    if (registeredSearchInput) {
+
+        registeredSearchInput.oninput =
+            renderRegisteredSongs;
+    }
+
+
+    // --------------------------------
+    // ソート
+    // --------------------------------
+
+    if (registeredSortSelect) {
+
+        registeredSortSelect.onchange =
+            renderRegisteredSongs;
+    }
 
 
     selectAllSongs.checked = false;
 }
-
 
 // ========================================
 // Select all
@@ -1576,7 +1743,7 @@ selectAllSongs.addEventListener(
     () => {
 
         const checkboxes =
-            document.querySelectorAll(
+            registeredBody.querySelectorAll(
                 '.registered-song-checkbox'
             );
 
@@ -1616,11 +1783,11 @@ deleteSelectedBtn.addEventListener(
     async () => {
 
         const selected =
-            Array.from(
-                document.querySelectorAll(
-                    '.registered-song-checkbox:checked'
-                )
-            );
+			Array.from(
+				registeredBody.querySelectorAll(
+					'.registered-song-checkbox:checked'
+				)
+			);
 
 
         if (selected.length === 0) {

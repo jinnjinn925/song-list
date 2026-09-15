@@ -254,23 +254,42 @@
 
         <!-- 全選択 -->
 
-        <div class="registered-controls">
+       <div class="registered-controls">
 
-            <label class="select-all-label">
-                <input
-                    type="checkbox"
-                    id="select-all-songs">
-                すべて選択
-            </label>
+		<div class="registered-search-row">
+			<input
+				type="search"
+				id="registered-search"
+				placeholder="アーティスト・曲名を検索"
+				autocomplete="off"
+			>
 
-            <button
-                type="button"
-                id="reload-songs-btn"
-                class="sub-button">
-                ↻ 曲一覧を更新
-            </button>
+			<select id="registered-sort">
+				<option value="artist">アーティスト順</option>
+				<option value="title">曲名順</option>
+				<option value="newest">登録が新しい順</option>
+			</select>
+		</div>
 
-        </div>
+		<div class="registered-action-row">
+			<label class="select-all-label">
+				<input
+					type="checkbox"
+					id="select-all-songs"
+				>
+				表示中をすべて選択
+			</label>
+
+			<button
+				type="button"
+				id="reload-songs-btn"
+				class="sub-button"
+			>
+				曲一覧を更新
+			</button>
+		</div>
+
+	</div>
 
 
         <!-- 登録済み曲一覧 -->
