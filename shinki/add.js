@@ -219,7 +219,9 @@ function addInputRow(
         document.createElement('tr');
 
 
+    // ========================================
     // Artist
+    // ========================================
 
     const artistTd =
         document.createElement('td');
@@ -249,126 +251,348 @@ function addInputRow(
     );
 
 
+    // ========================================
     // Title
+    // ========================================
+
+    const titleTd =
+        document.createElement('td');
 
     const titleInput =
-    document.createElement('input');
+        document.createElement('input');
 
-	titleInput.type =
-		'text';
+    titleInput.type =
+        'text';
 
-	titleInput.className =
-		'row-title';
+    titleInput.className =
+        'row-title';
 
-	titleInput.placeholder =
-		'曲名';
+    titleInput.placeholder =
+        '曲名';
 
-	titleInput.value =
-		title;
+    titleInput.value =
+        title;
 
 
-	// この行専用の曲名候補
-	const songListId =
-		'song-list-' +
-		Date.now() +
-		'-' +
-		Math.random()
-			.toString(36)
-			.substring(2, 8);
+    // この行専用の曲名候補リスト
 
-	titleInput.setAttribute(
-		'list',
-		songListId
-	);
+    const songListId =
+        'song-list-' +
+        Date.now() +
+        '-' +
+        Math.random()
+            .toString(36)
+            .substring(2, 8);
 
-	const songDatalist =
-		document.createElement('datalist');
+    titleInput.setAttribute(
+        'list',
+        songListId
+    );
 
-	songDatalist.id =
-		songListId;
+    const songDatalist =
+        document.createElement('datalist');
 
-	document.body.appendChild(
-		songDatalist
-	);
+    songDatalist.id =
+        songListId;
 
-	titleTd.appendChild(
-		titleInput
-	);
-		
-	
-	artistInput.addEventListener(
-    'change',
-    async () => {
+    document.body.appendChild(
+        songDatalist
+    );
 
-        songDatalist.innerHTML = '';
+    titleTd.appendChild(
+        titleInput
+    );
 
-        const artistName =
-            artistInput.value.trim();
 
-        if (!artistName) {
-            return;
-        }
+    // ========================================
+    // Artist → existing songs
+    // ========================================
 
-        const selectedArtist =
-            existingArtists.find(
-                item =>
-                    item.name === artistName
-            );
+    artistInput.addEventListener(
+        'change',
+        async () => {
 
-        // 新規アーティストなら候補なし
-        if (!selectedArtist) {
-            return;
-        }
+            songDatalist.innerHTML = '';
 
-        const {
-            data,
-            error
-        } =
-            await supabaseClient
-                .from('songs')
-                .select(`
-                    id,
-                    title,
-                    intro
-                `)
-                .eq(
-                    'artist_id',
-                    selectedArtist.id
-                )
-                .order(
-                    'title',
-                    {
-                        ascending: true
-                    }
+            const artistName =
+                artistInput.value.trim();
+
+            if (!artistName) {
+                return;
+            }
+
+            const selectedArtist =
+                existingArtists.find(
+                    item =>
+                        item.name === artistName
                 );
 
-        if (error) {
+            // 新規アーティストなら候補なし
 
-            console.error(
-                '曲一覧の取得に失敗しました。',
+            if (!selectedArtist) {
+                return;
+            }
+
+            const {
+                data,
                 error
-            );
+            } =
+                await supabaseClient
+                    .from('songs')
+                    .select(`
+                        id,
+                        title,
+                        intro
+                    `)
+                    .eq(
+                        'artist_id',
+                        selectedArtist.id
+                    )
+                    .order(
+                        'title',
+                        {
+                            ascending: true
+                        }
+                    );
 
-            return;
-        }
+            if (error) {
 
-        (data || []).forEach(song => {
-
-            const option =
-                document.createElement(
-                    'option'
+                console.error(
+                    '曲一覧の取得に失敗しました。',
+                    error
                 );
 
-            option.value =
-                song.title;
+                return;
+            }
 
-            songDatalist.appendChild(
-                option
-            );
-        });
-    }
-);
+            (data || []).forEach(song => {
 
+                const option =
+                    document.createElement(
+                        'option'
+                    );
+
+                option.value =
+                    song.title;
+
+                songDatalist.appendChild(
+                    option
+                );
+            });
+        }
+    );
+
+
+    // ========================================
+    // Existing song → intro
+    // ========================================
+
+    titleInput.addEventListener(
+        'change',
+        async () => {
+
+            const artistName =
+                artistInput.value.trim();
+
+            const titleName =
+                titleInput.value.trim();
+
+            const selectedArtist =
+                existingArtists.find(
+                    item =>
+                        item.name === artistName
+                );
+
+            if (!selectedArtist) {
+                return;
+            }
+
+            const {
+                data,
+                error
+            } =
+                await supabaseClient
+                    .from('songs')
+                    .select(`
+                        id,
+                        title,
+                        intro
+                    `)
+                    .eq(
+                        'artist_id',
+                        selectedArtist.id
+                    )
+                    .eq(
+                        'title',
+                        titleName
+                    )
+                    .maybeSingle();
+
+            if (error) {
+
+                console.error(
+                    '曲情報の取得に失敗しました。',
+                    error
+                );
+
+                return;
+            }
+
+            if (data) {
+
+                introInput.value =
+                    data.intro || '';
+
+            }
+        }
+    );
+
+
+    // ========================================
+    // Complete status
+    // ========================================
+
+    const completeTd =
+        document.createElement('td');
+
+    completeTd.appendChild(
+        createStatusSelect(
+            complete
+        )
+    );
+
+
+    // ========================================
+    // Confident
+    // ========================================
+
+    const confidentTd =
+        document.createElement('td');
+
+    confidentTd.className =
+        'checkbox-cell';
+
+    const confidentInput =
+        document.createElement('input');
+
+    confidentInput.type =
+        'checkbox';
+
+    confidentInput.className =
+        'row-confident';
+
+    confidentInput.checked =
+        confident;
+
+    confidentTd.appendChild(
+        confidentInput
+    );
+
+
+    // ========================================
+    // Intro
+    // ========================================
+
+    const introTd =
+        document.createElement('td');
+
+    const introInput =
+        document.createElement('input');
+
+    introInput.type =
+        'text';
+
+    introInput.className =
+        'row-intro';
+
+    introInput.placeholder =
+        'Optional';
+
+    introInput.value =
+        intro;
+
+    introTd.appendChild(
+        introInput
+    );
+
+
+    // ========================================
+    // Delete
+    // ========================================
+
+    const deleteTd =
+        document.createElement('td');
+
+    deleteTd.className =
+        'delete-cell';
+
+    const deleteButton =
+        document.createElement('button');
+
+    deleteButton.type =
+        'button';
+
+    deleteButton.textContent =
+        'X';
+
+    deleteButton.className =
+        'delete-button';
+
+    deleteButton.addEventListener(
+        'click',
+        () => {
+
+            tr.remove();
+
+            if (
+                inputBody.children.length === 0
+            ) {
+
+                addInputRow();
+
+            }
+
+        }
+    );
+
+    deleteTd.appendChild(
+        deleteButton
+    );
+
+
+    // ========================================
+    // Row
+    // ========================================
+
+    tr.appendChild(
+        artistTd
+    );
+
+    tr.appendChild(
+        titleTd
+    );
+
+    tr.appendChild(
+        completeTd
+    );
+
+    tr.appendChild(
+        confidentTd
+    );
+
+    tr.appendChild(
+        introTd
+    );
+
+    tr.appendChild(
+        deleteTd
+    );
+
+
+    inputBody.appendChild(
+        tr
+    );
+}
 
     // Complete status
 
