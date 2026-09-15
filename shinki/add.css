@@ -633,3 +633,22 @@ h3 {
 .registered-action-row #reload-songs-btn {
     flex-shrink: 0;
 }
+
+
+/* 登録済み曲：全選択 */
+.select-all-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.select-all-label input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    flex-shrink: 0;
+}
