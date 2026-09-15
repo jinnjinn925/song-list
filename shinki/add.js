@@ -678,92 +678,174 @@ function collectInputRows() {
 // Generate readings
 // ========================================
 
-async function generateReadings(rows) {
+async function generateReadings() {
+    const rows = collectInputRows();
 
-    const requestRows =
-        rows.map(row => ({
+    if (rows.length === 0) {
+        alert('曲を入力してください。');
+        return;
+    }
 
-            artist:
-                row.artist,
+    const results = [];
 
-            title:
-                row.title
+    for (const row of rows) {
+        const artistName = row.artist.trim();
+        const titleName = row.title.trim();
 
-        }));
+        if (!artistName || !titleName) {
+            continue;
+        }
 
+        // ================================
+        // 既存アーティストを探す
+        // ================================
 
-    const response =
-        await fetch(
-            FURIGANA_FUNCTION_URL,
-            {
+        const existingArtist =
+            existingArtists.find(
+                artist =>
+                    artist.name === artistName
+            );
 
-                method:
-                    'POST',
+        let artistInitial = '';
+        let titleInitial = '';
 
-                headers: {
+        // ================================
+        // 既存アーティスト
+        // ================================
 
-                    'Content-Type':
-                        'application/json'
+        if (existingArtist) {
+            // DBに登録済みの読みをそのまま使用
+            artistInitial =
+                existingArtist.artist_initial || '';
 
-                },
+            // ================================
+            // 既存曲を探す
+            // ================================
 
-                body:
-                    JSON.stringify({
+            const {
+                data: existingSong,
+                error: songError
+            } = await supabaseClient
+                .from('songs')
+                .select(`
+                    id,
+                    title,
+                    title_initial,
+                    intro
+                `)
+                .eq(
+                    'artist_id',
+                    existingArtist.id
+                )
+                .eq(
+                    'title',
+                    titleName
+                )
+                .maybeSingle();
 
-                        rows:
-                            requestRows
-
-                    })
-
+            if (songError) {
+                console.error(
+                    '既存曲の取得に失敗しました。',
+                    songError
+                );
             }
-        );
 
+            if (existingSong) {
+                // 既存曲ならタイトルの読みもDBから使用
+                titleInitial =
+                    existingSong.title_initial || '';
 
-    let data = null;
+                // イントロも既存値を使用
+                if (!row.intro) {
+                    row.intro =
+                        existingSong.intro || '';
+                }
+            }
+        }
 
+        // ================================
+        // 新規アーティスト or 新規曲
+        // ================================
 
-    try {
+        if (
+            !artistInitial ||
+            !titleInitial
+        ) {
+            try {
+                const response =
+                    await fetch(
+                        FURIGANA_FUNCTION_URL,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
+                            body: JSON.stringify({
+                                artist:
+                                    !artistInitial
+                                        ? artistName
+                                        : '',
+                                title:
+                                    !titleInitial
+                                        ? titleName
+                                        : ''
+                            })
+                        }
+                    );
 
-        data =
-            await response.json();
+                if (!response.ok) {
+                    throw new Error(
+                        `ひらがな生成に失敗しました (${response.status})`
+                    );
+                }
 
-    } catch (error) {
+                const data =
+                    await response.json();
 
-        console.error(
-            error
-        );
+                if (!artistInitial) {
+                    artistInitial =
+                        data.artist_initial || '';
+                }
 
+                if (!titleInitial) {
+                    titleInitial =
+                        data.title_initial || '';
+                }
+
+            } catch (error) {
+                console.error(
+                    'ひらがな生成エラー:',
+                    error
+                );
+
+                alert(
+                    'ひらがなの生成に失敗しました。'
+                );
+
+                return;
+            }
+        }
+
+        results.push({
+            ...row,
+            artist_initial:
+                artistInitial,
+            title_initial:
+                titleInitial
+        });
     }
 
+    generatedRows = results;
 
-    if (!response.ok) {
+    previewBody.innerHTML = '';
 
-        const detail =
-            data?.error ||
-            `HTTP ${response.status}`;
+    results.forEach(row => {
+        createPreviewRow(row);
+    });
 
-        throw new Error(
-            detail
-        );
-
-    }
-
-
-    if (
-        !Array.isArray(
-            data?.rows
-        )
-    ) {
-
-        throw new Error(
-            'Invalid response from furigana function.'
-        );
-
-    }
-
-
-    return data.rows;
-
+    inputSection.style.display = 'none';
+    previewSection.style.display = 'block';
 }
 
 
