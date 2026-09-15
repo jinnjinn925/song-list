@@ -1173,21 +1173,61 @@ document
 
             try {
 
-                const {
-                    error
-                } =
-                    await supabaseClient
-                        .from('songs')
-                        .insert(
-                            insertData
-                        );
+                const managementKey =
+    				document.getElementById(
+        				'management-key'
+    				).value.trim();
 
+				if (!managementKey) {
 
-                if (error) {
+    				throw new Error(
+        				'管理キーを入力してください。'
+    				);
 
-                    throw error;
+				}
 
-                }
+				const streamerId =
+    				document.getElementById(
+        				'streamer-id'
+    				).value;
+
+				const response =
+    				await fetch(
+        				`${supabaseUrl}/functions/v1/management`,
+        				{
+            				method: 'POST',
+
+            				headers: {
+                				'Content-Type':
+                    				'application/json'
+            				},
+
+            				body: JSON.stringify({
+                				action: 'insert',
+
+                				streamer_id:
+                    				Number(streamerId),
+
+                				management_key:
+                    				managementKey,
+
+                				songs:
+                    				insertData
+            				})
+        				}
+    				);
+
+				const result =
+    				await response.json();
+
+				if (!response.ok) {
+
+    				throw new Error(
+        				result.error ||
+        				'曲の登録に失敗しました。'
+    				);
+
+				}
 
 
                 message.style.color =
@@ -1614,20 +1654,68 @@ deleteSelectedBtn.addEventListener(
 
         try {
 
-            const {
-                error
-            } =
-                await supabaseClient
-                    .from('songs')
-                    .delete()
-                    .in(
-                        'id',
-                        ids
-                    );
+            const managementKey =
+                document.getElementById(
+                    'management-key'
+                ).value.trim();
 
 
-            if (error) {
-                throw error;
+            if (!managementKey) {
+
+                throw new Error(
+                    '管理キーを入力してください。'
+                );
+
+            }
+
+
+            const streamerId =
+                document.getElementById(
+                    'streamer-id'
+                ).value;
+
+
+            const response =
+                await fetch(
+                    `${supabaseUrl}/functions/v1/management`,
+                    {
+                        method: 'POST',
+
+                        headers: {
+                            'Content-Type':
+                                'application/json'
+                        },
+
+                        body: JSON.stringify({
+
+                            action:
+                                'delete',
+
+                            streamer_id:
+                                Number(streamerId),
+
+                            management_key:
+                                managementKey,
+
+                            song_ids:
+                                ids
+
+                        })
+                    }
+                );
+
+
+            const result =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    result.error ||
+                    '曲の削除に失敗しました。'
+                );
+
             }
 
 
