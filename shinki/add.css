@@ -622,16 +622,34 @@ h3 {
 .registered-action-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 8px;
+    gap: 12px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .registered-action-row .select-all-label {
-    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.registered-action-row .select-all-label input[type="checkbox"] {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    margin: 0;
 }
 
 .registered-action-row #reload-songs-btn {
-    flex-shrink: 0;
+    flex: 0 0 auto;
+    width: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+    white-space: nowrap;
 }
 
 
@@ -651,4 +669,53 @@ h3 {
     height: 16px;
     margin: 0;
     flex-shrink: 0;
+}
+
+#reload-songs-btn {
+    box-sizing: border-box;
+    max-width: 100%;
+    white-space: nowrap;
+}
+
+/* 登録済み曲の操作エリア */
+.registered-controls {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.registered-search-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 12px;
+}
+
+.registered-search-row input {
+    box-sizing: border-box;
+}
+
+.registered-action-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.registered-action-row .select-all-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.registered-action-row #reload-songs-btn {
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    white-space: nowrap;
+    margin: 0;
 }
