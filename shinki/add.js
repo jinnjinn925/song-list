@@ -1403,14 +1403,6 @@ async function loadRegisteredSongs() {
             .eq(
                 'streamer_id',
                 streamerId
-            )
-            .order(
-                'artist',
-                { ascending: true }
-            )
-            .order(
-                'title',
-                { ascending: true }
             );
 
     if (error) {
@@ -1429,21 +1421,9 @@ async function loadRegisteredSongs() {
         return;
     }
 
-    registeredBody.innerHTML = '';
-
-    if (!songs || songs.length === 0) {
-
-        registeredBody.innerHTML =
-            '<tr><td colspan="6">登録されている曲はありません。</td></tr>';
-
-        selectAllSongs.checked = false;
-
-        return;
-    }
-
 
     // --------------------------------
-    // 検索・ソート用の表示関数
+    // 表示
     // --------------------------------
 
     function renderRegisteredSongs() {
@@ -1465,148 +1445,155 @@ async function loadRegisteredSongs() {
         // 検索
         // --------------------------------
 
-        let filteredSongs =
-            songs.filter(song => {
+        const filteredSongs =
+            (songs || [])
+                .filter(song => {
 
-                if (!searchText) {
-                    return true;
-                }
+                    if (!searchText) {
+                        return true;
+                    }
 
-                const artist =
-                    (song.artist || '')
-                        .toLowerCase();
+                    const artist =
+                        (song.artist || '')
+                            .toLowerCase();
 
-                const title =
-                    (song.title || '')
-                        .toLowerCase();
+                    const title =
+                        (song.title || '')
+                            .toLowerCase();
 
-                return (
-                    artist.includes(searchText) ||
-                    title.includes(searchText)
-                );
-            });
+                    return (
+                        artist.includes(searchText) ||
+                        title.includes(searchText)
+                    );
+                });
 
 
         // --------------------------------
         // ソート
+        // ※元の songs は直接変更しない
         // --------------------------------
 
-        filteredSongs.sort((a, b) => {
+        const sortedSongs =
+            [...filteredSongs];
 
-			// --------------------------------
-			// 曲名順
-			// --------------------------------
+        sortedSongs.sort((a, b) => {
 
-			if (sortType === 'title') {
+            // 曲名順
+            if (sortType === 'title') {
 
-				const aInitial =
-					(a.title_initial || '').trim();
+                const initialCompare =
+                    (a.title_initial || '')
+                        .trim()
+                        .localeCompare(
+                            (b.title_initial || '')
+                                .trim(),
+                            'ja'
+                        );
 
-				const bInitial =
-					(b.title_initial || '').trim();
+                if (initialCompare !== 0) {
+                    return initialCompare;
+                }
 
-				const initialCompare =
-					aInitial.localeCompare(
-						bInitial,
-						'ja'
-					);
-
-				if (initialCompare !== 0) {
-					return initialCompare;
-				}
-
-				return (
-					(a.title || '').localeCompare(
-						b.title || '',
-						'ja'
-					)
-				);
-			}
+                return (
+                    (a.title || '')
+                        .localeCompare(
+                            b.title || '',
+                            'ja'
+                        )
+                );
+            }
 
 
-			// --------------------------------
-			// 登録が新しい順
-			// --------------------------------
+            // 登録が新しい順
+            if (sortType === 'newest') {
 
-			if (sortType === 'newest') {
-
-				return (
-					Number(b.id) -
-					Number(a.id)
-				);
-			}
+                return (
+                    Number(b.id) -
+                    Number(a.id)
+                );
+            }
 
 
-			// --------------------------------
-			// アーティスト順
-			// --------------------------------
+            // アーティスト順
+            const artistInitialCompare =
+                (a.artist_initial || '')
+                    .trim()
+                    .localeCompare(
+                        (b.artist_initial || '')
+                            .trim(),
+                        'ja'
+                    );
 
-			const aArtistInitial =
-				(a.artist_initial || '').trim();
-
-			const bArtistInitial =
-				(b.artist_initial || '').trim();
-
-
-			const artistInitialCompare =
-				aArtistInitial.localeCompare(
-					bArtistInitial,
-					'ja'
-				);
-
-			if (artistInitialCompare !== 0) {
-				return artistInitialCompare;
-			}
+            if (artistInitialCompare !== 0) {
+                return artistInitialCompare;
+            }
 
 
-			const artistCompare =
-				(a.artist || '').localeCompare(
-					b.artist || '',
-					'ja'
-				);
+            const artistCompare =
+                (a.artist || '')
+                    .localeCompare(
+                        b.artist || '',
+                        'ja'
+                    );
 
-			if (artistCompare !== 0) {
-				return artistCompare;
-			}
-
-
-			// 同じアーティストなら曲名順
-			const aTitleInitial =
-				(a.title_initial || '').trim();
-
-			const bTitleInitial =
-				(b.title_initial || '').trim();
+            if (artistCompare !== 0) {
+                return artistCompare;
+            }
 
 
-			const titleInitialCompare =
-				aTitleInitial.localeCompare(
-					bTitleInitial,
-					'ja'
-				);
+            // 同じアーティストなら曲名順
+            const titleInitialCompare =
+                (a.title_initial || '')
+                    .trim()
+                    .localeCompare(
+                        (b.title_initial || '')
+                            .trim(),
+                        'ja'
+                    );
 
-			if (titleInitialCompare !== 0) {
-				return titleInitialCompare;
-			}
+            if (titleInitialCompare !== 0) {
+                return titleInitialCompare;
+            }
 
-
-			return (
-				(a.title || '').localeCompare(
-					b.title || '',
-					'ja'
-				)
-			);
-
-		});
+            return (
+                (a.title || '')
+                    .localeCompare(
+                        b.title || '',
+                        'ja'
+                    )
+            );
+        });
 
 
         // --------------------------------
-        // 検索結果なし
+        // 一度だけ表示をクリア
         // --------------------------------
 
-        if (filteredSongs.length === 0) {
+        registeredBody.innerHTML = '';
 
-            registeredBody.innerHTML =
-                '<tr><td colspan="6">該当する曲がありません。</td></tr>';
+
+        // --------------------------------
+        // 曲がない場合
+        // --------------------------------
+
+        if (sortedSongs.length === 0) {
+
+            const tr =
+                document.createElement('tr');
+
+            const td =
+                document.createElement('td');
+
+            td.colSpan = 6;
+
+            td.textContent =
+                searchText
+                    ? '該当する曲がありません。'
+                    : '登録されている曲はありません。';
+
+            tr.appendChild(td);
+
+            registeredBody.appendChild(tr);
 
             selectAllSongs.checked = false;
 
@@ -1618,21 +1605,19 @@ async function loadRegisteredSongs() {
         // 曲を表示
         // --------------------------------
 
-        filteredSongs.forEach(song => {
+        sortedSongs.forEach(song => {
 
             const tr =
                 document.createElement('tr');
 
 
-            // --------------------------------
             // Checkbox
-            // --------------------------------
-
             const checkTd =
                 document.createElement('td');
 
             checkTd.className =
                 'checkbox-cell';
+
 
             const checkbox =
                 document.createElement('input');
@@ -1646,15 +1631,13 @@ async function loadRegisteredSongs() {
             checkbox.dataset.id =
                 song.id;
 
+
             checkTd.appendChild(
                 checkbox
             );
 
 
-            // --------------------------------
             // Artist
-            // --------------------------------
-
             const artistTd =
                 document.createElement('td');
 
@@ -1662,10 +1645,7 @@ async function loadRegisteredSongs() {
                 song.artist || '';
 
 
-            // --------------------------------
             // Title
-            // --------------------------------
-
             const titleTd =
                 document.createElement('td');
 
@@ -1673,10 +1653,7 @@ async function loadRegisteredSongs() {
                 song.title || '';
 
 
-            // --------------------------------
             // Status
-            // --------------------------------
-
             const statusTd =
                 document.createElement('td');
 
@@ -1686,10 +1663,7 @@ async function loadRegisteredSongs() {
                 );
 
 
-            // --------------------------------
             // Confident
-            // --------------------------------
-
             const confidentTd =
                 document.createElement('td');
 
@@ -1702,10 +1676,7 @@ async function loadRegisteredSongs() {
                     : '';
 
 
-            // --------------------------------
             // Intro
-            // --------------------------------
-
             const introTd =
                 document.createElement('td');
 
@@ -1713,35 +1684,14 @@ async function loadRegisteredSongs() {
                 song.intro || '';
 
 
-            tr.appendChild(
-                checkTd
-            );
+            tr.appendChild(checkTd);
+            tr.appendChild(artistTd);
+            tr.appendChild(titleTd);
+            tr.appendChild(statusTd);
+            tr.appendChild(confidentTd);
+            tr.appendChild(introTd);
 
-            tr.appendChild(
-                artistTd
-            );
-
-            tr.appendChild(
-                titleTd
-            );
-
-            tr.appendChild(
-                statusTd
-            );
-
-            tr.appendChild(
-                confidentTd
-            );
-
-            tr.appendChild(
-                introTd
-            );
-
-
-            registeredBody.appendChild(
-                tr
-            );
-
+            registeredBody.appendChild(tr);
         });
 
 
@@ -1765,17 +1715,11 @@ async function loadRegisteredSongs() {
     }
 
 
-    // --------------------------------
     // 初回表示
-    // --------------------------------
-
     renderRegisteredSongs();
 
 
-    // --------------------------------
     // 検索
-    // --------------------------------
-
     if (registeredSearchInput) {
 
         registeredSearchInput.oninput =
@@ -1783,10 +1727,7 @@ async function loadRegisteredSongs() {
     }
 
 
-    // --------------------------------
     // ソート
-    // --------------------------------
-
     if (registeredSortSelect) {
 
         registeredSortSelect.onchange =
@@ -1796,7 +1737,6 @@ async function loadRegisteredSongs() {
 
     selectAllSongs.checked = false;
 }
-
 // ========================================
 // Select all
 // ========================================
