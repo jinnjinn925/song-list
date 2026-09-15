@@ -1037,8 +1037,7 @@ function createPreviewRow(
     const introTd =
         document.createElement('td');
 
-    const introInput =
-        document.createElement('input');
+
 
     introInput.type =
         'text';
