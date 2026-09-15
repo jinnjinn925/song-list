@@ -459,10 +459,11 @@ textarea {
 }
 
 .registered-action-row #reload-songs-btn {
-    flex-shrink: 1;
-    width: auto;
-    max-width: 130px;
+    flex: 0 0 auto;
+    width: 140px;
+    min-height: 44px;
     box-sizing: border-box;
-    padding: 10px 12px;
+    padding: 10px 14px;
     white-space: nowrap;
+    margin: 0;
 }
