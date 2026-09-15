@@ -15,6 +15,48 @@ const FURIGANA_FUNCTION_URL =
 
 let generatedRows = [];
 
+// ========================================
+// Existing artists
+// ========================================
+
+let existingArtists = [];
+
+async function loadExistingArtists() {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from('artists')
+            .select(`
+                id,
+                name,
+                artist_initial
+            `)
+            .order(
+                'name',
+                {
+                    ascending: true
+                }
+            );
+
+    if (error) {
+
+        console.error(
+            'アーティスト一覧の取得に失敗しました。',
+            error
+        );
+
+        return;
+
+    }
+
+    existingArtists =
+        data || [];
+
+}
+
 const inputBody =
     document.getElementById('input-body');
 
@@ -61,8 +103,10 @@ window.addEventListener('load', () => {
         );
 
     }
+	
+	await loadExistingArtists();
 
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < 3; i++) {
         addInputRow();
     }
 	
