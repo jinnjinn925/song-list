@@ -30,6 +30,65 @@
             autocomplete="off"
         >
     </section>
+	
+	<div id="reset-key-area">
+
+		<button
+			type="button"
+			id="show-reset-btn"
+			class="sub-button"
+		>
+			管理キーを忘れた場合
+		</button>
+
+		<div id="reset-form" style="display:none;">
+
+			<label for="reset-key">
+				再設定コード
+			</label>
+
+			<input
+				type="text"
+				id="reset-key"
+				placeholder="再設定コードを入力"
+				autocomplete="off"
+			>
+
+			<label for="new-management-key">
+				新しい管理キー
+			</label>
+
+			<input
+				type="password"
+				id="new-management-key"
+				placeholder="新しい管理キー"
+				autocomplete="new-password"
+			>
+
+			<label for="new-management-key-confirm">
+				新しい管理キー（確認）
+			</label>
+
+			<input
+				type="password"
+				id="new-management-key-confirm"
+				placeholder="もう一度入力"
+				autocomplete="new-password"
+			>
+
+			<button
+				type="button"
+				id="reset-management-key-btn"
+				class="main-button"
+			>
+				管理キーを再設定
+			</button>
+
+			<div id="reset-message"></div>
+
+		</div>
+
+	</div>
 
     <section id="input-section" class="management-section">
         <div class="section-header">
