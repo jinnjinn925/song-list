@@ -1060,7 +1060,9 @@ async function loadSongs() {
             .replace('.html', '');
 
 
+    // =========================
     // ストリーマー情報
+    // =========================
 
     const {
         data: streamer,
@@ -1089,28 +1091,54 @@ async function loadSongs() {
     }
 
 
+    // =========================
     // ストリーマー名
+    // =========================
 
     streamerName.textContent =
         streamer.name;
 
 
+    // =========================
     // お気に入り
+    // =========================
 
     displayFavoriteArtists(
         streamer.favorite_artists || []
     );
 
 
+    // =========================
     // 曲情報
+    // streamer_songs
+    //   ↓
+    // songs_new
+    //   ↓
+    // artists
+    // =========================
 
     const {
-        data: songs,
+        data: streamerSongs,
         error: songsError
     } =
         await supabaseClient
-            .from('songs')
-            .select('*')
+            .from('streamer_songs')
+            .select(`
+                id,
+                complete,
+                confident,
+                song:songs(
+                    id,
+                    title,
+                    title_initial,
+                    intro,
+                    artist:artists(
+                        id,
+                        name,
+                        artist_initial
+                    )
+                )
+            `)
             .eq(
                 'streamer_id',
                 streamer.id
@@ -1130,7 +1158,58 @@ async function loadSongs() {
     }
 
 
+    // =========================
+    // 今までの data と同じ形にする
+    // =========================
+
+    const songs =
+        streamerSongs
+            .filter(
+                row =>
+                    row.song &&
+                    row.song.artist
+            )
+            .map(
+                row => {
+
+                    return {
+
+                        // 曲そのもの
+                        id:
+                            row.song.id,
+
+                        title:
+                            row.song.title,
+
+                        title_initial:
+                            row.song.title_initial,
+
+                        intro:
+                            row.song.intro,
+
+                        // アーティスト
+                        artist:
+                            row.song.artist.name,
+
+                        artist_initial:
+                            row.song.artist.artist_initial,
+
+                        // ストリーマーごとの情報
+                        complete:
+                            row.complete,
+
+                        confident:
+                            row.confident
+
+                    };
+
+                }
+            );
+
+
+    // =========================
     // 曲を並び替え
+    // =========================
 
     songs.sort((a, b) => {
 
@@ -1166,17 +1245,23 @@ async function loadSongs() {
     });
 
 
+    // =========================
     // データを保存
+    // =========================
 
     data = songs;
 
 
+    // =========================
     // 曲数表示
+    // =========================
 
     updateSongCount();
 
 
+    // =========================
     // 最初は一覧
+    // =========================
 
     document
         .querySelector(
@@ -1185,11 +1270,12 @@ async function loadSongs() {
         .classList.add('active');
 
 
+    // =========================
     // 表示
+    // =========================
 
     render();
 }
-
 
 // =========================
 // 検索メニュー

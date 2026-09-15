@@ -1406,7 +1406,7 @@ async function loadRegisteredSongs() {
                 id,
                 complete,
                 confident,
-                song:songs_new(
+                song:songs(
                     id,
                     title,
                     title_initial,
