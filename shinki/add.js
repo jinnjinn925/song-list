@@ -1158,6 +1158,11 @@ document
                     'submit-all-btn'
                 );
 
+			const submitError =
+    			document.getElementById(
+        			'submit-error'
+    			);
+
 
             button.disabled =
                 true;
@@ -1180,9 +1185,10 @@ document
 
 				if (!managementKey) {
 
-    				throw new Error(
-        				'管理キーを入力してください。'
-    				);
+    				submitError.textContent =
+        				'管理キーを入力してください。';
+
+    				return;
 
 				}
 
@@ -1222,11 +1228,11 @@ document
 
 				if (!response.ok) {
 
-    				throw new Error(
+    				submitError.textContent =
         				result.error ||
-        				'曲の登録に失敗しました。'
-    				);
+        				'曲の登録に失敗しました。';
 
+    				return;
 				}
 
 

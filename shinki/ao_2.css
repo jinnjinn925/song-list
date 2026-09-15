@@ -568,3 +568,11 @@ h3 {
     white-space: nowrap;
     cursor: pointer;
 }
+
+#submit-error {
+    margin-top: 8px;
+    color: #d33;
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+}
