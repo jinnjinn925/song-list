@@ -80,7 +80,7 @@ const managementKeyInput =
 // Get streamer ID from URL
 // ========================================
 
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
 
     const urlParams =
         new URLSearchParams(
