@@ -496,8 +496,6 @@ function addInputRow(
     const introTd =
         document.createElement('td');
 
-    const introInput =
-        document.createElement('input');
 
     introInput.type =
         'text';
@@ -678,27 +676,22 @@ function collectInputRows() {
 // Generate readings
 // ========================================
 
-async function generateReadings() {
-    const rows = collectInputRows();
-
-    if (rows.length === 0) {
-        alert('曲を入力してください。');
-        return;
-    }
+async function generateReadings(rows) {
 
     const results = [];
 
     for (const row of rows) {
-        const artistName = row.artist.trim();
-        const titleName = row.title.trim();
 
-        if (!artistName || !titleName) {
-            continue;
-        }
+        const artistName =
+            row.artist.trim();
 
-        // ================================
-        // 既存アーティストを探す
-        // ================================
+        const titleName =
+            row.title.trim();
+
+
+        // ========================================
+        // 既存アーティストを確認
+        // ========================================
 
         const existingArtist =
             existingArtists.find(
@@ -706,148 +699,197 @@ async function generateReadings() {
                     artist.name === artistName
             );
 
+
         let artistInitial = '';
         let titleInitial = '';
 
-        // ================================
+
+        // ========================================
         // 既存アーティスト
-        // ================================
+        // ========================================
 
         if (existingArtist) {
-            // DBに登録済みの読みをそのまま使用
+
+            // アーティストの読みはDBからそのまま使用
             artistInitial =
                 existingArtist.artist_initial || '';
 
-            // ================================
-            // 既存曲を探す
-            // ================================
+
+            // ========================================
+            // 既存曲を確認
+            // ========================================
 
             const {
                 data: existingSong,
                 error: songError
-            } = await supabaseClient
-                .from('songs')
-                .select(`
-                    id,
-                    title,
-                    title_initial,
-                    intro
-                `)
-                .eq(
-                    'artist_id',
-                    existingArtist.id
-                )
-                .eq(
-                    'title',
-                    titleName
-                )
-                .maybeSingle();
+            } =
+                await supabaseClient
+                    .from('songs')
+                    .select(`
+                        id,
+                        title,
+                        title_initial,
+                        intro
+                    `)
+                    .eq(
+                        'artist_id',
+                        existingArtist.id
+                    )
+                    .eq(
+                        'title',
+                        titleName
+                    )
+                    .maybeSingle();
+
 
             if (songError) {
+
                 console.error(
                     '既存曲の取得に失敗しました。',
                     songError
                 );
+
+                throw songError;
+
             }
 
+
+            // ========================================
+            // 既存曲
+            // ========================================
+
             if (existingSong) {
-                // 既存曲ならタイトルの読みもDBから使用
+
+                // 曲名の読みもDBからそのまま使用
                 titleInitial =
                     existingSong.title_initial || '';
 
+
                 // イントロも既存値を使用
                 if (!row.intro) {
+
                     row.intro =
                         existingSong.intro || '';
+
                 }
+
             }
+
         }
 
-        // ================================
-        // 新規アーティスト or 新規曲
-        // ================================
+
+        // ========================================
+        // 新規アーティスト・新規曲だけ生成
+        // ========================================
 
         if (
             !artistInitial ||
             !titleInitial
         ) {
-            try {
-                const response =
-                    await fetch(
-                        FURIGANA_FUNCTION_URL,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type':
-                                    'application/json'
-                            },
-                            body: JSON.stringify({
-                                artist:
-                                    !artistInitial
-                                        ? artistName
-                                        : '',
-                                title:
-                                    !titleInitial
-                                        ? titleName
-                                        : ''
-                            })
-                        }
-                    );
 
-                if (!response.ok) {
-                    throw new Error(
-                        `ひらがな生成に失敗しました (${response.status})`
-                    );
-                }
+            const response =
+                await fetch(
+                    FURIGANA_FUNCTION_URL,
+                    {
+                        method: 'POST',
 
-                const data =
-                    await response.json();
+                        headers: {
+                            'Content-Type':
+                                'application/json'
+                        },
 
-                if (!artistInitial) {
-                    artistInitial =
-                        data.artist_initial || '';
-                }
+                        body: JSON.stringify({
 
-                if (!titleInitial) {
-                    titleInitial =
-                        data.title_initial || '';
-                }
+                            // 既存アーティストなら
+                            // 空文字 → 生成しない
+                            artist:
+                                artistInitial
+                                    ? ''
+                                    : artistName,
 
-            } catch (error) {
-                console.error(
-                    'ひらがな生成エラー:',
-                    error
+                            // 既存曲なら
+                            // 空文字 → 生成しない
+                            title:
+                                titleInitial
+                                    ? ''
+                                    : titleName
+
+                        })
+                    }
                 );
 
-                alert(
-                    'ひらがなの生成に失敗しました。'
+
+            if (!response.ok) {
+
+                throw new Error(
+                    `ひらがな生成に失敗しました (${response.status})`
                 );
 
-                return;
             }
+
+
+            const data =
+                await response.json();
+
+
+            // 新規アーティストだけ取得
+            if (!artistInitial) {
+
+                artistInitial =
+                    data.artist_initial || '';
+
+            }
+
+
+            // 新規曲だけ取得
+            if (!titleInitial) {
+
+                titleInitial =
+                    data.title_initial || '';
+
+            }
+
         }
 
+
+        // ========================================
+        // プレビュー用の形にする
+        // ========================================
+
         results.push({
-            ...row,
-            artist_initial:
-                artistInitial,
-            title_initial:
-                titleInitial
+
+            artist:
+                artistName,
+
+            title:
+                titleName,
+
+            complete:
+                row.complete,
+
+            confident:
+                row.confident,
+
+            intro:
+                row.intro,
+
+            reading: {
+
+                artist_initial:
+                    artistInitial,
+
+                title_initial:
+                    titleInitial
+
+            }
+
         });
+
     }
 
-    generatedRows = results;
 
-    previewBody.innerHTML = '';
-
-    results.forEach(row => {
-        createPreviewRow(row);
-    });
-
-    inputSection.style.display = 'none';
-    previewSection.style.display = 'block';
+    return results;
 }
-
 
 // ========================================
 // Create preview row
@@ -912,6 +954,9 @@ function createPreviewRow(
         document.createElement('td');
 
     const titleInput =
+        document.createElement('input');
+		
+	const introInput =
         document.createElement('input');
 
     titleInput.type =
@@ -1190,35 +1235,10 @@ document
 
             try {
 
-                const readings =
-                    await generateReadings(
-                        rows
-                    );
-
-
-                if (
-                    readings.length !==
-                    rows.length
-                ) {
-
-                    throw new Error(
-                        'Reading count does not match song count.'
-                    );
-
-                }
-
-
                 generatedRows =
-                    rows.map(
-                        (row, index) => ({
-
-                            ...row,
-
-                            reading:
-                                readings[index]
-
-                        })
-                    );
+					await generateReadings(
+						rows
+					);
 
 
                 previewBody.innerHTML =
