@@ -576,3 +576,15 @@ h3 {
     font-weight: 700;
     text-align: center;
 }
+
+#reload-songs-btn {
+    background: #3F3FD3;
+    color: #fff;
+    border-color: #3F3FD3;
+    font-weight: 700;
+}
+
+#reload-songs-btn:hover {
+    background: #2A2F8B;
+    border-color: #2A2F8B;
+}
