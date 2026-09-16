@@ -135,7 +135,7 @@ window.addEventListener('load', async () => {
 	await loadExistingArtists();
 	createArtistDatalist();
 
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 1; i++) {
         addInputRow();
     }
 	
