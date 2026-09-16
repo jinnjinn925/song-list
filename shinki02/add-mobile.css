@@ -587,41 +587,99 @@ textarea {
    登録済み曲リストエリア（スクロール化 ＋ 2段組レイアウト）
    ======================================== */
 
-/* 1. リストを囲むコンテナにスクロールを設定 */
-#registered-section {
-    max-height: 320px;                   /* 枠の最大高さ（調整可能） */
-    overflow-y: auto;                    /* 溢れた場合に縦スクロール */
-    padding: 10px;
-    background-color: #fafafa;           /* スクロール領域を明確化 */
-    border: 1px solid #eee;
+/* ========================================
+   1. 登録曲テーブルのコンテナ（スクロール化）
+   ======================================== */
+#registered-section .mobile-table {
+    max-height: 360px;                 /* スクロール枠の高さ（好みで調整） */
+    overflow-y: auto;                  /* 溢れた場合のみ縦スクロール */
+    overflow-x: hidden;                /* 横スクロールを防止 */
+    padding: 8px;
+    margin-bottom: 12px;
+    background-color: #fafafa;
+    border: 1px solid #e5e7eb;
     border-radius: 10px;
-    -webkit-overflow-scrolling: touch;   /* スマホの滑らかな慣性スクロール */
+    -webkit-overflow-scrolling: touch; /* スマホの滑らかな慣性スクロール */
 }
 
-/* 2. リスト要素（ul / ol）を2段組（2列グリッド）にする */
-#registered-section ul,
-#registered-section ol,
-#registered-section .song-list {         /* 実際に使用しているクラス/タグに合わせて適用 */
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 均等な2列配置 */
-    gap: 8px;                            /* 項目同士の間隔 */
-    list-style: none;
-    padding: 0;
-    margin: 0;
+/* ========================================
+   2. テーブル行（tr）を2段組（2列カード）に変換
+   ======================================== */
+/* ヘッダー（<th>）はスマホ表示では非表示化 */
+.registered-table thead {
+    display: none;
 }
 
-/* 3. 各曲カード・項目（li）の見た目を整える */
-#registered-section li,
-#registered-section .song-item {
-    background: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 8px 10px;
-    font-size: 13px;
+/* tbodyを2列グリッド化 */
+#registered-body {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important; /* 均等な2列配置 */
+    gap: 8px !important;                               /* カード同士の間隔 */
+    width: 100%;
     box-sizing: border-box;
+}
 
-    /* 長いテキストがみ出ないように省略表示 */
+/* 1曲分の行（tr）を1つのカードとして整形 */
+#registered-body tr {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px;
+    box-sizing: border-box;
+    min-width: 0; /* 幅崩れ防止 */
+}
+
+/* セル（td）のレイアウト調整 */
+#registered-body td {
+    display: block;
+    padding: 2px 0;
+    font-size: 13px;
+    border: none;
+    min-width: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+/* 選択用チェックボックス行 */
+#registered-body td:first-child {
+    margin-bottom: 4px;
+    padding-bottom: 4px;
+    border-bottom: 1px dashed #eee;
+}
+
+/* ========================================
+   3. スクロール枠外のボタンエリア（横並び）
+   ======================================== */
+.registered-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 12px;
+}
+
+#save-registered-changes-btn,
+#delete-selected-btn {
+    flex: 1;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 8px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#save-registered-changes-btn {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+
+#delete-selected-btn {
+    background-color: #dc2626;
+    color: #ffffff;
 }
