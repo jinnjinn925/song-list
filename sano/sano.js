@@ -697,151 +697,82 @@ function updateCompleteButton() {
 // お気に入りアーティスト表示
 // =========================
 
-function displayFavoriteArtists(
-    favoriteList
-) {
+// =========================
+// お気に入りアーティスト表示
+// =========================
 
-    favoriteArtistList =
-        favoriteList || [];
+// =========================
+// お気に入りアーティスト表示
+// =========================
 
-    // ★ complete-filter以外のボタン（過去に生成したアーティストボタン）だけを削除する
-    favoriteArtists
-        .querySelectorAll('.favorite-button:not(#complete-filter)')
-        .forEach(el => el.remove());
+function displayFavoriteArtists(favoriteList) {
 
+    favoriteArtistList = favoriteList || [];
 
-    if (
-        !favoriteList ||
-        favoriteList.length === 0
-    ) {
+    // `#favorite-artists` 内（前回生成されたボタン）をクリア
+    favoriteArtists.innerHTML = '';
 
-        favoriteSection.style.display =
-            'none';
-
-        return;
-    }
+    // セクション全体を常に表示
+    favoriteSection.style.display = 'block';
 
 
-    favoriteSection.style.display =
-        'block';
+    // -------------------------
+    // 好きな歌手ボタン（常に表示）
+    // -------------------------
+    const artistButton = document.createElement('button');
+    artistButton.textContent = '好きな歌手';
+    artistButton.className = 'favorite-button';
+
+    artistButton.addEventListener('click', () => {
+        if (favoriteMode === 'artist') {
+            favoriteMode = null;
+        } else {
+            favoriteMode = 'artist';
+        }
+
+        currentRow = null;
+
+        document.querySelectorAll('#artist-nav button').forEach(navButton => {
+            navButton.classList.remove('active');
+        });
+
+        artistButton.classList.toggle('active', favoriteMode === 'artist');
+        confidentButton.classList.remove('active');
+
+        render();
+    });
+
+    favoriteArtists.appendChild(artistButton);
 
 
-    // 好きなアーティスト
+    // -------------------------
+    // 自信曲ボタン（常に表示）
+    // -------------------------
+    const confidentButton = document.createElement('button');
+    confidentButton.textContent = '自信曲';
+    confidentButton.className = 'favorite-button';
 
-    const artistButton =
-        document.createElement('button');
+    confidentButton.addEventListener('click', () => {
+        if (favoriteMode === 'confident') {
+            favoriteMode = null;
+        } else {
+            favoriteMode = 'confident';
+        }
 
-    artistButton.textContent =
-        '好きな歌手';
+        currentRow = null;
 
-    artistButton.className =
-        'favorite-button';
+        document.querySelectorAll('#artist-nav button').forEach(navButton => {
+            navButton.classList.remove('active');
+        });
 
+        confidentButton.classList.toggle('active', favoriteMode === 'confident');
+        artistButton.classList.remove('active');
 
-    artistButton.addEventListener(
-    	'click',
-    	() => {
+        render();
+    });
 
-        	if (favoriteMode === 'artist') {
-            	favoriteMode = null;
-        	} else {
-            	favoriteMode = 'artist';
-        	}
-
-        	currentRow = null;
-
-        	document
-            	.querySelectorAll(
-                	'#artist-nav button'
-            	)
-            	.forEach(
-                	navButton => {
-
-                    	navButton.classList.remove(
-                        	'active'
-                    	);
-
-                	}
-            	);
-
-        	artistButton.classList.toggle(
-            	'active',
-            	favoriteMode === 'artist'
-        	);
-
-        	confidentButton.classList.remove(
-            	'active'
-        	);
-
-        	render();
-
-    	}
-	);
-
-
-    // 自信曲
-
-    const confidentButton =
-        document.createElement('button');
-
-    confidentButton.textContent =
-        '自信曲';
-
-    confidentButton.className =
-        'favorite-button';
-
-
-    confidentButton.addEventListener(
-    	'click',
-    	() => {
-
-        	if (favoriteMode === 'confident') {
-            	favoriteMode = null;
-        	} else {
-            	favoriteMode = 'confident';
-        	}
-
-        	currentRow = null;
-
-        	document
-            	.querySelectorAll(
-                	'#artist-nav button'
-            	)
-            	.forEach(
-                	navButton => {
-
-                    	navButton.classList.remove(
-                        	'active'
-                    	);
-
-                	}
-				);
-
-        	confidentButton.classList.toggle(
-            	'active',
-            	favoriteMode === 'confident'
-        	);
-
-        	artistButton.classList.remove(
-            	'active'
-        	);
-
-        	render();
-
-    	}
-	);
-
-
-    favoriteArtists.appendChild(
-        artistButton
-    );
-
-    favoriteArtists.appendChild(
-        confidentButton
-    );
-
+    favoriteArtists.appendChild(confidentButton);
 }
-
 
 // =========================
 // 現在の条件で再表示
