@@ -615,19 +615,7 @@ function displaySongs(songs) {
 		songDiv.appendChild(titleDiv);
 
 		// 歌いだし（登録されている場合だけ）
-		if (song.intro) {
-
-    		const introDiv =
-        		document.createElement('div');
-
-    		introDiv.textContent =
-        		song.intro;
-
-    		introDiv.className =
-        		'song-intro';
-
-    		songDiv.appendChild(introDiv);
-		}
+		
 
 		artistSongs.appendChild(songDiv);
 
@@ -1133,7 +1121,6 @@ async function loadSongs() {
                     id,
                     title,
                     title_initial,
-                    intro,
                     artist:artists(
                         id,
                         name,
@@ -1186,8 +1173,7 @@ async function loadSongs() {
                         title_initial:
                             row.song.title_initial,
 
-                        intro:
-                            row.song.intro,
+                        
 
                         // アーティスト
                         artist:
