@@ -755,7 +755,7 @@ function renderRegisteredSongs() {
     });
 
     if (filtered.length === 0) {
-        registeredBody.innerHTML = '<tr><td colspan="5">該当する曲がありません。</td></tr>';
+        registeredBody.innerHTML = '<tr><td colspan="4">該当する曲がありません。</td></tr>';
         return;
     }
 
@@ -779,7 +779,7 @@ async function loadRegisteredSongs() {
     if (!Number.isInteger(streamerId)) return;
 
     if (registeredBody) {
-        registeredBody.innerHTML = '<tr><td colspan="5">読み込み中...</td></tr>';
+        registeredBody.innerHTML = '<tr><td colspan="4">読み込み中...</td></tr>';
     }
 
     // 1. 曲一覧の取得
@@ -805,7 +805,7 @@ async function loadRegisteredSongs() {
     if (error) {
         console.error(error);
         if (registeredBody) {
-            registeredBody.innerHTML = '<tr><td colspan="5">曲一覧の取得に失敗しました。</td></tr>';
+            registeredBody.innerHTML = '<tr><td colspan="4">曲一覧の取得に失敗しました。</td></tr>';
         }
         if (message) {
             message.style.color = 'red';
