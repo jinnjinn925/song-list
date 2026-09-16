@@ -603,52 +603,87 @@ textarea {
 }
 
 /* ========================================
-   2. テーブル行（tr）を2段組（2列カード）に変換
+   登録曲テーブル：カード内2段組（高さ短縮）レイアウト
    ======================================== */
-/* ヘッダー（<th>）はスマホ表示では非表示化 */
+
+/* テーブルヘッダー非表示 */
 .registered-table thead {
     display: none;
 }
 
-/* tbodyを2列グリッド化 */
-#registered-body {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important; /* 均等な2列配置 */
-    gap: 8px !important;                               /* カード同士の間隔 */
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* 1曲分の行（tr）を1つのカードとして整形 */
+/* 1曲分のカード（tr）内の要素を2段レイアウトにする */
 #registered-body tr {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    display: grid !important;
+    /* 上段：選択チェックボックス ＋ アーティスト名 ＋ 曲名 */
+    /* 下段：歌える状態（セレクト） ＋ 自信曲（チェックボックス） */
+    grid-template-columns: auto 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 6px 10px;
+    
     background: #ffffff;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     padding: 10px;
+    margin-bottom: 8px; /* カード同士の縦の隙間 */
     box-sizing: border-box;
-    min-width: 0; /* 幅崩れ防止 */
 }
 
-/* セル（td）のレイアウト調整 */
-#registered-body td {
-    display: block;
-    padding: 2px 0;
-    font-size: 13px;
-    border: none;
-    min-width: 0;
+/* --- セルごとの配置指定 --- */
+
+/* 1番目のセル：選択チェックボックス（1〜2段目を縦にまたぐ） */
+#registered-body td:nth-child(1) {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: 4px;
+    border-right: 1px solid #f0f0f0;
+}
+
+/* 2番目のセル：アーティスト名（上段・左） */
+#registered-body td:nth-child(2) {
+    grid-column: 2;
+    grid-row: 1;
+    font-weight: bold;
+    font-size: 14px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* 選択用チェックボックス行 */
-#registered-body td:first-child {
-    margin-bottom: 4px;
-    padding-bottom: 4px;
-    border-bottom: 1px dashed #eee;
+/* 3番目のセル：曲名（上段・右） */
+#registered-body td:nth-child(3) {
+    grid-column: 3;
+    grid-row: 1;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 4番目のセル：歌える状態（下段・左） */
+#registered-body td:nth-child(4) {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+/* 5番目のセル：自信曲（下段・右） */
+#registered-body td:nth-child(5) {
+    grid-column: 3;
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+}
+
+/* カード内のセレクトボックスや入力欄のサイズ調整 */
+#registered-body td select,
+#registered-body td input[type="text"] {
+    width: 100%;
+    height: 32px; /* 高さを小さく抑える */
+    font-size: 12px;
+    padding: 2px 4px;
+    box-sizing: border-box;
 }
 
 /* ========================================
