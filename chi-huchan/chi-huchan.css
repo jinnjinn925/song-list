@@ -145,7 +145,7 @@ body {
 #song-count {
     margin-bottom: 14px;
     font-size: 14px;
-    color: #666;
+    color: #C8BACE;
 }
 
 
@@ -232,9 +232,9 @@ body {
 
     font-size: 18px;/* アーティスト名の文字サイズ */
     font-weight: 700;
-	color: #DDDDDD;      /* ← 文字色を変更したい場合はここを追加（例: color: #fff; で白） */
+	color: #C8BACE;      /* ← 文字色を変更したい場合はここを追加（例: color: #fff; で白） */
 
-    border-bottom: 2px solid #184F88; /*アーティスト名の下の線の色*/
+    border-bottom: 2px solid #c8bace; /*アーティスト名の下の線の色*/
 
     cursor: pointer;
 
@@ -271,7 +271,7 @@ body {
     padding: 9px 5px;
 
     font-size: 16px;/* 曲名の文字サイズ */
-	color: #dddddd;     /* ← 曲名の文字色を変更したい場合はここを追加 */
+	color: #C8BACE;     /* ← 曲名の文字色を変更したい場合はここを追加 */
 
     /*border-bottom: 1px solid #e5e5e5;/* 各曲の間の区切り線の色 */
 }
@@ -415,7 +415,7 @@ body::before {
 
 /* メイン部分を少し透過 */
 main {
-    background: rgba(255, 255, 255, 0.2);/* メインコンテンツ全体の透け感 0.2を下げると透明度が上がり、上げると白みが増します */
+    background: rgba(255, 255, 255, 0.1);/* メインコンテンツ全体の透け感 0.2を下げると透明度が上がり、上げると白みが増します */
 }
 /* 曲リストの半透明パネル */
 #song-list {
@@ -431,7 +431,7 @@ main {
 #song-search,
 #search-clear,
 .favorite-button {
-    background: rgba(255, 255, 255, 0.35);/* 入力欄の背景透過度 */
+    background: rgba(255, 255, 255, 0.1);/* 入力欄の背景透過度 */
     border: 1px solid rgba(200, 186, 207, 0.5);/* 枠線の色 */
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
@@ -480,7 +480,7 @@ main {
 }
 
 #song-search::placeholder {
-    color: #C8BACE;/* 検索前の「曲名・アーティスト名で検索」の文字色 */
+    color: #ECDBF3;/* 検索前の「曲名・アーティスト名で検索」の文字色 */
 }
 
 #filter-buttons {
