@@ -896,11 +896,7 @@ function createPreviewRow(
     const tr =
         document.createElement('tr');
 
-
-    // =========================
     // Artist
-    // =========================
-
     const artistTd =
         document.createElement('td');
 
@@ -921,38 +917,28 @@ function createPreviewRow(
     );
 
 
-    // =========================
     // Artist reading
-    // 新規アーティストの場合だけ表示
-    // =========================
-
     const artistInitialTd =
         document.createElement('td');
 
-    if (row.isNewArtist) {
+    const artistInitialInput =
+        document.createElement('input');
 
-        const artistInitialInput =
-            document.createElement('input');
+    artistInitialInput.type =
+        'text';
 
-        artistInitialInput.type =
-            'text';
+    artistInitialInput.className =
+        'row-artist-initial';
 
-        artistInitialInput.className =
-            'row-artist-initial';
+    artistInitialInput.value =
+        reading.artist_initial || '';
 
-        artistInitialInput.value =
-            reading.artist_initial || '';
-
-        artistInitialTd.appendChild(
-            artistInitialInput
-        );
-    }
+    artistInitialTd.appendChild(
+        artistInitialInput
+    );
 
 
-    // =========================
     // Title
-    // =========================
-
     const titleTd =
         document.createElement('td');
 
@@ -973,38 +959,28 @@ function createPreviewRow(
     );
 
 
-    // =========================
     // Title reading
-    // 新規曲の場合だけ表示
-    // =========================
-
     const titleInitialTd =
         document.createElement('td');
 
-    if (row.isNewSong) {
+    const titleInitialInput =
+        document.createElement('input');
 
-        const titleInitialInput =
-            document.createElement('input');
+    titleInitialInput.type =
+        'text';
 
-        titleInitialInput.type =
-            'text';
+    titleInitialInput.className =
+        'row-title-initial';
 
-        titleInitialInput.className =
-            'row-title-initial';
+    titleInitialInput.value =
+        reading.title_initial || '';
 
-        titleInitialInput.value =
-            reading.title_initial || '';
-
-        titleInitialTd.appendChild(
-            titleInitialInput
-        );
-    }
+    titleInitialTd.appendChild(
+        titleInitialInput
+    );
 
 
-    // =========================
-    // Complete status
-    // =========================
-
+    // Complete
     const completeTd =
         document.createElement('td');
 
@@ -1015,10 +991,7 @@ function createPreviewRow(
     );
 
 
-    // =========================
     // Confident
-    // =========================
-
     const confidentTd =
         document.createElement('td');
 
@@ -1042,10 +1015,7 @@ function createPreviewRow(
     );
 
 
-    // =========================
     // Intro
-    // =========================
-
     const introTd =
         document.createElement('td');
 
@@ -1069,10 +1039,7 @@ function createPreviewRow(
     );
 
 
-    // =========================
     // Delete
-    // =========================
-
     const deleteTd =
         document.createElement('td');
 
@@ -1094,9 +1061,7 @@ function createPreviewRow(
     deleteButton.addEventListener(
         'click',
         () => {
-
             tr.remove();
-
         }
     );
 
@@ -1105,10 +1070,7 @@ function createPreviewRow(
     );
 
 
-    // =========================
     // Row
-    // =========================
-
     tr.appendChild(
         artistTd
     );
@@ -1141,11 +1103,9 @@ function createPreviewRow(
         deleteTd
     );
 
-
     previewBody.appendChild(
         tr
     );
-
 }
 
 
@@ -1384,19 +1344,11 @@ document
                     10
                 );
 
-
-            if (
-                !Number.isInteger(
-                    streamerId
-                )
-            ) {
-
+            if (!Number.isInteger(streamerId)) {
                 alert(
                     'Streamer ID is invalid.'
                 );
-
                 return;
-
             }
 
 
@@ -1405,166 +1357,144 @@ document
                     '#preview-body tr'
                 );
 
-
             const insertData = [];
 
 
-            rows.forEach(
-                tr => {
+            rows.forEach(tr => {
 
-                    const artistInput =
-                        tr.querySelector(
-                            '.row-artist'
-                        );
+                const artistInput =
+                    tr.querySelector(
+                        '.row-artist'
+                    );
 
-                    const artistInitialInput =
-                        tr.querySelector(
-                            '.row-artist-initial'
-                        );
-
-                    const titleInput =
-                        tr.querySelector(
-                            '.row-title'
-                        );
-
-                    const titleInitialInput =
-                        tr.querySelector(
-                            '.row-title-initial'
-                        );
-
-                    const completeInput =
-                        tr.querySelector(
-                            '.row-complete'
-                        );
-
-                    const confidentInput =
-                        tr.querySelector(
-                            '.row-confident'
-                        );
-
-                    const introInput =
-                        tr.querySelector(
-                            '.row-intro'
-                        );
+                const artist =
+                    artistInput
+                        ? artistInput.value.trim()
+                        : '';
 
 
-                    const artist =
-                        artistInput
-                            ? artistInput.value.trim()
-                            : '';
+                const artistInitialInput =
+                    tr.querySelector(
+                        '.row-artist-initial'
+                    );
+
+                const artistInitial =
+                    artistInitialInput
+                        ? artistInitialInput.value.trim()
+                        : '';
 
 
-                    const artistInitial =
-                        artistInitialInput
-                            ? artistInitialInput.value.trim()
-                            : '';
+                const titleInput =
+                    tr.querySelector(
+                        '.row-title'
+                    );
+
+                const title =
+                    titleInput
+                        ? titleInput.value.trim()
+                        : '';
 
 
-                    const title =
-                        titleInput
-                            ? titleInput.value.trim()
-                            : '';
+                const titleInitialInput =
+                    tr.querySelector(
+                        '.row-title-initial'
+                    );
+
+                const titleInitial =
+                    titleInitialInput
+                        ? titleInitialInput.value.trim()
+                        : '';
 
 
-                    const titleInitial =
-                        titleInitialInput
-                            ? titleInitialInput.value.trim()
-                            : '';
+                const completeInput =
+                    tr.querySelector(
+                        '.row-complete'
+                    );
+
+                const completeValue =
+                    completeInput
+                        ? completeInput.value
+                        : 'complete';
 
 
-                    const completeValue =
-                        completeInput
-                            ? completeInput.value
-                            : 'partial';
+                const confidentInput =
+                    tr.querySelector(
+                        '.row-confident'
+                    );
+
+                const confident =
+                    confidentInput
+                        ? confidentInput.checked
+                        : false;
 
 
-                    const confident =
-                        confidentInput
-                            ? confidentInput.checked
-                            : false;
+                const introInput =
+                    tr.querySelector(
+                        '.row-intro'
+                    );
+
+                const intro =
+                    introInput
+                        ? introInput.value.trim()
+                        : '';
 
 
-                    const intro =
-                        introInput
-                            ? introInput.value.trim()
-                            : '';
-
-
-                    if (
-                        !artist ||
-                        !title
-                    ) {
-
-                        return;
-
-                    }
-
-
-                    let complete =
-                        null;
-
-
-                    if (
-                        completeValue ===
-                        'complete'
-                    ) {
-
-                        complete =
-                            true;
-
-                    } else if (
-                        completeValue ===
-                        'practice'
-                    ) {
-
-                        complete =
-                            false;
-
-                    }
-
-
-                    insertData.push({
-
-                        streamer_id:
-                            streamerId,
-
-                        artist:
-                            artist,
-
-                        artist_initial:
-                            artistInitial,
-
-                        title:
-                            title,
-
-                        title_initial:
-                            titleInitial,
-
-                        complete:
-                            complete,
-
-                        confident:
-                            confident,
-
-                        intro:
-                            intro || null
-
-                    });
-
+                if (!artist || !title) {
+                    return;
                 }
-            );
 
 
-            if (
-                !insertData.length
-            ) {
+                let complete = null;
+
+                if (
+                    completeValue ===
+                    'complete'
+                ) {
+                    complete = true;
+
+                } else if (
+                    completeValue ===
+                    'practice'
+                ) {
+                    complete = false;
+                }
+
+
+                insertData.push({
+                    streamer_id:
+                        streamerId,
+
+                    artist:
+                        artist,
+
+                    artist_initial:
+                        artistInitial,
+
+                    title:
+                        title,
+
+                    title_initial:
+                        titleInitial,
+
+                    complete:
+                        complete,
+
+                    confident:
+                        confident,
+
+                    intro:
+                        intro || null
+                });
+            });
+
+
+            if (!insertData.length) {
 
                 alert(
                     'There are no songs to register.'
                 );
 
                 return;
-
             }
 
 
@@ -1573,26 +1503,19 @@ document
                     'submit-all-btn'
                 );
 
-
             const submitError =
                 document.getElementById(
                     'submit-error'
                 );
 
 
-            submitError.textContent =
-                '';
-
-            submitError.style.color =
-                '';
+            submitError.textContent = '';
+            submitError.style.color = '';
 
 
-            button.disabled =
-                true;
+            button.disabled = true;
 
-
-            message.style.color =
-                '';
+            message.style.color = '';
 
             message.textContent =
                 'Registering...';
@@ -1612,7 +1535,6 @@ document
                         '管理キーを入力してください。';
 
                     return;
-
                 }
 
 
@@ -1628,7 +1550,6 @@ document
                             },
 
                             body: JSON.stringify({
-
                                 action:
                                     'insert',
 
@@ -1640,9 +1561,7 @@ document
 
                                 songs:
                                     insertData
-
                             })
-
                         }
                     );
 
@@ -1658,42 +1577,34 @@ document
                         '曲の登録に失敗しました。';
 
                     return;
-
                 }
 
 
                 submitError.style.color =
                     'green';
 
-
                 message.textContent =
                     insertData.length +
                     ' songs registered successfully.';
-
 
                 submitError.textContent =
                     insertData.length +
                     '曲を登録しました。';
 
 
-                inputBody.innerHTML =
-                    '';
+                inputBody.innerHTML = '';
 
-                previewBody.innerHTML =
-                    '';
+                previewBody.innerHTML = '';
 
-                generatedRows =
-                    [];
+                generatedRows = [];
 
 
                 for (
                     let i = 0;
-                    i < 5;
+                    i < 1;
                     i++
                 ) {
-
                     addInputRow();
-
                 }
 
 
@@ -1705,13 +1616,8 @@ document
 
 
                 window.scrollTo({
-
-                    top:
-                        0,
-
-                    behavior:
-                        'smooth'
-
+                    top: 0,
+                    behavior: 'smooth'
                 });
 
 
@@ -1721,7 +1627,6 @@ document
                     error
                 );
 
-
                 message.style.color =
                     'red';
 
@@ -1729,17 +1634,13 @@ document
                     'Registration error: ' +
                     error.message;
 
-
             } finally {
 
                 button.disabled =
                     false;
-
             }
-
         }
     );
-
 
 // ========================================
 // Load registered songs
