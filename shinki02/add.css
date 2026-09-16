@@ -745,3 +745,74 @@ h3 {
 .artist-checkbox-item:hover {
     background: #f0f0f0;
 }
+
+/* 登録曲一覧の操作エリア（ボタンの親要素） */
+.registered-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+/* ボタン共通スタイル */
+#save-registered-changes-btn,
+#delete-selected-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* アクティブ（クリック時）の共通挙動 */
+#save-registered-changes-btn:active,
+#delete-selected-btn:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+/* 非活性（無効化時）の共通スタイル */
+#save-registered-changes-btn:disabled,
+#delete-selected-btn:disabled {
+  background-color: #cccccc !important;
+  color: #666666 !important;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.7;
+}
+
+/* ========================================
+   1. 変更を保存ボタン（メイン操作）
+   ======================================== */
+#save-registered-changes-btn {
+  background-color: #2563eb; /* 青系アクセント */
+  color: #ffffff;
+}
+
+#save-registered-changes-btn:hover:not(:disabled) {
+  background-color: #1d4ed8;
+  box-shadow: 0 4px 8px rgba(37, 99, 235, 0.25);
+}
+
+/* ========================================
+   2. 選択した曲を削除ボタン（危険操作）
+   ======================================== */
+#delete-selected-btn {
+  background-color: #dc2626; /* 赤系危険色 */
+  color: #ffffff;
+}
+
+#delete-selected-btn:hover:not(:disabled) {
+  background-color: #b91c1c;
+  box-shadow: 0 4px 8px rgba(220, 38, 38, 0.25);
+}
