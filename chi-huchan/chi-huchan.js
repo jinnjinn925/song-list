@@ -39,6 +39,11 @@ const filterAll =
 const filterComplete =
     document.getElementById('filter-complete');
 
+
+const filterPartial =
+    document.getElementById('filter-partial');
+
+
 const filterPractice =
     document.getElementById('filter-practice');
 
@@ -445,6 +450,14 @@ function getVisibleSongs() {
         	song => song.complete === true
     	);
 	}
+	
+	
+	if (completeFilter === 'partial') {
+    	songs = songs.filter(
+        	song => song.complete === null || song.complete === undefined
+    	);
+	}
+	
 
 	if (completeFilter === 'practice') {
     	songs = songs.filter(
@@ -667,26 +680,67 @@ function updateSongCount() {
 
 
 // =========================
-// フィルターボタン表示
+// 最後まで歌えるフィルター
 // =========================
 
-function updateCompleteButton() {
+filterAll.addEventListener(
+    'click',
+    () => {
+        completeFilter = 'all';
 
-    filterAll.classList.toggle(
-        'active',
-        completeFilter === 'all'
-    );
+        filterAll.classList.add('active');
+        filterComplete.classList.remove('active');
+        filterPartial.classList.remove('active');
+        filterPractice.classList.remove('active');
 
-    filterComplete.classList.toggle(
-        'active',
-        completeFilter === 'complete'
-    );
+        render();
+    }
+);
 
-    filterPractice.classList.toggle(
-        'active',
-        completeFilter === 'practice'
-    );
-}
+filterComplete.addEventListener(
+    'click',
+    () => {
+        completeFilter = 'complete';
+
+        filterAll.classList.remove('active');
+        filterComplete.classList.add('active');
+        filterPartial.classList.remove('active');
+        filterPractice.classList.remove('active');
+
+        render();
+    }
+);
+
+// ▼ ここに console.log を追加します
+filterPartial.addEventListener(
+    'click',
+    () => {
+        // console.log('途中までボタンが押されました。現在のデータ:', data); // ← ★この1行を追加
+
+        completeFilter = 'partial';
+
+        filterAll.classList.remove('active');
+        filterComplete.classList.remove('active');
+        filterPartial.classList.add('active');
+        filterPractice.classList.remove('active');
+
+        render();
+    }
+);
+
+filterPractice.addEventListener(
+    'click',
+    () => {
+        completeFilter = 'practice';
+
+        filterAll.classList.remove('active');
+        filterComplete.classList.remove('active');
+        filterPartial.classList.remove('active');
+        filterPractice.classList.add('active');
+
+        render();
+    }
+);
 
 
 // =========================
@@ -772,6 +826,33 @@ function displayFavoriteArtists(favoriteList) {
     });
 
     favoriteArtists.appendChild(confidentButton);
+}
+
+// =========================
+// フィルターボタン表示状態の更新
+// =========================
+
+function updateCompleteButton() {
+
+    filterAll.classList.toggle(
+        'active',
+        completeFilter === 'all'
+    );
+
+    filterComplete.classList.toggle(
+        'active',
+        completeFilter === 'complete'
+    );
+
+    filterPartial.classList.toggle(
+        'active',
+        completeFilter === 'partial'
+    );
+
+    filterPractice.classList.toggle(
+        'active',
+        completeFilter === 'practice'
+    );
 }
 
 // =========================
