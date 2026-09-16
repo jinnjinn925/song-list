@@ -563,3 +563,192 @@ textarea {
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease;
 }
+
+/* ========================================
+   好きな歌手のチェックボックスエリア（縦スクロール化）
+   ======================================== */
+#favorite-artist-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+
+    /* スクロール設定 */
+    max-height: 180px;         /* 枠の最大高さ（好みに応じて調整可能） */
+    overflow-y: auto;          /* はみ出た場合に縦スクロールを表示 */
+    padding: 6px;
+    background-color: #fafafa; /* スクロールエリア領域を視覚的にわかりやすくする背景 */
+    border: 1px solid #eee;
+    border-radius: 8px;
+    -webkit-overflow-scrolling: touch; /* スマホでの操作をなめらかにする */
+}
+
+/* ========================================
+   登録済み曲リストエリア（スクロール化 ＋ 2段組レイアウト）
+   ======================================== */
+
+/* ========================================
+   1. 登録曲テーブルのコンテナ（スクロール化）
+   ======================================== */
+#registered-section .mobile-table {
+    max-height: 600px;                 /* スクロール枠の高さ（好みで調整） */
+    overflow-y: auto;                  /* 溢れた場合のみ縦スクロール */
+    overflow-x: hidden;                /* 横スクロールを防止 */
+    padding: 8px;
+    margin-bottom: 12px;
+    background-color: #fafafa;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    -webkit-overflow-scrolling: touch; /* スマホの滑らかな慣性スクロール */
+}
+
+/* ========================================
+   登録曲テーブル：カード内2段組（高さ短縮）レイアウト
+   ======================================== */
+
+/* テーブルヘッダー非表示 */
+.registered-table thead {
+    display: none;
+}
+
+/* 1曲分のカード（tr）内の要素を2段レイアウトにする */
+#registered-body tr {
+    display: grid !important;
+    /* 上段：選択チェックボックス ＋ アーティスト名 ＋ 曲名 */
+    /* 下段：歌える状態（セレクト） ＋ 自信曲（チェックボックス） */
+    grid-template-columns: auto 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 6px 10px;
+    
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 8px; /* カード同士の縦の隙間 */
+    box-sizing: border-box;
+}
+
+/* --- セルごとの配置指定 --- */
+
+/* 1番目のセル：選択チェックボックス（1〜2段目を縦にまたぐ） */
+#registered-body td:nth-child(1) {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-right: 4px;
+    border-right: 1px solid #f0f0f0;
+}
+
+/* 2番目のセル：アーティスト名（上段・左） */
+#registered-body td:nth-child(2) {
+    grid-column: 2;
+    grid-row: 1;
+    font-weight: bold;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 3番目のセル：曲名（上段・右） */
+#registered-body td:nth-child(3) {
+    grid-column: 3;
+    grid-row: 1;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 4番目のセル：歌える状態（下段・左） */
+#registered-body td:nth-child(4) {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+/* 5番目のセル：自信曲（下段・右） */
+#registered-body td:nth-child(5) {
+    grid-column: 3;
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+}
+
+/* カード内のセレクトボックスや入力欄のサイズ調整 */
+#registered-body td select,
+#registered-body td input[type="text"] {
+    width: 100%;
+    height: 32px; /* 高さを小さく抑える */
+    font-size: 12px;
+    padding: 2px 4px;
+    box-sizing: border-box;
+}
+
+/* ========================================
+   3. スクロール枠外のボタンエリア（横並び）
+   ======================================== */
+.registered-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 12px;
+}
+
+#save-registered-changes-btn,
+#delete-selected-btn {
+    flex: 1;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 8px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#save-registered-changes-btn {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+
+#delete-selected-btn {
+    background-color: #dc2626;
+    color: #ffffff;
+}
+
+/* ========================================
+   登録済みセクションおよび最下部の余白一括圧縮
+   ======================================== */
+
+/* 1. 登録セクション自体の下部パディングとマージンを削る */
+#registered-section {
+    margin-bottom: 8px !important;
+    padding-bottom: 8px !important;
+}
+
+/* 2. テーブル（スクロール枠）の下部マージンを狭くする */
+#registered-section .mobile-table {
+    margin-bottom: 6px !important;
+}
+
+/* 3. ボタンエリアの上下マージンを完全に詰める */
+.registered-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 4px !important;
+    margin-bottom: 4px !important;
+}
+
+/* 4. メッセージエリアやメイン全体の底面余白を詰める */
+#message {
+    margin-top: 2px !important;
+    margin-bottom: 4px !important;
+}
+
+.add-main {
+    padding-bottom: 8px !important;
+}
