@@ -779,204 +779,93 @@ function collectInputRows() {
 // ========================================
 
 async function generateReadings(rows) {
-
     const results = [];
 
     for (const row of rows) {
-
-        const artistName =
-            row.artist.trim();
-
-        const titleName =
-            row.title.trim();
+        const artistName = row.artist.trim();
+        const titleName = row.title.trim();
 
         if (!artistName || !titleName) {
             continue;
         }
 
-        // =========================
-        // 既存アーティストを確認
-        // =========================
-
-        const existingArtist =
-            existingArtists.find(
-                artist =>
-                    artist.name === artistName
-            );
+        const existingArtist = existingArtists.find(
+            artist => artist.name === artistName
+        );
 
         let artistInitial = '';
         let titleInitial = '';
-
         let isNewArtist = false;
         let isNewSong = false;
 
         if (existingArtist) {
+            artistInitial = existingArtist.artist_initial || '';
 
-            // 既存アーティストなら
-            // DBにある読みをそのまま使用
-
-            artistInitial =
-                existingArtist.artist_initial || '';
-
-            // =========================
-            // 既存曲を確認
-            // =========================
-
-            const {
-                data: existingSong,
-                error: songError
-            } =
-                await supabaseClient
-                    .from('songs')
-                    .select(`
-                        id,
-                        title,
-                        title_initial
-                    `)
-                    .eq(
-                        'artist_id',
-                        existingArtist.id
-                    )
-                    .eq(
-                        'title',
-                        titleName
-                    )
-                    .maybeSingle();
+            const { data: existingSong, error: songError } = await supabaseClient
+                .from('songs')
+                .select('id, title, title_initial')
+                .eq('artist_id', existingArtist.id)
+                .eq('title', titleName)
+                .maybeSingle();
 
             if (songError) {
-
-                console.error(
-                    '既存曲の取得に失敗しました。',
-                    songError
-                );
-
+                console.error('既存曲の取得に失敗しました。', songError);
                 throw songError;
             }
 
             if (existingSong) {
-
-                // 既存曲なら読みもDBから取得
-
-                titleInitial =
-                    existingSong.title_initial || '';
-
-            
-
+                // 既存曲の場合、DBから取得した読みを設定
+                titleInitial = existingSong.title_initial || '';
             } else {
-
-                // 既存アーティストだが
-                // 曲は新規
-
                 isNewSong = true;
             }
-
         } else {
-
-            // アーティスト自体が新規
-
             isNewArtist = true;
             isNewSong = true;
         }
 
-
-        // =========================
-        // 新規部分だけひらがな生成
-        // =========================
-
-        if (
-            isNewArtist ||
-            isNewSong
-        ) {
-
-            const response =
-                await fetch(
-                    FURIGANA_FUNCTION_URL,
-                    {
-                        method: 'POST',
-
-                        headers: {
-                            'Content-Type':
-                                'application/json'
-                        },
-
-                        body: JSON.stringify({
-
-                            artist:
-                                isNewArtist
-                                    ? artistName
-                                    : '',
-
-                            title:
-                                isNewSong
-                                    ? titleName
-                                    : ''
-                        })
-                    }
-                );
+        // 新規アーティストまたは新規曲がある場合のみふりがな生成APIを実行
+        if (isNewArtist || isNewSong) {
+            const response = await fetch(FURIGANA_FUNCTION_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    artist: isNewArtist ? artistName : '',
+                    title: isNewSong ? titleName : ''
+                })
+            });
 
             if (!response.ok) {
-
-                throw new Error(
-                    `ひらがな生成に失敗しました (${response.status})`
-                );
+                throw new Error(`ひらがな生成に失敗しました (${response.status})`);
             }
 
-            const data =
-                await response.json();
+            const data = await response.json();
 
             if (isNewArtist) {
-
-                artistInitial =
-                    data.artist_initial || '';
+                artistInitial = data.artist_initial || '';
             }
-
             if (isNewSong) {
-
-                titleInitial =
-                    data.title_initial || '';
+                titleInitial = data.title_initial || '';
             }
         }
 
-
+        // 既存曲・新規曲のどちらであっても必ず reading オブジェクトを作成して追加
         results.push({
-
-            artist:
-                artistName,
-
-            title:
-                titleName,
-
-            complete:
-                row.complete,
-
-            confident:
-                row.confident,
-
-
-
-            // 新規かどうかを
-            // プレビュー側へ渡す
-
-            isNewArtist:
-                isNewArtist,
-
-            isNewSong:
-                isNewSong,
-
+            artist: artistName,
+            title: titleName,
+            complete: row.complete,
+            confident: row.confident,
+            isNewArtist: isNewArtist,
+            isNewSong: isNewSong,
             reading: {
-
-                artist_initial:
-                    artistInitial,
-
-                title_initial:
-                    titleInitial
+                artist_initial: artistInitial,
+                title_initial: titleInitial
             }
         });
     }
 
     return results;
 }
-
 // ========================================
 // Create preview row
 // ========================================
@@ -2100,7 +1989,7 @@ async function loadRegisteredSongs() {
                     'td'
                 );
 
-            td.colSpan = 6;
+            td.colSpan = 5;
 
             td.textContent =
                 searchText
