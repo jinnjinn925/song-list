@@ -926,3 +926,24 @@ h3 {
   box-shadow: none;
   opacity: 0.7;
 }
+
+/* ========================================
+   PC版：登録曲一覧の縦スクロール化
+   ======================================== */
+#registered-section .mobile-table {
+    max-height: 400px;                 /* 表示する高さの上限（必要に応じて調整してください） */
+    overflow-y: auto;                  /* 高さを超えた場合に縦スクロールを表示 */
+    overflow-x: hidden;                /* 横スクロールを防止 */
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background-color: #fafafa;
+}
+
+/* スクロール中もテーブルのヘッダー（見出し）を固定したい場合 */
+#registered-section .registered-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #ffffff;         /* スクロール時に文字が透けないよう背景色を指定 */
+    z-index: 10;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
