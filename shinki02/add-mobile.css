@@ -563,3 +563,37 @@ textarea {
     cursor: pointer;
     transition: background-color 0.2s ease, transform 0.1s ease;
 }
+
+/* ========================================
+   好きな歌手のチェックボックスエリア（縦スクロール化）
+   ======================================== */
+#favorite-artist-checkboxes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+
+    /* スクロール設定 */
+    max-height: 180px;         /* 枠の最大高さ（好みに応じて調整可能） */
+    overflow-y: auto;          /* はみ出た場合に縦スクロールを表示 */
+    padding: 6px;
+    background-color: #fafafa; /* スクロールエリア領域を視覚的にわかりやすくする背景 */
+    border: 1px solid #eee;
+    border-radius: 8px;
+    -webkit-overflow-scrolling: touch; /* スマホでの操作をなめらかにする */
+}
+
+/* ========================================
+   登録済み曲リストエリア（縦スクロール化）
+   ======================================== */
+/* 曲リスト全体を囲むコンテナ要素、またはul/ol要素に適用 */
+.registered-songs-list,
+#registered-section ul {
+    max-height: 300px;         /* 枠の最大高さ（好みに応じて調整可能） */
+    overflow-y: auto;          /* はみ出た場合に縦スクロールを表示 */
+    padding-right: 4px;        /* スクロールバーとの重なりを防止 */
+    margin-bottom: 12px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    -webkit-overflow-scrolling: touch; /* スマホでの操作をなめらかにする */
+}
