@@ -39,6 +39,11 @@ const filterAll =
 const filterComplete =
     document.getElementById('filter-complete');
 
+
+const filterPartial =
+    document.getElementById('filter-partial');
+
+
 const filterPractice =
     document.getElementById('filter-practice');
 
@@ -445,6 +450,14 @@ function getVisibleSongs() {
         	song => song.complete === true
     	);
 	}
+	
+	
+	if (completeFilter === 'partial') {
+    	songs = songs.filter(
+        	song => song.complete === null
+    	);
+	}
+	
 
 	if (completeFilter === 'practice') {
     	songs = songs.filter(
@@ -681,6 +694,13 @@ function updateCompleteButton() {
         'active',
         completeFilter === 'complete'
     );
+	
+	
+	filterPartial.classList.toggle(
+        'active',
+        completeFilter === 'partial'
+    );
+	
 
     filterPractice.classList.toggle(
         'active',
