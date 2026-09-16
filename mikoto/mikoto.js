@@ -454,7 +454,7 @@ function getVisibleSongs() {
 	
 	if (completeFilter === 'partial') {
     	songs = songs.filter(
-        	song => song.complete === null
+        	song => song.complete === null || song.complete === undefined
     	);
 	}
 	
