@@ -720,28 +720,35 @@ textarea {
 }
 
 /* ========================================
-   操作ボタンとメッセージエリアの下部余白の調整
+   登録済みセクションおよび最下部の余白一括圧縮
    ======================================== */
 
-/* 1. ボタンエリアの上下マージンを最小限に設定 */
+/* 1. 登録セクション自体の下部パディングとマージンを削る */
+#registered-section {
+    margin-bottom: 8px !important;
+    padding-bottom: 8px !important;
+}
+
+/* 2. テーブル（スクロール枠）の下部マージンを狭くする */
+#registered-section .mobile-table {
+    margin-bottom: 6px !important;
+}
+
+/* 3. ボタンエリアの上下マージンを完全に詰める */
 .registered-actions {
     display: flex;
     gap: 10px;
     width: 100%;
-    margin-top: 8px;     /* 上のスクロール枠との隙間 */
-    margin-bottom: 4px;  /* 下のスペースとの隙間を短縮 */
+    margin-top: 4px !important;
+    margin-bottom: 4px !important;
 }
 
-/* 2. 最下部メッセージ表示エリアのマージン削減 */
+/* 4. メッセージエリアやメイン全体の底面余白を詰める */
 #message {
-    margin-top: 4px;
-    margin-bottom: 8px;
-    padding: 4px 8px;
-    font-size: 13px;
-    text-align: center;
+    margin-top: 2px !important;
+    margin-bottom: 4px !important;
 }
 
-/* 3. 親要素（mainタグ）の下部パディングを縮小 */
 .add-main {
-    padding-bottom: 12px; /* 全体の底面の余白を詰める */
+    padding-bottom: 8px !important;
 }
