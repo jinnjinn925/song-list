@@ -715,7 +715,7 @@ filterComplete.addEventListener(
 filterPartial.addEventListener(
     'click',
     () => {
-        console.log('途中までボタンが押されました。現在のデータ:', data); // ← ★この1行を追加
+        // console.log('途中までボタンが押されました。現在のデータ:', data); // ← ★この1行を追加
 
         completeFilter = 'partial';
 
