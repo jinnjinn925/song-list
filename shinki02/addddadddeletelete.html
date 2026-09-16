@@ -235,19 +235,18 @@
 	
 	<!-- 曲追加エリア等の後 -->
 
-	<!-- ★追加：定番アーティスト・自信曲の一括管理セクション -->
-	<section id="favorite-and-confident-section" class="admin-card" style="margin: 30px 0; padding: 20px; border: 1px solid #ccc; border-radius: 8px; background: #f9f9f9;">
-		
+	<!-- ★好きな歌手の一括管理セクション（折りたたみ式） -->
+	<section id="favorite-and-confident-section" class="management-section" style="padding: 16px; border: 1px solid #ddd; border-radius: 14px; background: #fff;">
+		<details open> <!-- 最初から開いておきたい場合は open を指定。閉じたちのうがよければ open を削除 -->
+			<summary style="font-size: 19px; font-weight: bold; cursor: pointer; outline: none;">
+				好きな歌手の設定
+			</summary>
 
-		<!-- 1. 定番アーティスト選択（既存アーティスト一覧から複数選択） -->
-		<!-- 定番歌手セクション -->
-		<div class="favorite-artists-section">
-		  <h3>好きな歌手の設定</h3>
-		  <div id="favorite-artist-checkboxes"></div>
-		  <button type="button" id="update-favorites-btn">好きな歌手を保存</button>
-		</div>
-
-		
+			<div class="favorite-artists-section" style="margin-top: 12px;">
+				<div id="favorite-artist-checkboxes" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;"></div>
+				<button type="button" id="update-favorites-btn">好きな歌手を保存</button>
+			</div>
+		</details>
 	</section>
 
 
