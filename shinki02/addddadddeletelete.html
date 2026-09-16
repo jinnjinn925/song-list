@@ -240,20 +240,18 @@
 		<h2>定番設定・自信曲の管理</h2>
 
 		<!-- 1. 定番アーティスト選択（既存アーティスト一覧から複数選択） -->
-		<div style="margin-bottom: 20px;">
-			<h3>定番アーティストの選択</h3>
-			<p style="font-size: 0.9em; color: #666;">登録済みの曲から抽出されたアーティスト一覧です。定番として表示したいものにチェックを入れてください。</p>
-
-			<div id="favorite-artist-checkboxes" style="max-height: 180px; overflow-y: auto; border: 1px solid #ddd; background: #fff; padding: 10px; border-radius: 4px; display: flex; flex-wrap: wrap; gap: 10px;">
-				<!-- JSで登録済みアーティストのチェックボックスが一覧生成されます -->
-				<span style="color: #999;">曲データ読み込み中...</span>
-			</div>
+		<!-- 定番歌手セクション -->
+		<div class="favorite-artists-section">
+		  <h3>好きな歌手の設定</h3>
+		  <div id="favorite-artist-checkboxes"></div>
+		  <button type="button" id="update-favorites-btn">定番歌手を保存</button>
 		</div>
 
-		<!-- 2. 保存・更新アクション -->
-		<div class="action-row">
-			<button type="button" id="save-favorites-and-confident-btn" class="btn-primary">定番設定と自信曲の変更を保存</button>
-			<span id="favorite-management-message" style="margin-left: 10px;"></span>
+		<!-- 自信曲セクション -->
+		<div class="confident-section">
+		  <h3>登録楽曲一覧（自信曲の変更）</h3>
+		  <!-- 登録曲テーブルなど -->
+		  <button type="button" id="update-confident-btn">自信曲の変更を保存</button>
 		</div>
 	</section>
 
