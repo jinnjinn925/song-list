@@ -689,10 +689,13 @@ async function generateReadings(rows) {
         const titleName =
             row.title.trim();
 
+        if (!artistName || !titleName) {
+            continue;
+        }
 
-        // ========================================
+        // =========================
         // 既存アーティストを確認
-        // ========================================
+        // =========================
 
         const existingArtist =
             existingArtists.find(
@@ -700,25 +703,23 @@ async function generateReadings(rows) {
                     artist.name === artistName
             );
 
-
         let artistInitial = '';
         let titleInitial = '';
 
-
-        // ========================================
-        // 既存アーティスト
-        // ========================================
+        let isNewArtist = false;
+        let isNewSong = false;
 
         if (existingArtist) {
 
-            // アーティストの読みはDBからそのまま使用
+            // 既存アーティストなら
+            // DBにある読みをそのまま使用
+
             artistInitial =
                 existingArtist.artist_initial || '';
 
-
-            // ========================================
+            // =========================
             // 既存曲を確認
-            // ========================================
+            // =========================
 
             const {
                 data: existingSong,
@@ -742,7 +743,6 @@ async function generateReadings(rows) {
                     )
                     .maybeSingle();
 
-
             if (songError) {
 
                 console.error(
@@ -751,41 +751,47 @@ async function generateReadings(rows) {
                 );
 
                 throw songError;
-
             }
-
-
-            // ========================================
-            // 既存曲
-            // ========================================
 
             if (existingSong) {
 
-                // 曲名の読みもDBからそのまま使用
+                // 既存曲なら読みもDBから取得
+
                 titleInitial =
                     existingSong.title_initial || '';
 
+                // イントロが入力されていなければ
+                // DBのイントロを使用
 
-                // イントロも既存値を使用
                 if (!row.intro) {
-
                     row.intro =
                         existingSong.intro || '';
-
                 }
 
+            } else {
+
+                // 既存アーティストだが
+                // 曲は新規
+
+                isNewSong = true;
             }
 
+        } else {
+
+            // アーティスト自体が新規
+
+            isNewArtist = true;
+            isNewSong = true;
         }
 
 
-        // ========================================
-        // 新規アーティスト・新規曲だけ生成
-        // ========================================
+        // =========================
+        // 新規部分だけひらがな生成
+        // =========================
 
         if (
-            !artistInitial ||
-            !titleInitial
+            isNewArtist ||
+            isNewSong
         ) {
 
             const response =
@@ -801,61 +807,42 @@ async function generateReadings(rows) {
 
                         body: JSON.stringify({
 
-                            // 既存アーティストなら
-                            // 空文字 → 生成しない
                             artist:
-                                artistInitial
-                                    ? ''
-                                    : artistName,
+                                isNewArtist
+                                    ? artistName
+                                    : '',
 
-                            // 既存曲なら
-                            // 空文字 → 生成しない
                             title:
-                                titleInitial
-                                    ? ''
-                                    : titleName
-
+                                isNewSong
+                                    ? titleName
+                                    : ''
                         })
                     }
                 );
-
 
             if (!response.ok) {
 
                 throw new Error(
                     `ひらがな生成に失敗しました (${response.status})`
                 );
-
             }
-
 
             const data =
                 await response.json();
 
-
-            // 新規アーティストだけ取得
-            if (!artistInitial) {
+            if (isNewArtist) {
 
                 artistInitial =
                     data.artist_initial || '';
-
             }
 
-
-            // 新規曲だけ取得
-            if (!titleInitial) {
+            if (isNewSong) {
 
                 titleInitial =
                     data.title_initial || '';
-
             }
-
         }
 
-
-        // ========================================
-        // プレビュー用の形にする
-        // ========================================
 
         results.push({
 
@@ -874,6 +861,15 @@ async function generateReadings(rows) {
             intro:
                 row.intro,
 
+            // 新規かどうかを
+            // プレビュー側へ渡す
+
+            isNewArtist:
+                isNewArtist,
+
+            isNewSong:
+                isNewSong,
+
             reading: {
 
                 artist_initial:
@@ -881,13 +877,9 @@ async function generateReadings(rows) {
 
                 title_initial:
                     titleInitial
-
             }
-
         });
-
     }
-
 
     return results;
 }
@@ -904,9 +896,7 @@ function createPreviewRow(
     const tr =
         document.createElement('tr');
 
-
     // Artist
-
     const artistTd =
         document.createElement('td');
 
@@ -928,7 +918,6 @@ function createPreviewRow(
 
 
     // Artist reading
-
     const artistInitialTd =
         document.createElement('td');
 
@@ -950,14 +939,10 @@ function createPreviewRow(
 
 
     // Title
-
     const titleTd =
         document.createElement('td');
 
     const titleInput =
-        document.createElement('input');
-		
-	const introInput =
         document.createElement('input');
 
     titleInput.type =
@@ -975,7 +960,6 @@ function createPreviewRow(
 
 
     // Title reading
-
     const titleInitialTd =
         document.createElement('td');
 
@@ -996,8 +980,7 @@ function createPreviewRow(
     );
 
 
-    // Complete status
-
+    // Complete
     const completeTd =
         document.createElement('td');
 
@@ -1009,7 +992,6 @@ function createPreviewRow(
 
 
     // Confident
-
     const confidentTd =
         document.createElement('td');
 
@@ -1034,11 +1016,11 @@ function createPreviewRow(
 
 
     // Intro
-
     const introTd =
         document.createElement('td');
 
-
+    const introInput =
+        document.createElement('input');
 
     introInput.type =
         'text';
@@ -1058,7 +1040,6 @@ function createPreviewRow(
 
 
     // Delete
-
     const deleteTd =
         document.createElement('td');
 
@@ -1080,9 +1061,7 @@ function createPreviewRow(
     deleteButton.addEventListener(
         'click',
         () => {
-
             tr.remove();
-
         }
     );
 
@@ -1091,6 +1070,7 @@ function createPreviewRow(
     );
 
 
+    // Row
     tr.appendChild(
         artistTd
     );
@@ -1123,11 +1103,9 @@ function createPreviewRow(
         deleteTd
     );
 
-
     previewBody.appendChild(
         tr
     );
-
 }
 
 
@@ -1366,19 +1344,11 @@ document
                     10
                 );
 
-
-            if (
-                !Number.isInteger(
-                    streamerId
-                )
-            ) {
-
+            if (!Number.isInteger(streamerId)) {
                 alert(
                     'Streamer ID is invalid.'
                 );
-
                 return;
-
             }
 
 
@@ -1387,135 +1357,144 @@ document
                     '#preview-body tr'
                 );
 
-
             const insertData = [];
 
 
-            rows.forEach(
-                tr => {
+            rows.forEach(tr => {
 
-                    const artist =
-                        tr.querySelector(
-                            '.row-artist'
-                        ).value.trim();
+                const artistInput =
+                    tr.querySelector(
+                        '.row-artist'
+                    );
 
-
-                    const artistInitial =
-                        tr.querySelector(
-                            '.row-artist-initial'
-                        ).value.trim();
+                const artist =
+                    artistInput
+                        ? artistInput.value.trim()
+                        : '';
 
 
-                    const title =
-                        tr.querySelector(
-                            '.row-title'
-                        ).value.trim();
+                const artistInitialInput =
+                    tr.querySelector(
+                        '.row-artist-initial'
+                    );
+
+                const artistInitial =
+                    artistInitialInput
+                        ? artistInitialInput.value.trim()
+                        : '';
 
 
-                    const titleInitial =
-                        tr.querySelector(
-                            '.row-title-initial'
-                        ).value.trim();
+                const titleInput =
+                    tr.querySelector(
+                        '.row-title'
+                    );
+
+                const title =
+                    titleInput
+                        ? titleInput.value.trim()
+                        : '';
 
 
-                    const completeValue =
-                        tr.querySelector(
-                            '.row-complete'
-                        ).value;
+                const titleInitialInput =
+                    tr.querySelector(
+                        '.row-title-initial'
+                    );
+
+                const titleInitial =
+                    titleInitialInput
+                        ? titleInitialInput.value.trim()
+                        : '';
 
 
-                    const confident =
-                        tr.querySelector(
-                            '.row-confident'
-                        ).checked;
+                const completeInput =
+                    tr.querySelector(
+                        '.row-complete'
+                    );
+
+                const completeValue =
+                    completeInput
+                        ? completeInput.value
+                        : 'complete';
 
 
-                    const intro =
-                        tr.querySelector(
-                            '.row-intro'
-                        ).value.trim();
+                const confidentInput =
+                    tr.querySelector(
+                        '.row-confident'
+                    );
+
+                const confident =
+                    confidentInput
+                        ? confidentInput.checked
+                        : false;
 
 
-                    if (
-                        !artist ||
-                        !title
-                    ) {
+                const introInput =
+                    tr.querySelector(
+                        '.row-intro'
+                    );
 
-                        return;
-
-                    }
-
-
-                    let complete =
-                        null;
+                const intro =
+                    introInput
+                        ? introInput.value.trim()
+                        : '';
 
 
-                    if (
-                        completeValue ===
-                        'complete'
-                    ) {
-
-                        complete =
-                            true;
-
-                    } else if (
-                        completeValue ===
-                        'practice'
-                    ) {
-
-                        complete =
-                            false;
-
-                    } else {
-
-                        complete =
-                            null;
-
-                    }
-
-
-                    insertData.push({
-
-                        streamer_id:
-                            streamerId,
-
-                        artist:
-                            artist,
-
-                        artist_initial:
-                            artistInitial,
-
-                        title:
-                            title,
-
-                        title_initial:
-                            titleInitial,
-
-                        complete:
-                            complete,
-
-                        confident:
-                            confident,
-
-                        intro:
-                            intro || null
-
-                    });
-
+                if (!artist || !title) {
+                    return;
                 }
-            );
 
 
-            if (
-                !insertData.length
-            ) {
+                let complete = null;
+
+                if (
+                    completeValue ===
+                    'complete'
+                ) {
+                    complete = true;
+
+                } else if (
+                    completeValue ===
+                    'practice'
+                ) {
+                    complete = false;
+                }
+
+
+                insertData.push({
+                    streamer_id:
+                        streamerId,
+
+                    artist:
+                        artist,
+
+                    artist_initial:
+                        artistInitial,
+
+                    title:
+                        title,
+
+                    title_initial:
+                        titleInitial,
+
+                    complete:
+                        complete,
+
+                    confident:
+                        confident,
+
+                    intro:
+                        intro || null
+                });
+            });
+
+
+            if (!insertData.length) {
 
                 alert(
                     'There are no songs to register.'
                 );
 
                 return;
-
             }
 
 
@@ -1524,22 +1503,19 @@ document
                     'submit-all-btn'
                 );
 
-			const submitError =
-    			document.getElementById(
-        			'submit-error'
-    			);
-
-			submitError.textContent = '';
-			submitError.style.color = '';
+            const submitError =
+                document.getElementById(
+                    'submit-error'
+                );
 
 
-            button.disabled =
-                true;
+            submitError.textContent = '';
+            submitError.style.color = '';
 
 
-            message.style.color =
-                '';
+            button.disabled = true;
 
+            message.style.color = '';
 
             message.textContent =
                 'Registering...';
@@ -1548,93 +1524,92 @@ document
             try {
 
                 const managementKey =
-    				document.getElementById(
-        				'management-key'
-    				).value.trim();
+                    document.getElementById(
+                        'management-key'
+                    ).value.trim();
 
-				if (!managementKey) {
 
-    				submitError.textContent =
-        				'管理キーを入力してください。';
+                if (!managementKey) {
 
-    				return;
+                    submitError.textContent =
+                        '管理キーを入力してください。';
 
-				}
+                    return;
+                }
 
-				const streamerId =
-    				document.getElementById(
-        				'streamer-id'
-    				).value;
 
-				const response =
-    				await fetch(
-        				`${supabaseUrl}/functions/v1/management`,
-        				{
-            				method: 'POST',
+                const response =
+                    await fetch(
+                        `${supabaseUrl}/functions/v1/management`,
+                        {
+                            method: 'POST',
 
-            				headers: {
-                				'Content-Type':
-                    				'application/json'
-            				},
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
 
-            				body: JSON.stringify({
-                				action: 'insert',
+                            body: JSON.stringify({
+                                action:
+                                    'insert',
 
-                				streamer_id:
-                    				Number(streamerId),
+                                streamer_id:
+                                    streamerId,
 
-                				management_key:
-                    				managementKey,
+                                management_key:
+                                    managementKey,
 
-                				songs:
-                    				insertData
-            				})
-        				}
-    				);
+                                songs:
+                                    insertData
+                            })
+                        }
+                    );
 
-				const result =
-    				await response.json();
 
-				if (!response.ok) {
+                const result =
+                    await response.json();
 
-    				submitError.textContent =
-        				result.error ||
-        				'曲の登録に失敗しました。';
 
-    				return;
-				}
+                if (!response.ok) {
+
+                    submitError.textContent =
+                        result.error ||
+                        '曲の登録に失敗しました。';
+
+                    return;
+                }
 
 
                 submitError.style.color =
-    				'green';
+                    'green';
 
-				message.textContent =
-    				insertData.length +
-    				' songs registered successfully.';
+                message.textContent =
+                    insertData.length +
+                    ' songs registered successfully.';
 
-				submitError.textContent =
-    				insertData.length +
-    				'曲を登録しました。';
+                submitError.textContent =
+                    insertData.length +
+                    '曲を登録しました。';
 
 
-                inputBody.innerHTML =
-                    '';
+                inputBody.innerHTML = '';
 
-                previewBody.innerHTML =
-                    '';
+                previewBody.innerHTML = '';
 
-                generatedRows =
-                    [];
+                generatedRows = [];
+				
+				
+				// DBで更新された読み仮名を再取得
+				await loadExistingArtists();
+				createArtistDatalist();
 
 
                 for (
                     let i = 0;
-                    i < 5;
+                    i < 1;
                     i++
                 ) {
-
                     addInputRow();
-
                 }
 
 
@@ -1646,13 +1621,8 @@ document
 
 
                 window.scrollTo({
-
-                    top:
-                        0,
-
-                    behavior:
-                        'smooth'
-
+                    top: 0,
+                    behavior: 'smooth'
                 });
 
 
@@ -1662,26 +1632,20 @@ document
                     error
                 );
 
-
                 message.style.color =
                     'red';
-
 
                 message.textContent =
                     'Registration error: ' +
                     error.message;
 
-
             } finally {
 
                 button.disabled =
                     false;
-
             }
-
         }
     );
-
 
 // ========================================
 // Load registered songs
