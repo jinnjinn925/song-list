@@ -538,7 +538,7 @@ function addInputRow(
                     .from('songs')
                     .select(`
                         id,
-                        title,
+                        title
                     `)
                     .eq(
                         'artist_id',
