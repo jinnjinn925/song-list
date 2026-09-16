@@ -16,7 +16,7 @@ body {
     margin: 0;
     padding: 0 0 120px 0;
     background: #f8f8f8;
-    color: #222;
+    color: #C8BACE;
 
     font-family:
         "Noto Sans JP",
@@ -53,7 +53,7 @@ body {
     border-radius: 10px;
 
     background: transparent;
-    color: #f8f8f8;
+    color: #C8BACE;
 
     font-size: 26px;
 
@@ -126,7 +126,7 @@ body {
     padding: 0 14px;
     border: 1px solid #ccc;
     border-radius: 10px;
-    background: #fff;
+    background: #C8BACE;
     font-family: inherit;
     font-size: 14px;
     cursor: pointer;
@@ -331,7 +331,7 @@ body {
 
 #artist-nav button.active {
     background: #222;
-    color: #fff;
+    color: #C8BACE;
     border-color: #222;
 }
 
@@ -432,7 +432,7 @@ main {
 #search-clear,
 .favorite-button {
     background: rgba(255, 255, 255, 0.35);/* 入力欄の背景透過度 */
-    border: 1px solid rgba(255, 255, 255, 0.5);/* 枠線の色 */
+    border: 1px solid rgba(200, 186, 207, 0.5);/* 枠線の色 */
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
@@ -465,7 +465,7 @@ main {
 /* 50音ナビゲーション */
 #artist-nav button {
     background: rgba(255, 255, 255, 0.30);/* 50音ボタンの透過背景 */
-    border: 1px solid rgba(255, 255, 255, 0.75);/* ボタンの枠線色 */
+    border: 1px solid rgba(200, 186, 207, 0.75);/* ボタンの枠線色 */
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
@@ -476,11 +476,11 @@ main {
 }
 
 #song-search {
-    color: #333;/* 入力した文字の色 */
+    color: #C8BACE;/* 入力した文字の色 */
 }
 
 #song-search::placeholder {
-    color: #333;/* 検索前の「曲名・アーティスト名で検索」の文字色 */
+    color: #C8BACE;/* 検索前の「曲名・アーティスト名で検索」の文字色 */
 }
 
 #filter-buttons {
