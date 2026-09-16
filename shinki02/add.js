@@ -804,38 +804,46 @@ async function loadRegisteredSongs() {
             return;
         }
 
-        sortedSongs.forEach(song => {
-            const tr = document.createElement('tr');
+        // loadRegisteredSongs 関数の下半部（renderRegisteredSongs 内のループ処理）
 
-            const checkTd = document.createElement('td');
-            checkTd.className = 'checkbox-cell';
-            const checkbox = document.createElement('input');
-            checkbox.type = 'checkbox';
-            checkbox.className = 'registered-song-checkbox';
-            checkbox.dataset.id = song.id;
-            checkTd.appendChild(checkbox);
+		sortedSongs.forEach(song => {
+			const tr = document.createElement('tr');
 
-            const artistTd = document.createElement('td');
-            artistTd.textContent = song.artist || '';
+			const checkTd = document.createElement('td');
+			checkTd.className = 'checkbox-cell';
+			const checkbox = document.createElement('input');
+			checkbox.type = 'checkbox';
+			checkbox.className = 'registered-song-checkbox';
+			checkbox.dataset.id = song.id;
+			checkTd.appendChild(checkbox);
 
-            const titleTd = document.createElement('td');
-            titleTd.textContent = song.title || '';
+			const artistTd = document.createElement('td');
+			artistTd.textContent = song.artist || '';
 
-            const statusTd = document.createElement('td');
-            statusTd.textContent = getStatusLabel(song.complete);
+			const titleTd = document.createElement('td');
+			titleTd.textContent = song.title || '';
 
-            const confidentTd = document.createElement('td');
-            confidentTd.className = 'checkbox-cell';
-            confidentTd.textContent = song.confident === true ? '✓' : '';
+			const statusTd = document.createElement('td');
+			statusTd.textContent = getStatusLabel(song.complete);
 
-            tr.appendChild(checkTd);
-            tr.appendChild(artistTd);
-            tr.appendChild(titleTd);
-            tr.appendChild(statusTd);
-            tr.appendChild(confidentTd);
+			// 【変更点】テキスト表記から、状態を操作できるチェックボックスへ変更
+			const confidentTd = document.createElement('td');
+			confidentTd.className = 'checkbox-cell';
+			const confidentCheckbox = document.createElement('input');
+			confidentCheckbox.type = 'checkbox';
+			confidentCheckbox.className = 'registered-confident-checkbox';
+			confidentCheckbox.dataset.id = song.id;
+			confidentCheckbox.checked = song.confident === true;
+			confidentTd.appendChild(confidentCheckbox);
 
-            registeredBody.appendChild(tr);
-        });
+			tr.appendChild(checkTd);
+			tr.appendChild(artistTd);
+			tr.appendChild(titleTd);
+			tr.appendChild(statusTd);
+			tr.appendChild(confidentTd);
+
+			registeredBody.appendChild(tr);
+		});
 
         const visibleCheckboxes = registeredBody.querySelectorAll('.registered-song-checkbox');
         selectAllSongs.checked = visibleCheckboxes.length > 0 && Array.from(visibleCheckboxes).every(cb => cb.checked);
@@ -1046,12 +1054,12 @@ if (saveFavoritesAndConfidentBtn) {
             return;
         }
 
-        // 1. チェックされている「定番アーティスト」を取得
+        // 1. 定番アーティストの選択状態を取得
         const selectedArtists = Array.from(
             document.querySelectorAll('input[name="favorite-artist-select"]:checked')
         ).map(cb => cb.value);
 
-        // 2. テーブル上の「自信あり」チェックボックス状態を取得
+        // 2. テーブル上の「自信あり」チェックボックスの状態を集計
         const confidentCheckboxes = document.querySelectorAll('.registered-confident-checkbox');
         const confidentUpdates = Array.from(confidentCheckboxes).map(cb => ({
             id: parseInt(cb.dataset.id, 10),
@@ -1084,10 +1092,81 @@ if (saveFavoritesAndConfidentBtn) {
 
             if (msgEl) {
                 msgEl.style.color = 'green';
-                msgEl.textContent = '定番アーティストと自信曲の変更を保存しました！';
+                msgEl.textContent = '設定の変更を保存しました。';
             }
 
-            // 一覧を再読み込み
+            // テーブル一覧を再読み込み
+            await loadRegisteredSongs();
+        } catch (err) {
+            console.error(err);
+            if (msgEl) {
+                msgEl.style.color = 'red';
+                msgEl.textContent = 'エラー: ' + err.message;
+            }
+        } finally {
+            saveFavoritesAndConfidentBtn.disabled = false;
+        }
+    });
+}
+										   
+										   
+										   
+										   
+const saveFavoritesAndConfidentBtn = document.getElementById('save-favorites-and-confident-btn');
+
+if (saveFavoritesAndConfidentBtn) {
+    saveFavoritesAndConfidentBtn.addEventListener('click', async () => {
+        const streamerId = parseInt(document.getElementById('streamer-id').value, 10);
+        const managementKey = document.getElementById('management-key').value.trim();
+        const msgEl = document.getElementById('favorite-management-message');
+
+        if (!Number.isInteger(streamerId) || !managementKey) {
+            alert('Streamer ID と管理キーを入力してください。');
+            return;
+        }
+
+        // 1. 定番アーティストの選択状態を取得
+        const selectedArtists = Array.from(
+            document.querySelectorAll('input[name="favorite-artist-select"]:checked')
+        ).map(cb => cb.value);
+
+        // 2. テーブル上の「自信あり」チェックボックスの状態を集計
+        const confidentCheckboxes = document.querySelectorAll('.registered-confident-checkbox');
+        const confidentUpdates = Array.from(confidentCheckboxes).map(cb => ({
+            id: parseInt(cb.dataset.id, 10),
+            confident: cb.checked
+        }));
+
+        saveFavoritesAndConfidentBtn.disabled = true;
+        if (msgEl) {
+            msgEl.style.color = '';
+            msgEl.textContent = '設定を更新中...';
+        }
+
+        try {
+            const response = await fetch(`${supabaseUrl}/functions/v1/management`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'update_favorites_and_confident',
+                    streamer_id: streamerId,
+                    management_key: managementKey,
+                    favorite_artists: selectedArtists,
+                    confident_updates: confidentUpdates
+                })
+            });
+
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.error || '保存に失敗しました。');
+            }
+
+            if (msgEl) {
+                msgEl.style.color = 'green';
+                msgEl.textContent = '設定の変更を保存しました。';
+            }
+
+            // テーブル一覧を再読み込み
             await loadRegisteredSongs();
         } catch (err) {
             console.error(err);
