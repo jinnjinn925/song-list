@@ -857,7 +857,7 @@ async function loadRegisteredSongs() {
 	
 	
 	// 曲データの読み込み成功時の処理内などで呼び出す
-	renderFavoriteArtistCheckboxes(registeredSongs, currentFavoriteArtists);
+	renderFavoriteArtistCheckboxes(songs);
 	
 	
 	
@@ -1006,7 +1006,7 @@ function renderFavoriteArtistCheckboxes(registeredSongs, currentFavoriteArtists 
     if (!container) return;
 
     // 登録済みの曲から重複を除いたアーティスト名リストを取得（昇順ソート）
-    const artists = Array.from(new Set(registeredSongs.map(s => s.artist_name).filter(Boolean))).sort();
+    const artists = Array.from(new Set(registeredSongs.map(s => s.artist).filter(Boolean))).sort();
 
     if (artists.length === 0) {
         container.innerHTML = '<span style="color: #999;">登録済みのアーティストがありません。</span>';
