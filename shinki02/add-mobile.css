@@ -469,3 +469,97 @@ textarea {
     margin: 0;
     white-space: nowrap;
 }
+
+/* ========================================
+   アーティスト選択用のチップ表示（モバイル用）
+   ======================================== */
+.artist-checkbox-item {
+    display: inline-flex;
+    align-items: center;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.artist-checkbox-item input {
+    margin-right: 6px;
+    width: 18px;
+    height: 18px;
+}
+
+/* ========================================
+   登録曲操作ボタンエリア（2列均等配置）
+   ======================================== */
+.registered-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+}
+
+#save-registered-changes-btn,
+#delete-selected-btn {
+    flex: 1; /* スマホ画面の横幅を50%ずつ分け合う */
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 8px;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+#save-registered-changes-btn:active,
+#delete-selected-btn:active,
+#update-favorites-btn:active {
+    transform: translateY(1px);
+}
+
+#save-registered-changes-btn:disabled,
+#delete-selected-btn:disabled,
+#update-favorites-btn:disabled {
+    background-color: #cccccc !important;
+    color: #666666 !important;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* 変更を保存ボタン（青系） */
+#save-registered-changes-btn {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+
+/* 選択した曲を削除ボタン（赤系） */
+#delete-selected-btn {
+    background-color: #dc2626;
+    color: #ffffff;
+}
+
+/* ========================================
+   定番歌手を保存ボタン（緑系）
+   ======================================== */
+#update-favorites-btn {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    color: #ffffff;
+    background-color: #059669;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
