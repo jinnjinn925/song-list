@@ -21,6 +21,37 @@ let generatedRows = [];
 
 let existingArtists = [];
 
+// ========================================
+// 好きなアーティスト
+// ========================================
+
+let favoriteArtistNames = [];
+
+const favoriteArtistsSelected =
+    document.getElementById(
+        'favorite-artists-selected'
+    );
+
+const favoriteArtistSearch =
+    document.getElementById(
+        'favorite-artist-search'
+    );
+
+const favoriteArtistsList =
+    document.getElementById(
+        'favorite-artists-list'
+    );
+
+const saveFavoriteArtistsBtn =
+    document.getElementById(
+        'save-favorite-artists-btn'
+    );
+
+const favoriteArtistsMessage =
+    document.getElementById(
+        'favorite-artists-message'
+    );
+
 async function loadExistingArtists() {
 
     const {
@@ -83,6 +114,173 @@ function createArtistDatalist() {
     });
 
     document.body.appendChild(datalist);
+}
+
+// ========================================
+// 好きなアーティスト表示
+// ========================================
+
+function renderFavoriteArtists() {
+
+    if (!favoriteArtistsSelected) {
+        return;
+    }
+
+    favoriteArtistsSelected.innerHTML = '';
+
+    if (favoriteArtistNames.length === 0) {
+
+        favoriteArtistsSelected.textContent =
+            'まだ選択されていません。';
+
+        return;
+    }
+
+    favoriteArtistNames.forEach(
+        artistName => {
+
+            const chip =
+                document.createElement('span');
+
+            chip.className =
+                'favorite-chip';
+
+            chip.textContent =
+                artistName;
+
+            favoriteArtistsSelected.appendChild(
+                chip
+            );
+        }
+    );
+}
+
+
+// ========================================
+// 好きなアーティスト候補表示
+// ========================================
+
+function renderFavoriteArtistList() {
+
+    if (!favoriteArtistsList) {
+        return;
+    }
+
+    const searchText =
+        favoriteArtistSearch
+            ? favoriteArtistSearch.value
+                .trim()
+                .toLowerCase()
+            : '';
+
+    favoriteArtistsList.innerHTML = '';
+
+    const filteredArtists =
+        existingArtists.filter(
+            artist => {
+
+                if (!searchText) {
+                    return true;
+                }
+
+                return artist.name
+                    .toLowerCase()
+                    .includes(searchText);
+            }
+        );
+
+    if (filteredArtists.length === 0) {
+
+        const empty =
+            document.createElement('div');
+
+        empty.className =
+            'favorite-artist-item';
+
+        empty.textContent =
+            '該当するアーティストがありません。';
+
+        favoriteArtistsList.appendChild(
+            empty
+        );
+
+        return;
+    }
+
+    filteredArtists.forEach(
+        artist => {
+
+            const item =
+                document.createElement('div');
+
+            item.className =
+                'favorite-artist-item';
+
+            item.textContent =
+                artist.name;
+
+            if (
+                favoriteArtistNames.includes(
+                    artist.name
+                )
+            ) {
+
+                item.classList.add(
+                    'selected'
+                );
+            }
+
+            item.addEventListener(
+                'click',
+                () => {
+
+                    const index =
+                        favoriteArtistNames.indexOf(
+                            artist.name
+                        );
+
+                    if (index >= 0) {
+
+                        // 選択解除
+                        favoriteArtistNames.splice(
+                            index,
+                            1
+                        );
+
+                    } else {
+
+                        // 選択
+                        favoriteArtistNames.push(
+                            artist.name
+                        );
+                    }
+
+                    renderFavoriteArtists();
+                    renderFavoriteArtistList();
+                }
+            );
+
+            favoriteArtistsList.appendChild(
+                item
+            );
+        }
+    );
+}
+
+// ========================================
+// 好きなアーティスト検索
+// ========================================
+
+if (favoriteArtistSearch) {
+
+    favoriteArtistSearch.addEventListener(
+        'input',
+        () => {
+
+            renderFavoriteArtistList();
+
+        }
+    );
 }
 
 const inputBody =
@@ -1602,6 +1800,10 @@ document
 				// DBで更新された読み仮名を再取得
 				await loadExistingArtists();
 				createArtistDatalist();
+				
+				
+				renderFavoriteArtists();
+				renderFavoriteArtistList();
 
 
                 for (

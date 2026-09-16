@@ -99,6 +99,52 @@
     <h2>レパートリー管理</h2>
 
     <input type="hidden" id="streamer-id">
+	
+	
+	<!-- =========================
+		 好きなアーティスト
+	========================== -->
+
+	<section id="favorite-artists-section">
+
+		<div class="section-header">
+
+			<div>
+				<h3>好きなアーティスト</h3>
+
+				<p>
+					リスナー向けページで優先表示する
+					アーティストを選択します。
+				</p>
+			</div>
+
+		</div>
+
+		<div id="favorite-artists-selected">
+			まだ選択されていません
+		</div>
+
+		<input
+			type="search"
+			id="favorite-artist-search"
+			placeholder="アーティストを検索"
+			autocomplete="off"
+		>
+
+		<div id="favorite-artists-list">
+		</div>
+
+		<button
+			type="button"
+			id="save-favorite-artists-btn"
+			class="main-button"
+		>
+			好きなアーティストを保存
+		</button>
+
+		<div id="favorite-artists-message"></div>
+
+	</section>
 
 
     <!-- =========================
