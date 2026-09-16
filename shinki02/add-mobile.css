@@ -584,16 +584,44 @@ textarea {
 }
 
 /* ========================================
-   登録済み曲リストエリア（縦スクロール化）
+   登録済み曲リストエリア（スクロール化 ＋ 2段組レイアウト）
    ======================================== */
-/* 曲リスト全体を囲むコンテナ要素、またはul/ol要素に適用 */
-.registered-songs-list,
-#registered-section ul {
-    max-height: 300px;         /* 枠の最大高さ（好みに応じて調整可能） */
-    overflow-y: auto;          /* はみ出た場合に縦スクロールを表示 */
-    padding-right: 4px;        /* スクロールバーとの重なりを防止 */
-    margin-bottom: 12px;
+
+/* 1. リストを囲むコンテナにスクロールを設定 */
+#registered-section {
+    max-height: 320px;                   /* 枠の最大高さ（調整可能） */
+    overflow-y: auto;                    /* 溢れた場合に縦スクロール */
+    padding: 10px;
+    background-color: #fafafa;           /* スクロール領域を明確化 */
     border: 1px solid #eee;
+    border-radius: 10px;
+    -webkit-overflow-scrolling: touch;   /* スマホの滑らかな慣性スクロール */
+}
+
+/* 2. リスト要素（ul / ol）を2段組（2列グリッド）にする */
+#registered-section ul,
+#registered-section ol,
+#registered-section .song-list {         /* 実際に使用しているクラス/タグに合わせて適用 */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 均等な2列配置 */
+    gap: 8px;                            /* 項目同士の間隔 */
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* 3. 各曲カード・項目（li）の見た目を整える */
+#registered-section li,
+#registered-section .song-item {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
     border-radius: 8px;
-    -webkit-overflow-scrolling: touch; /* スマホでの操作をなめらかにする */
+    padding: 8px 10px;
+    font-size: 13px;
+    box-sizing: border-box;
+
+    /* 長いテキストがみ出ないように省略表示 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
