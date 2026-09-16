@@ -829,6 +829,33 @@ function displayFavoriteArtists(favoriteList) {
 }
 
 // =========================
+// フィルターボタン表示状態の更新
+// =========================
+
+function updateCompleteButton() {
+
+    filterAll.classList.toggle(
+        'active',
+        completeFilter === 'all'
+    );
+
+    filterComplete.classList.toggle(
+        'active',
+        completeFilter === 'complete'
+    );
+
+    filterPartial.classList.toggle(
+        'active',
+        completeFilter === 'partial'
+    );
+
+    filterPractice.classList.toggle(
+        'active',
+        completeFilter === 'practice'
+    );
+}
+
+// =========================
 // 現在の条件で再表示
 // =========================
 
