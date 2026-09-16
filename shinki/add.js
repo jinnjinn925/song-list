@@ -410,7 +410,6 @@ function addInputRow(
     title = '',
     complete = 'complete',
     confident = false,
-    intro = ''
 ) {
 
     const tr =
@@ -540,7 +539,6 @@ function addInputRow(
                     .select(`
                         id,
                         title,
-                        intro
                     `)
                     .eq(
                         'artist_id',
@@ -581,69 +579,6 @@ function addInputRow(
     );
 
 
-    // ========================================
-    // Existing song → intro
-    // ========================================
-
-    titleInput.addEventListener(
-        'change',
-        async () => {
-
-            const artistName =
-                artistInput.value.trim();
-
-            const titleName =
-                titleInput.value.trim();
-
-            const selectedArtist =
-                existingArtists.find(
-                    item =>
-                        item.name === artistName
-                );
-
-            if (!selectedArtist) {
-                return;
-            }
-
-            const {
-                data,
-                error
-            } =
-                await supabaseClient
-                    .from('songs')
-                    .select(`
-                        id,
-                        title,
-                        intro
-                    `)
-                    .eq(
-                        'artist_id',
-                        selectedArtist.id
-                    )
-                    .eq(
-                        'title',
-                        titleName
-                    )
-                    .maybeSingle();
-
-            if (error) {
-
-                console.error(
-                    '曲情報の取得に失敗しました。',
-                    error
-                );
-
-                return;
-            }
-
-            if (data) {
-
-                introInput.value =
-                    data.intro || '';
-
-            }
-        }
-    );
 
 
     // ========================================
@@ -687,31 +622,6 @@ function addInputRow(
     );
 
 
-    // ========================================
-	// Intro
-	// ========================================
-
-	const introTd =
-		document.createElement('td');
-
-	const introInput =
-		document.createElement('input');
-
-	introInput.type =
-		'text';
-
-	introInput.className =
-		'row-intro';
-
-	introInput.placeholder =
-		'Optional';
-
-	introInput.value =
-		intro;
-
-	introTd.appendChild(
-		introInput
-	);
 
     // ========================================
     // Delete
@@ -777,9 +687,7 @@ function addInputRow(
         confidentTd
     );
 
-    tr.appendChild(
-        introTd
-    );
+
 
     tr.appendChild(
         deleteTd
@@ -828,10 +736,6 @@ function collectInputRows() {
                 '.row-confident'
             ).checked;
 
-        const intro =
-            tr.querySelector(
-                '.row-intro'
-            ).value.trim();
 
 
         if (
@@ -858,8 +762,7 @@ function collectInputRows() {
             confident:
                 confident,
 
-            intro:
-                intro
+
 
         });
 
@@ -929,7 +832,6 @@ async function generateReadings(rows) {
                         id,
                         title,
                         title_initial,
-                        intro
                     `)
                     .eq(
                         'artist_id',
@@ -958,13 +860,7 @@ async function generateReadings(rows) {
                 titleInitial =
                     existingSong.title_initial || '';
 
-                // イントロが入力されていなければ
-                // DBのイントロを使用
-
-                if (!row.intro) {
-                    row.intro =
-                        existingSong.intro || '';
-                }
+            
 
             } else {
 
@@ -1056,8 +952,7 @@ async function generateReadings(rows) {
             confident:
                 row.confident,
 
-            intro:
-                row.intro,
+
 
             // 新規かどうかを
             // プレビュー側へ渡す
@@ -1213,28 +1108,6 @@ function createPreviewRow(
     );
 
 
-    // Intro
-    const introTd =
-        document.createElement('td');
-
-    const introInput =
-        document.createElement('input');
-
-    introInput.type =
-        'text';
-
-    introInput.className =
-        'row-intro';
-
-    introInput.placeholder =
-        'Optional';
-
-    introInput.value =
-        row.intro || '';
-
-    introTd.appendChild(
-        introInput
-    );
 
 
     // Delete
@@ -1293,9 +1166,7 @@ function createPreviewRow(
         confidentTd
     );
 
-    tr.appendChild(
-        introTd
-    );
+
 
     tr.appendChild(
         deleteTd
@@ -1626,15 +1497,7 @@ document
                         : false;
 
 
-                const introInput =
-                    tr.querySelector(
-                        '.row-intro'
-                    );
-
-                const intro =
-                    introInput
-                        ? introInput.value.trim()
-                        : '';
+  
 
 
                 if (!artist || !title) {
@@ -1680,8 +1543,7 @@ document
                     confident:
                         confident,
 
-                    intro:
-                        intro || null
+
                 });
             });
 
@@ -1942,7 +1804,6 @@ async function loadRegisteredSongs() {
                     id,
                     title,
                     title_initial,
-                    intro,
                     artist:artists(
                         id,
                         name,
@@ -2011,8 +1872,7 @@ async function loadRegisteredSongs() {
                     confident:
                         row.confident,
 
-                    intro:
-                        row.song.intro,
+
 
                     // 曲そのもののID
                     song_id:
@@ -2367,17 +2227,6 @@ async function loadRegisteredSongs() {
                         : '';
 
 
-                // -------------------------
-                // Intro
-                // -------------------------
-
-                const introTd =
-                    document.createElement(
-                        'td'
-                    );
-
-                introTd.textContent =
-                    song.intro || '';
 
 
                 // -------------------------
@@ -2404,9 +2253,6 @@ async function loadRegisteredSongs() {
                     confidentTd
                 );
 
-                tr.appendChild(
-                    introTd
-                );
 
 
                 registeredBody.appendChild(
