@@ -701,54 +701,53 @@ function updateCompleteButton() {
 // お気に入りアーティスト表示
 // =========================
 
+// =========================
+// お気に入りアーティスト表示
+// =========================
+
 function displayFavoriteArtists(favoriteList) {
 
     favoriteArtistList = favoriteList || [];
 
-    // `#favorite-artists` の中身（前回生成されたボタン）を一旦クリア
+    // `#favorite-artists` 内（前回生成されたボタン）をクリア
     favoriteArtists.innerHTML = '';
 
-    // セクション自体は常に表示
+    // セクション全体を常に表示
     favoriteSection.style.display = 'block';
 
 
     // -------------------------
-    // 好きな歌手ボタン
+    // 好きな歌手ボタン（常に表示）
     // -------------------------
-    // お気に入りアーティストが登録されている場合のみ生成・追加
-    if (favoriteArtistList.length > 0) {
+    const artistButton = document.createElement('button');
+    artistButton.textContent = '好きな歌手';
+    artistButton.className = 'favorite-button';
 
-        const artistButton = document.createElement('button');
-        artistButton.textContent = '好きな歌手';
-        artistButton.className = 'favorite-button';
+    artistButton.addEventListener('click', () => {
+        if (favoriteMode === 'artist') {
+            favoriteMode = null;
+        } else {
+            favoriteMode = 'artist';
+        }
 
-        artistButton.addEventListener('click', () => {
-            if (favoriteMode === 'artist') {
-                favoriteMode = null;
-            } else {
-                favoriteMode = 'artist';
-            }
+        currentRow = null;
 
-            currentRow = null;
-
-            document.querySelectorAll('#artist-nav button').forEach(navButton => {
-                navButton.classList.remove('active');
-            });
-
-            artistButton.classList.toggle('active', favoriteMode === 'artist');
-            confidentButton.classList.remove('active');
-
-            render();
+        document.querySelectorAll('#artist-nav button').forEach(navButton => {
+            navButton.classList.remove('active');
         });
 
-        favoriteArtists.appendChild(artistButton);
-    }
+        artistButton.classList.toggle('active', favoriteMode === 'artist');
+        confidentButton.classList.remove('active');
+
+        render();
+    });
+
+    favoriteArtists.appendChild(artistButton);
 
 
     // -------------------------
-    // 自信曲ボタン
+    // 自信曲ボタン（常に表示）
     // -------------------------
-    // データが空でも常に表示
     const confidentButton = document.createElement('button');
     confidentButton.textContent = '自信曲';
     confidentButton.className = 'favorite-button';
@@ -767,19 +766,13 @@ function displayFavoriteArtists(favoriteList) {
         });
 
         confidentButton.classList.toggle('active', favoriteMode === 'confident');
-
-        // 「好きな歌手」ボタンが存在する場合のみアクティブ解除を行う
-        const artistBtn = favoriteArtists.querySelector('.favorite-button');
-        if (artistBtn && artistBtn !== confidentButton) {
-            artistBtn.classList.remove('active');
-        }
+        artistButton.classList.remove('active');
 
         render();
     });
 
     favoriteArtists.appendChild(confidentButton);
 }
-
 
 // =========================
 // 現在の条件で再表示
