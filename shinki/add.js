@@ -831,7 +831,7 @@ async function generateReadings(rows) {
                     .select(`
                         id,
                         title,
-                        title_initial,
+                        title_initial
                     `)
                     .eq(
                         'artist_id',
