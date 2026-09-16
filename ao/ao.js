@@ -533,37 +533,39 @@ function displaySongs(songs) {
                 'artist-songs';
 			
 			
-			// 「一覧」のときだけ最初から開く
+			// =========================
 			// 最初の開閉状態
+			// =========================
+
+			// 「一覧」のときだけ最初から開く
 			const shouldOpen =
-    			!searchQuery &&
-    			currentRow === null &&
-    			(
-        			favoriteMode === null ||
-        			favoriteMode === 'confident'
-    			);
+				!searchQuery &&
+				currentRow === null &&
+				favoriteMode === null &&
+				completeFilter === 'all';
 
 			if (shouldOpen) {
 
-    			// 一覧・自信曲は開く
-    			newArtistSongs.classList.remove(
-        			'collapsed'
-    			);
+				// 一覧だけ開く
+				newArtistSongs.classList.remove(
+					'collapsed'
+				);
 
-    			artistDiv.classList.remove(
-        			'collapsed'
-    			);
+				artistDiv.classList.remove(
+					'collapsed'
+				);
 
 			} else {
 
-    			// 50音・好きなアーティスト・検索は閉じる
-    			newArtistSongs.classList.add(
-        			'collapsed'
-    			);
+				// 50音・好きな歌手・自信曲・
+				// 最後まで・練習中・検索は閉じる
+				newArtistSongs.classList.add(
+					'collapsed'
+				);
 
-    			artistDiv.classList.add(
-        			'collapsed'
-    			);
+				artistDiv.classList.add(
+					'collapsed'
+				);
 			}
 
             // アーティスト名を押したら開閉
