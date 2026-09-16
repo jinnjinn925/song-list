@@ -722,3 +722,26 @@ h3 {
     white-space: nowrap;
     margin: 0;
 }
+
+
+
+/* アーティスト選択用の項目スタイリング */
+.artist-checkbox-item {
+    display: inline-flex;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 4px 10px;
+    border-radius: 16px;
+    font-size: 14px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.artist-checkbox-item input {
+    margin-right: 6px;
+}
+
+.artist-checkbox-item:hover {
+    background: #f0f0f0;
+}

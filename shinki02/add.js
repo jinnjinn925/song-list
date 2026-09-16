@@ -846,6 +846,26 @@ async function loadRegisteredSongs() {
     if (registeredSearchInput) registeredSearchInput.oninput = renderRegisteredSongs;
     if (registeredSortSelect) registeredSortSelect.onchange = renderRegisteredSongs;
     selectAllSongs.checked = false;
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	// 曲データの読み込み成功時の処理内などで呼び出す
+	renderFavoriteArtistCheckboxes(registeredSongs, currentFavoriteArtists);
+	
+	
+	
+	
+	
+	
+	
+	
 }
 
 selectAllSongs.addEventListener('change', () => {
@@ -974,6 +994,109 @@ if (resetManagementKeyBtn) {
             resetMessage.textContent = error.message;
         } finally {
             resetManagementKeyBtn.disabled = false;
+        }
+    });
+}
+											  
+											  
+											  
+// 登録済み曲データから固有のアーティスト一覧を抽出して選択肢を作成する関数
+function renderFavoriteArtistCheckboxes(registeredSongs, currentFavoriteArtists = []) {
+    const container = document.getElementById('favorite-artist-checkboxes');
+    if (!container) return;
+
+    // 登録済みの曲から重複を除いたアーティスト名リストを取得（昇順ソート）
+    const artists = Array.from(new Set(registeredSongs.map(s => s.artist_name).filter(Boolean))).sort();
+
+    if (artists.length === 0) {
+        container.innerHTML = '<span style="color: #999;">登録済みのアーティストがありません。</span>';
+        return;
+    }
+
+    container.innerHTML = '';
+    artists.forEach(artist => {
+        const label = document.createElement('label');
+        label.className = 'artist-checkbox-item';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.name = 'favorite-artist-select';
+        checkbox.value = artist;
+        if (currentFavoriteArtists.includes(artist)) {
+            checkbox.checked = true;
+        }
+
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(artist));
+        container.appendChild(label);
+    });
+}
+
+// 保存ボタンのイベント処理
+const saveFavoritesAndConfidentBtn = document.getElementById('save-favorites-and-confident-btn');
+
+if (saveFavoritesAndConfidentBtn) {
+    saveFavoritesAndConfidentBtn.addEventListener('click', async () => {
+        const streamerId = parseInt(document.getElementById('streamer-id').value, 10);
+        const managementKey = document.getElementById('management-key').value.trim();
+        const msgEl = document.getElementById('favorite-management-message');
+
+        if (!Number.isInteger(streamerId) || !managementKey) {
+            alert('Streamer ID と管理キーを入力してください。');
+            return;
+        }
+
+        // 1. チェックされている「定番アーティスト」を取得
+        const selectedArtists = Array.from(
+            document.querySelectorAll('input[name="favorite-artist-select"]:checked')
+        ).map(cb => cb.value);
+
+        // 2. テーブル上の「自信あり」チェックボックス状態を取得
+        const confidentCheckboxes = document.querySelectorAll('.registered-confident-checkbox');
+        const confidentUpdates = Array.from(confidentCheckboxes).map(cb => ({
+            id: parseInt(cb.dataset.id, 10),
+            confident: cb.checked
+        }));
+
+        saveFavoritesAndConfidentBtn.disabled = true;
+        if (msgEl) {
+            msgEl.style.color = '';
+            msgEl.textContent = '設定を更新中...';
+        }
+
+        try {
+            const response = await fetch(`${supabaseUrl}/functions/v1/management`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'update_favorites_and_confident',
+                    streamer_id: streamerId,
+                    management_key: managementKey,
+                    favorite_artists: selectedArtists,
+                    confident_updates: confidentUpdates
+                })
+            });
+
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.error || '保存に失敗しました。');
+            }
+
+            if (msgEl) {
+                msgEl.style.color = 'green';
+                msgEl.textContent = '定番アーティストと自信曲の変更を保存しました！';
+            }
+
+            // 一覧を再読み込み
+            await loadRegisteredSongs();
+        } catch (err) {
+            console.error(err);
+            if (msgEl) {
+                msgEl.style.color = 'red';
+                msgEl.textContent = 'エラー: ' + err.message;
+            }
+        } finally {
+            saveFavoritesAndConfidentBtn.disabled = false;
         }
     });
 }
