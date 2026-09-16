@@ -93,7 +93,7 @@
     <section id="input-section" class="management-section">
         <div class="section-header">
             <h2>曲を入力</h2>
-            <p>1曲ずつ入力してください。<br>苗字と名前の間にスペースをいれてください!!!<br>「＋ 曲を追加」で入力欄を増やせます。</p>
+            <p>1曲ずつ入力してください。<br>「＋ 曲を追加」で入力欄を増やせます。</p>
         </div>
 
         <div class="mobile-table">
@@ -104,6 +104,7 @@
                         <th>曲名</th>
                         <th>歌える状態</th>
                         <th>自信曲</th>
+                       
                         <th class="delete-column"></th>
                     </tr>
                 </thead>
@@ -138,6 +139,7 @@
                         <th>曲名読み</th>
                         <th>歌える状態</th>
                         <th>自信曲</th>
+                      
                         <th class="delete-column"></th>
                     </tr>
                 </thead>
@@ -153,11 +155,24 @@
             この内容で一括登録する
         </button>
     </section>
+	
+	
+	
+	<!-- ★追加：定番歌手の一括管理セクション -->
+	<section id="favorite-and-confident-section" class="management-section" style="padding: 16px; border: 1px solid #ddd; border-radius: 14px; background: #fff;">
+		<div class="favorite-artists-section">
+			<h2 style="font-size: 19px; margin-bottom: 8px;">好きな歌手の設定</h2>
+			<div id="favorite-artist-checkboxes" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;"></div>
+			<button type="button" id="update-favorites-btn">好きな歌手を保存</button>
+		</div>
+	</section>
+	
+	
 
     <section id="registered-section" class="management-section">
         <div class="section-header">
-            <h2>登録済みの曲</h2>
-            <p>削除したい曲にチェックを入れてください。</p>
+            <h2>登録済みの曲の設定の変更または削除</h2>
+            <p>設定を変更したい項目を変更してください。　削除したい曲の上部のボックスにチェックを入れてください。</p>
         </div>
 
         <div class="registered-controls">
@@ -212,15 +227,17 @@
                         <th>曲名</th>
                         <th>歌える状態</th>
                         <th>自信曲</th>
+                      
                     </tr>
                 </thead>
                 <tbody id="registered-body"></tbody>
             </table>
         </div>
 
-        <button type="button" id="delete-selected-btn" class="delete-button">
-            選択した曲を削除
-        </button>
+        <div class="registered-actions">
+			<button type="button" id="delete-selected-btn">選択した曲を削除</button>
+			<button type="button" id="save-registered-changes-btn">変更を保存</button>
+		</div>
     </section>
 
     <div id="message"></div>
