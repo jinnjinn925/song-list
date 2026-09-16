@@ -766,10 +766,10 @@ function renderRegisteredSongs() {
             </td>
             <td>${escapeHtml(song.artist)}</td>
             <td>${escapeHtml(song.title)}</td>
+            <td>${getStatusLabel(song.complete)}</td>
             <td>
                 <input type="checkbox" class="confident-checkbox" data-id="${song.id}" ${song.confident ? 'checked' : ''}>
             </td>
-            <td>${getStatusLabel(song.complete)}</td>
         </tr>
     `).join('');
 }
@@ -1007,7 +1007,7 @@ function renderFavoriteArtistCheckboxes(registeredSongs, currentFavoriteArtists 
         checkbox.type = 'checkbox';
         checkbox.name = 'favorite-artist-select';
         checkbox.value = artist;
-        
+
         if (currentFavoriteArtists.includes(artist)) {
             checkbox.checked = true;
         }
