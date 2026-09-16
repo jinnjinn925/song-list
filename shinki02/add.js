@@ -28,19 +28,16 @@ const favoriteArtistsMessage = document.getElementById('favorite-artists-message
 // 文字列整形のヘルパー関数
 // ========================================
 
-// 1. 照合・検索用（全角半角スペースを全て除外して小文字化）
 function normalizeName(str) {
     if (!str) return '';
     return str.replace(/[\s\u3000]+/g, '').toLowerCase();
 }
 
-// 2. 表示・保存用（連続スペースを「半角スペース1つ」に統一して端を削る）
 function formatName(str) {
     if (!str) return '';
     return str.replace(/[\s\u3000]+/g, ' ').trim();
 }
 
-// 3. HTMLエスケープヘルパー
 function escapeHtml(str) {
     if (!str) return '';
     return String(str)
@@ -185,7 +182,6 @@ function updateArtistPlaceholders() {
     });
 }
 
-// リアルタイム入力イベントの監視
 if (inputBody) {
     inputBody.addEventListener('input', (e) => {
         if (e.target.classList.contains('row-artist')) {
@@ -237,7 +233,12 @@ function createStatusSelect(value = 'complete') {
     select.appendChild(optionComplete);
     select.appendChild(optionPartial);
     select.appendChild(optionPractice);
-    select.value = value;
+
+    // complete(boolean / null) から select の value に変換対応
+    if (value === true) select.value = 'complete';
+    else if (value === false) select.value = 'practice';
+    else if (value === 'complete' || value === 'partial' || value === 'practice') select.value = value;
+    else select.value = 'partial';
 
     return select;
 }
@@ -250,7 +251,6 @@ function addInputRow(artist = '', title = '', complete = 'complete', confident =
     if (!inputBody) return;
     const tr = document.createElement('tr');
 
-    // 1. Artist の入力欄を生成
     const artistTd = document.createElement('td');
     const artistInput = document.createElement('input');
     artistInput.type = 'text';
@@ -260,7 +260,6 @@ function addInputRow(artist = '', title = '', complete = 'complete', confident =
     artistInput.setAttribute('list', 'artist-list');
     artistTd.appendChild(artistInput);
 
-    // 2. Title の入力欄と datalist を生成
     const titleTd = document.createElement('td');
     const titleInput = document.createElement('input');
     titleInput.type = 'text';
@@ -276,7 +275,6 @@ function addInputRow(artist = '', title = '', complete = 'complete', confident =
     document.body.appendChild(songDatalist);
     titleTd.appendChild(titleInput);
 
-    // 3. 曲名候補リスト（datalist）の更新処理関数
     async function updateSongDatalist() {
         songDatalist.innerHTML = '';
 
@@ -324,11 +322,9 @@ function addInputRow(artist = '', title = '', complete = 'complete', confident =
     artistInput.addEventListener('change', updateSongDatalist);
     titleInput.addEventListener('focus', updateSongDatalist);
 
-    // 4. Status (完成度)
     const completeTd = document.createElement('td');
     completeTd.appendChild(createStatusSelect(complete));
 
-    // 5. Confident (自信)
     const confidentTd = document.createElement('td');
     confidentTd.className = 'checkbox-cell';
     const confidentInput = document.createElement('input');
@@ -337,7 +333,6 @@ function addInputRow(artist = '', title = '', complete = 'complete', confident =
     confidentInput.checked = confident;
     confidentTd.appendChild(confidentInput);
 
-    // 6. Delete (削除ボタン)
     const deleteTd = document.createElement('td');
     deleteTd.className = 'delete-cell';
     const deleteButton = document.createElement('button');
@@ -706,21 +701,16 @@ document.getElementById('submit-all-btn')?.addEventListener('click', async () =>
 });
 
 // ========================================
-// 登録済み曲一覧・削除・管理キー設定
+// 登録済み曲一覧・削除・変更・管理キー設定
 // ========================================
 
 const registeredBody = document.getElementById('registered-body');
 const selectAllSongs = document.getElementById('select-all-songs');
 const reloadSongsBtn = document.getElementById('reload-songs-btn');
 const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+const saveRegisteredChangesBtn = document.getElementById('save-registered-changes-btn'); // 編集内容の一括保存ボタン
 const registeredSearchInput = document.getElementById('registered-search');
 const registeredSortSelect = document.getElementById('registered-sort');
-
-function getStatusLabel(complete) {
-    if (complete === true) return '最後まで';
-    if (complete === false) return '練習中';
-    return '途中まで';
-}
 
 // 登録曲テーブルの描画関数
 function renderRegisteredSongs() {
@@ -728,7 +718,6 @@ function renderRegisteredSongs() {
 
     let filtered = [...registeredSongsList];
 
-    // 検索フィルタリング
     const query = registeredSearchInput ? registeredSearchInput.value.trim().toLowerCase() : '';
     if (query) {
         filtered = filtered.filter(song =>
@@ -739,7 +728,6 @@ function renderRegisteredSongs() {
         );
     }
 
-    // ソート処理
     const sortVal = registeredSortSelect ? registeredSortSelect.value : 'artist';
     filtered.sort((a, b) => {
         if (sortVal === 'artist') {
@@ -759,19 +747,46 @@ function renderRegisteredSongs() {
         return;
     }
 
-    registeredBody.innerHTML = filtered.map(song => `
-        <tr>
-            <td>
-                <input type="checkbox" class="registered-song-checkbox" data-id="${song.id}">
-            </td>
-            <td>${escapeHtml(song.artist)}</td>
-            <td>${escapeHtml(song.title)}</td>
-            <td>${getStatusLabel(song.complete)}</td>
-            <td>
-                <input type="checkbox" class="confident-checkbox" data-id="${song.id}" ${song.confident ? 'checked' : ''}>
-            </td>
-        </tr>
-    `).join('');
+    registeredBody.innerHTML = '';
+    filtered.forEach(song => {
+        const tr = document.createElement('tr');
+
+        // 1. チェックボックス
+        const selectTd = document.createElement('td');
+        selectTd.innerHTML = `<input type="checkbox" class="registered-song-checkbox" data-id="${song.id}">`;
+        tr.appendChild(selectTd);
+
+        // 2. アーティスト
+        const artistTd = document.createElement('td');
+        artistTd.textContent = song.artist;
+        tr.appendChild(artistTd);
+
+        // 3. 曲名
+        const titleTd = document.createElement('td');
+        titleTd.textContent = song.title;
+        tr.appendChild(titleTd);
+
+        // 4. 歌える状態（完成度）選択ドロップダウン
+        const completeTd = document.createElement('td');
+        const selectStatus = createStatusSelect(song.complete);
+        selectStatus.className = 'registered-complete-select';
+        selectStatus.dataset.id = song.id;
+        completeTd.appendChild(selectStatus);
+        tr.appendChild(completeTd);
+
+        // 5. 自信チェックボックス
+        const confidentTd = document.createElement('td');
+        confidentTd.className = 'checkbox-cell';
+        const confidentInput = document.createElement('input');
+        confidentInput.type = 'checkbox';
+        confidentInput.className = 'registered-confident-checkbox';
+        confidentInput.dataset.id = song.id;
+        confidentInput.checked = song.confident;
+        confidentTd.appendChild(confidentInput);
+        tr.appendChild(confidentTd);
+
+        registeredBody.appendChild(tr);
+    });
 }
 
 async function loadRegisteredSongs() {
@@ -782,7 +797,6 @@ async function loadRegisteredSongs() {
         registeredBody.innerHTML = '<tr><td colspan="4">読み込み中...</td></tr>';
     }
 
-    // 1. 曲一覧の取得
     const { data: streamerSongs, error } = await supabaseClient
         .from('streamer_songs')
         .select(`
@@ -814,7 +828,6 @@ async function loadRegisteredSongs() {
         return;
     }
 
-    // 2. 現在保存されている定番アーティスト（favorite_artists）を取得
     const { data: streamerData } = await supabaseClient
         .from('streamers')
         .select('favorite_artists')
@@ -842,7 +855,6 @@ async function loadRegisteredSongs() {
     if (registeredSortSelect) registeredSortSelect.onchange = renderRegisteredSongs;
     if (selectAllSongs) selectAllSongs.checked = false;
 
-    // 定番アーティスト選択ボックスの描画
     renderFavoriteArtistCheckboxes(registeredSongsList, currentFavoriteArtists);
 }
 
@@ -859,6 +871,7 @@ if (reloadSongsBtn) {
     });
 }
 
+// 選択曲の削除処理
 if (deleteSelectedBtn) {
     deleteSelectedBtn.addEventListener('click', async () => {
         const selected = Array.from(registeredBody.querySelectorAll('.registered-song-checkbox:checked'));
@@ -875,7 +888,6 @@ if (deleteSelectedBtn) {
         message.textContent = '削除しています...';
 
         try {
-
             const managementKey = document.getElementById('management-key').value.trim();
             if (!managementKey) throw new Error('管理キーを入力してください。');
 
@@ -903,6 +915,76 @@ if (deleteSelectedBtn) {
             message.textContent = '削除に失敗しました：' + error.message;
         } finally {
             deleteSelectedBtn.disabled = false;
+        }
+    });
+}
+
+// 登録曲の「歌える状態」・「自信あり」の一括保存処理
+if (saveRegisteredChangesBtn) {
+    saveRegisteredChangesBtn.addEventListener('click', async () => {
+        const streamerId = parseInt(document.getElementById('streamer-id').value, 10);
+        const managementKey = document.getElementById('management-key').value.trim();
+
+        if (!managementKey) {
+            alert('管理キーを入力してください。');
+            return;
+        }
+
+        const songUpdates = [];
+        const rows = registeredBody.querySelectorAll('tr');
+
+        rows.forEach(tr => {
+            const selectComp = tr.querySelector('.registered-complete-select');
+            const checkConf = tr.querySelector('.registered-confident-checkbox');
+
+            if (selectComp && checkConf) {
+                const songId = parseInt(selectComp.dataset.id, 10);
+                const completeVal = selectComp.value;
+                let complete = null;
+                if (completeVal === 'complete') complete = true;
+                else if (completeVal === 'practice') complete = false;
+
+                songUpdates.push({
+                    id: songId,
+                    complete: complete,
+                    confident: checkConf.checked
+                });
+            }
+        });
+
+        if (songUpdates.length === 0) {
+            alert('更新対象の曲がありません。');
+            return;
+        }
+
+        saveRegisteredChangesBtn.disabled = true;
+        message.style.color = '';
+        message.textContent = '変更を保存しています...';
+
+        try {
+            const res = await fetch(`${supabaseUrl}/functions/v1/management`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'update_favorites_and_confident',
+                    streamer_id: streamerId,
+                    management_key: managementKey,
+                    song_updates: songUpdates
+                })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || '更新に失敗しました。');
+
+            message.style.color = 'green';
+            message.textContent = '歌える状態・自信曲の変更を保存しました。';
+            await loadRegisteredSongs();
+        } catch (err) {
+            console.error(err);
+            message.style.color = 'red';
+            message.textContent = '保存エラー: ' + err.message;
+        } finally {
+            saveRegisteredChangesBtn.disabled = false;
         }
     });
 }
@@ -984,7 +1066,7 @@ if (resetManagementKeyBtn) {
 }
 
 // ========================================
-// 定番歌手・自信曲の保存処理
+// 定番歌手の保存処理
 // ========================================
 
 function renderFavoriteArtistCheckboxes(registeredSongs, currentFavoriteArtists = []) {
@@ -1018,7 +1100,6 @@ function renderFavoriteArtistCheckboxes(registeredSongs, currentFavoriteArtists 
     });
 }
 
-// 1. 定番歌手のみを保存するイベントハンドラ
 document.getElementById('update-favorites-btn')?.addEventListener('click', async () => {
     const streamerId = parseInt(document.getElementById('streamer-id').value, 10);
     const managementKey = document.getElementById('management-key').value.trim();
@@ -1048,45 +1129,6 @@ document.getElementById('update-favorites-btn')?.addEventListener('click', async
         if (!res.ok) throw new Error(data.error || '更新に失敗しました');
 
         alert('定番歌手を保存しました');
-    } catch (err) {
-        console.error(err);
-        alert(err.message);
-    }
-});
-
-// 2. 自信曲のみを保存するイベントハンドラ
-document.getElementById('update-confident-btn')?.addEventListener('click', async () => {
-    const streamerId = parseInt(document.getElementById('streamer-id').value, 10);
-    const managementKey = document.getElementById('management-key').value.trim();
-
-    if (!managementKey) {
-        alert('管理キーを入力してください');
-        return;
-    }
-
-    const confidentUpdates = Array.from(
-        document.querySelectorAll('.confident-checkbox')
-    ).map(cb => ({
-        id: parseInt(cb.dataset.id, 10),
-        confident: cb.checked
-    }));
-
-    try {
-        const res = await fetch(`${supabaseUrl}/functions/v1/management`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: 'update_favorites_and_confident',
-                streamer_id: streamerId,
-                management_key: managementKey,
-                confident_updates: confidentUpdates
-            })
-        });
-
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || '更新に失敗しました');
-
-        alert('自信曲の設定を保存しました');
     } catch (err) {
         console.error(err);
         alert(err.message);
