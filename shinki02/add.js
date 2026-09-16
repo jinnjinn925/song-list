@@ -232,18 +232,12 @@ function createStatusSelect(value = 'complete') {
 // 行追加
 // ========================================
 
-function addInputRow(artist = '', title = '', complete = 'complete', confident = false) {
-    const tr = document.createElement('tr');
+// ========================================
+// addInputRow 内の曲名候補補完ロジックの修正
+// ========================================
 
-    // Artist
-    const artistTd = document.createElement('td');
-    const artistInput = document.createElement('input');
-    artistInput.type = 'text';
-    artistInput.className = 'row-artist';
-    artistInput.placeholder = 'アーティスト';
-    artistInput.value = artist;
-    artistInput.setAttribute('list', 'artist-list');
-    artistTd.appendChild(artistInput);
+function addInputRow(artist = '', title = '', complete = 'complete', confident = false) {
+    // ...（前半の tr や input 生成処理はそのまま）...
 
     // Title
     const titleTd = document.createElement('td');
@@ -261,20 +255,39 @@ function addInputRow(artist = '', title = '', complete = 'complete', confident =
     document.body.appendChild(songDatalist);
     titleTd.appendChild(titleInput);
 
-    // アーティスト変更時の曲候補補完（表記揺れ対応）
-    artistInput.addEventListener('change', async () => {
+    // ----------------------------------------------------
+    // 【修正】曲名欄にフォーカスした際、同上も考慮して曲名リストを取得・更新
+    // ----------------------------------------------------
+    async function updateSongDatalist() {
         songDatalist.innerHTML = '';
-        const artistName = formatName(artistInput.value);
 
-        if (!artistName) return;
+        // 1. まず自分の行のアーティスト名を取得
+        let targetArtist = formatName(artistInput.value);
 
-        const normArtist = normalizeName(artistName);
+        // 2. 自分の行が空なら、上の行を順に遡って直近のアーティスト名を探す（同上の判定）
+        if (!targetArtist) {
+            let prevTr = tr.previousElementSibling;
+            while (prevTr) {
+                const prevArtistInput = prevTr.querySelector('.row-artist');
+                if (prevArtistInput && prevArtistInput.value.trim()) {
+                    targetArtist = formatName(prevArtistInput.value);
+                    break;
+                }
+                prevTr = prevTr.previousElementSibling;
+            }
+        }
+
+        if (!targetArtist) return;
+
+        // 3. 表記揺れを吸収して既存アーティストを検索
+        const normArtist = normalizeName(targetArtist);
         const selectedArtist = existingArtists.find(
             item => normalizeName(item.name) === normArtist
         );
 
         if (!selectedArtist) return;
 
+        // 4. DBから曲一覧を取得して datalist に追加
         const { data, error } = await supabaseClient
             .from('songs')
             .select(`id, title`)
@@ -291,48 +304,14 @@ function addInputRow(artist = '', title = '', complete = 'complete', confident =
             option.value = song.title;
             songDatalist.appendChild(option);
         });
-    });
+    }
 
-    // Status
-    const completeTd = document.createElement('td');
-    completeTd.appendChild(createStatusSelect(complete));
+    // アーティスト欄変更時だけでなく、曲名欄にフォーカスが当たった時にも更新を実行
+    artistInput.addEventListener('change', updateSongDatalist);
+    titleInput.addEventListener('focus', updateSongDatalist);
 
-    // Confident
-    const confidentTd = document.createElement('td');
-    confidentTd.className = 'checkbox-cell';
-    const confidentInput = document.createElement('input');
-    confidentInput.type = 'checkbox';
-    confidentInput.className = 'row-confident';
-    confidentInput.checked = confident;
-    confidentTd.appendChild(confidentInput);
-
-    // Delete
-    const deleteTd = document.createElement('td');
-    deleteTd.className = 'delete-cell';
-    const deleteButton = document.createElement('button');
-    deleteButton.type = 'button';
-    deleteButton.textContent = 'X';
-    deleteButton.className = 'delete-button';
-    deleteButton.addEventListener('click', () => {
-        tr.remove();
-        updateArtistPlaceholders();
-        if (inputBody.children.length === 0) {
-            addInputRow();
-        }
-    });
-    deleteTd.appendChild(deleteButton);
-
-    tr.appendChild(artistTd);
-    tr.appendChild(titleTd);
-    tr.appendChild(completeTd);
-    tr.appendChild(confidentTd);
-    tr.appendChild(deleteTd);
-
-    inputBody.appendChild(tr);
-
-    updateArtistPlaceholders();
+    // ...（以下、StatusやConfident、Deleteなどの処理はそのまま）...
 }
-
 // ========================================
 // 入力行の集計 & 「同上」の自動補完
 // ========================================
