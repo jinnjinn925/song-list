@@ -1597,6 +1597,11 @@ document
                 previewBody.innerHTML = '';
 
                 generatedRows = [];
+				
+				
+				// DBで更新された読み仮名を再取得
+				await loadExistingArtists();
+				createArtistDatalist();
 
 
                 for (
