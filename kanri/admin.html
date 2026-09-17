@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>管理画面 - 歌リスト管理</title>
-  <link rel="icon" href="data:,"> <!-- favicon 404防止 -->
+  <link rel="icon" href="data:,">
   <style>
     body {
       font-family: sans-serif;
@@ -25,7 +25,7 @@
       font-weight: bold;
       margin-bottom: 5px;
     }
-    input[type="text"], input[type="password"], select {
+    input[type="text"] {
       width: 100%;
       padding: 8px;
       box-sizing: border-box;
@@ -52,9 +52,37 @@
     }
     .success { background-color: #d4edda; color: #155724; }
     .error { background-color: #f8d7da; color: #721c24; }
+
+    /* 配信者一覧用スタイル */
+    .streamer-list {
+      list-style: none;
+      padding: 0;
+      margin-top: 15px;
+    }
+    .streamer-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid #ddd;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+    }
+    .streamer-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .streamer-name {
+      font-weight: bold;
+      font-size: 1.05em;
+    }
+    .streamer-url-id {
+      color: #666;
+      font-size: 0.85em;
+    }
   </style>
 
-  <!-- type="module" を指定して admin.js のみを読み込む -->
   <script type="module" src="./admin.js"></script>
 </head>
 <body>
@@ -76,13 +104,21 @@
       </div>
 
       <div class="form-group">
-        <label for="streamer-bg">背景画像URL（Supabase Storage等）</label>
+        <label for="streamer-bg">背景画像URL</label>
         <input type="text" id="streamer-bg" placeholder="https://...">
       </div>
 
       <button type="submit">配信者を登録する</button>
     </form>
     <div id="streamer-message" class="message"></div>
+  </section>
+
+  <!-- 登録済み配信者一覧を表示するセクション（追加） -->
+  <section style="margin-top: 40px;">
+    <h2>登録済み配信者一覧</h2>
+    <ul id="streamer-list" class="streamer-list">
+      <li>読み込み中...</li>
+    </ul>
   </section>
 
 </body>
