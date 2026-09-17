@@ -52,10 +52,10 @@
     .success { background-color: #d4edda; color: #155724; }
     .error { background-color: #f8d7da; color: #721c24; }
   </style>
-  <!-- 1. 先に Supabase SDK を読み込む (defer は付けない) -->
-	<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-client@2"></script>
+	 <!-- Supabase SDK (UMD版に変更) -->
+	<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-client@2/dist/umd/supabase.js"></script>
 
-	<!-- 2. その後に admin.js を defer 付きで読み込む -->
+	<!-- admin.js -->
 	<script src="./admin.js" defer></script>
 </head>
 <body>
