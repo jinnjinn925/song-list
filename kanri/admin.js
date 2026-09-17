@@ -1,5 +1,5 @@
 // esm.sh から直接 ES Module として Supabase を読み込み
-import { createClient } from 'https://esm.sh/@supabase/supabase-client@2';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 // Supabaseの接続情報（ご自身のプロジェクトの値に書き換えてください）
 const SUPABASE_URL = 'https://YOUR_SUPABASE_URL.supabase.co';
