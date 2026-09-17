@@ -1,50 +1,82 @@
 @charset "utf-8";
 /* CSS Document */
-/* =========================
-   全体
-   ========================= */
 
+/* =========================================================
+   1. 全体設定・ルート変数
+   ========================================================= */
+
+/* ボックスモデルの共通化 */
 * {
     box-sizing: border-box;
 }
 
+/* ルートのフォントサイズ定義 */
 html {
     font-size: 16px;
 }
 
+/* ページ全体の基本スタイル */
 body {
     margin: 0;
+    /* 下部に固定ナビ（50音ナビ等）が被らないよう余白を確保 */
     padding: 0 0 120px 0;
 
+    /* 背景色（画像が読み込まれるまでのフォールバック） */
     background: #f8f8f8;
+    
+    /* 基本の文字色（CSS変数 --text-color で全体を一括管理） */
+    color: var(--text-color, #222222);
 
-    color: var(--text-color, #f8f8f8);
-
+    /* 基本フォントの指定 */
     font-family:
         "Noto Sans JP",
         "Hiragino Kaku Gothic ProN",
         "Yu Gothic",
         sans-serif;
 
+    /* 行間を広げて読みやすく */
     line-height: 1.6;
-
     position: relative;
 }
 
+/* 疑似要素を使った画面固定背景 */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
 
-/* =========================
-   ヘッダー
-========================= */
+    /* 背景画像の設定 */
+    background-image: var(--background-image, url("background.jpg"));
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 
+    z-index: -1;
+}
+
+/* メインコンテンツエリア：背景画像の上に透ける白レイヤー */
+main {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+
+/* =========================================================
+   2. ヘッダーエリア
+   ========================================================= */
+
+/* ページ上部のヘッダー外枠 */
 #page-header {
     position: relative;
-
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
     padding: 20px 16px 10px;
 }
 
+/* メニュー開閉ボタン（右上アイコン） */
 #menu-button {
     position: absolute;
     top: 16px;
@@ -55,18 +87,17 @@ body {
 
     border: none;
     border-radius: 10px;
-
     background: transparent;
     color: #f8f8f8;
 
     font-size: 26px;
-
     cursor: pointer;
     z-index: 1001;
 
     -webkit-tap-highlight-color: transparent;
 }
 
+/* 検索や設定を格納するパネル（後ろの半透明箱を削除） */
 .menu-panel {
     position: sticky;
     top: 0;
@@ -75,77 +106,97 @@ body {
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
-
     padding: 8px 16px;
 
-    background: rgba(255, 255, 255, 0.35);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    /* 後ろの半透明背景とすりガラス効果を解除 */
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 
+/* メニューオープン時の表示切り替え用クラス */
 .menu-panel.open {
     display: block;
 }
 
+/* パネル内の見出しラベル */
 .menu-panel label {
     display: block;
-
     margin-bottom: 8px;
-
     font-size: 14px;
     font-weight: 700;
 }
 
+/* 検索窓とクリアボタンを横並びにするコンテナ */
 .search-box {
     display: flex;
     gap: 8px;
 }
 
-/* 70〜87行目：サイズや枠線の基本設定 */
+/* 楽曲検索入力テキストボックス */
 #song-search {
     flex: 1;
     min-width: 0;
-
     height: 44px;
     padding: 0 14px;
 
-    /*border: 1px solid #ccc;*/
-    border-radius: 10px;/* 角の丸み */
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
 
-    /*background: #fff;*/
+    background: rgba(255, 255, 255, 0.35);
+    color: var(--text-color, #222222); /* 入力文字色も --text-color に統一 */
 
     font-family: inherit;
     font-size: 16px;
-
     outline: none;
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
+/* 検索入力欄のプレースホルダー */
+#song-search::placeholder {
+    color: #666;
+}
+
+/* 検索入力欄にフォーカスが当たった時のスタイル */
 #song-search:focus {
     border-color: #888;
+    background: rgba(255, 255, 255, 0.45);
 }
 
+/* 検索文字のクリアボタン */
 #search-clear {
     display: none;
     height: 44px;
     padding: 0 14px;
-    border: 1px solid #ccc;
+
+    border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 10px;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.35);
+    color: var(--text-color, #222222);
+
     font-family: inherit;
     font-size: 14px;
     cursor: pointer;
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
+/* 検索文字がある時に表示されるクラス */
 #search-clear.visible {
     display: block;
 }
 
+/* 配信者名などのタイトルテキスト */
 #streamer-name {
     margin: 0 0 5px;
     font-size: 24px;
     font-weight: 700;
 }
 
+/* 件数表示 */
 #song-count {
     margin-bottom: 14px;
     font-size: 14px;
@@ -153,11 +204,11 @@ body {
 }
 
 
+/* =========================================================
+   3. お気に入り・フィルターボタンエリア
+   ========================================================= */
 
-/* =========================
-   お気に入り・フィルターボタンエリア
-========================= */
-
+/* フィルターボタン群の親コンテナ */
 #favorite-section {
     width: 100%;
     max-width: 600px;
@@ -165,13 +216,15 @@ body {
     padding: 5px 16px 15px;
 }
 
+/* お気に入りアーティストボタンのラッパー */
 #favorite-artists {
     display: flex;
-    flex-wrap: wrap; /* 画面幅に応じて綺麗に折り返すか並べる */
+    flex-wrap: wrap;
     gap: 7px;
     width: 100%;
 }
 
+/* 総合フィルターボタンエリア */
 #complete-filter-buttons {
     display: flex;
     gap: 7px;
@@ -183,310 +236,7 @@ body {
     flex: 1;
 }
 
-/* 共通デザイン */
-.favorite-button {
-    flex: 1; /* 横並び時に幅を均等に広げる */
-    min-width: 0;
-    padding: 8px 12px;
-
-    border: 1px solid rgba(255, 255, 255, 0.5);/* 枠線の色 */
-    border-radius: 999px; /* 角丸丸みデザイン */
-
-    background: rgba(255, 255, 255, 0.35);/* 通常時の透過背景 */
-    color: #222;/* 通常時の文字色 */
-
-    font-family: inherit;
-    font-size: 13px; /* 3つ並んでも収まりやすいサイズ */
-    text-align: center;
-    white-space: nowrap; /* ボタン内のテキスト折り返しを防止 */
-
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.favorite-button.active {
-    background: var(--theme-color, #222);
-    color: #fff;
-    border-color: var(--theme-color, #222);
-}
-
-/* =========================
-   曲一覧
-========================= */
-
-#song-list {
-    width: 100%;
-    max-width: 600px;
-
-    margin: 0 auto;
-    padding: 10px 16px;
-}
-
-.artist {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    margin-top: 24px;
-    padding: 8px 4px 5px;
-
-    font-size: 18px;/* アーティスト名の文字サイズ */
-    font-weight: 700;
-	color: #DDDDDD;      /* ← 文字色を変更したい場合はここを追加（例: color: #fff; で白） */
-
-    border-bottom: 2px solid var(--theme-color, #184F88); /*アーティスト名の下の線の色*/
-
-    cursor: pointer;
-
-    -webkit-tap-highlight-color: transparent;
-}
-
-.artist:first-child {
-    margin-top: 0;
-}
-
-.artist::after {
-    content: "−";
-
-    font-size: 18px;
-    font-weight: 400;
-}
-
-.artist.collapsed::after {
-    content: "+";
-}
-
-
-/* アーティストの曲 */
-
-.artist-songs {
-    overflow: hidden;
-}
-
-.artist-songs.collapsed {
-    display: none;
-}
-
-.song {
-    padding: 9px 5px;
-
-    font-size: 16px;/* 曲名の文字サイズ */
-	color: #dddddd;     /* ← 曲名の文字色を変更したい場合はここを追加 */
-
-    /*border-bottom: 1px solid #e5e5e5;/* 各曲の間の区切り線の色 */
-}
-
-
-/* =========================
-   50音ナビ
-========================= */
-
-#artist-nav {
-    position: fixed;
-
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    z-index: 1000;
-
-    width: 100%;
-
-    padding: 8px;
-
-    background: rgba(255, 255, 255, 0.2);/* バー全体の透過背景色 */
-
-    border-top: 1px solid #ddd;/* 上側の境界線の色 */
-
-    box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.08);
-
-    display: flex;
-    flex-wrap: wrap;
-
-    justify-content: center;
-
-    gap: 5px;
-}
-
-#artist-nav button {
-    min-width: 38px;
-    min-height: 38px;
-
-    padding: 5px 8px;
-
-    border: 1px solid #ccc;
-    border-radius: 8px;/* 角の丸み */
-	color: #222;        /* 文字色 */
-
-    background: rgba(255, 255, 255, 0.4);
-    color: #222;
-
-    font-family: inherit;
-    font-size: 14px;
-
-    cursor: pointer;
-
-    -webkit-tap-highlight-color: transparent;
-}
-
-#artist-nav button.active {
-    background: #222;
-    color: #fff;
-    border-color: #222;
-}
-
-#artist-nav button:active {
-    transform: scale(0.95);
-}
-
-
-/* =========================
-   400px以下
-========================= */
-
-@media (max-width: 400px) {
-
-    body {
-        padding-bottom: 115px;
-    }
-
-    #page-header {
-        padding: 16px 12px 8px;
-    }
-
-    #streamer-name {
-        font-size: 22px;
-    }
-
-    #favorite-section {
-        padding-left: 12px;
-        padding-right: 12px;
-    }
-
-    #song-list {
-        padding-left: 12px;
-        padding-right: 12px;
-    }
-
-    .artist {
-        font-size: 17px;
-    }
-
-    .song {
-        font-size: 15px;
-    }
-
-    #artist-nav {
-        padding: 6px;
-        gap: 4px;
-    }
-
-    #artist-nav button {
-        min-width: 34px;
-        min-height: 34px;
-
-        padding: 4px 6px;
-
-        font-size: 13px;
-    }
-}
-/* 背景写真 */
-
-
-/* 擬似要素で固定背景を作成 */
-body::before {
-    content: "";
-
-    position: fixed;
-    top: 0;
-    left: 0;
-
-    width: 100vw;
-    height: 100vh;
-
-    background-image: var(--background-image, url("background.jpg"));
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-
-    z-index: -1;
-}
-
-/* メイン部分を少し透過 */
-main {
-    background: rgba(255, 255, 255, 0.2);/* メインコンテンツ全体の透け感 0.2を下げると透明度が上がり、上げると白みが増します */
-}
-/* 曲リストの半透明パネル */
-#song-list {
-    background: rgba(155, 155, 255, 0.1);/* パネルの背景色と透明度 (赤, 緑, 青, 透明度0〜1) */
-    border: 1px solid rgba(255, 255, 255, 0);/* 枠線の太さ・種類・色 */
-    border-radius: 18px;/* 角の丸み */
-    padding: 10px 16px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);/* パネルの影の濃さ */
-    backdrop-filter: blur(8px);/* 背景のボカシ具合（数字が大きいとボケが強くなる） */
-    -webkit-backdrop-filter: blur(8px);
-}
-/* 検索欄・お気に入りボタンを半透明にする */
-#song-search,
-#search-clear,
-.favorite-button {
-    background: rgba(255, 255, 255, 0.35);/* 入力欄の背景透過度 */
-    border: 1px solid rgba(255, 255, 255, 0.5);/* 枠線の色 */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
-
-/* フォーカス時も透明感を維持 */
-#song-search:focus {
-    background: rgba(255, 255, 255, 0.45);
-}
-
-/* 下部固定エリアを半透明にする */
-#bottom-controls {
-    background: rgba(255, 255, 255, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
-
-
-
-/* ソート関連のボタン・セレクト */
-#sort-select,
-#sort-button,
-#view-toggle {
-    background: rgba(255, 255, 255, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
-
-/* 50音ナビゲーション */
-#artist-nav button {
-    background: rgba(255, 255, 255, 0.30);/* 50音ボタンの透過背景 */
-    border: 1px solid rgba(255, 255, 255, 0.75);/* ボタンの枠線色 */
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
-
-/* 選択中 */
-#artist-nav button.active {
-    background: var(--theme-color, rgba(255, 255, 255, 0.55));
-    color: #fff;
-    border-color: var(--theme-color, rgba(255, 255, 255, 0.55));
-}
-
-#song-search {
-    color: #333;/* 入力した文字の色 */
-}
-
-#song-search::placeholder {
-    color: #333;/* 検索前の「曲名・アーティスト名で検索」の文字色 */
-}
-
+/* フィルターボタンエリア全体の並び */
 #filter-buttons {
     display: flex;
     gap: 7px;
@@ -508,3 +258,222 @@ main {
     flex: 1;
 }
 
+/* フィルター用カプセル型ボタンの共通デザイン */
+.favorite-button {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 12px;
+
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.35);
+    color: var(--text-color, #222222);
+
+    font-family: inherit;
+    font-size: 13px;
+    text-align: center;
+    white-space: nowrap;
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* フィルターが選択・アクティブな状態 */
+.favorite-button.active {
+    background: var(--theme-color, #222);
+    color: #fff;
+    border-color: var(--theme-color, #222);
+}
+
+
+/* =========================================================
+   4. 楽曲リストエリア
+   ========================================================= */
+
+/* 楽曲リストのメインカード枠 */
+#song-list {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 10px 16px;
+
+    background: rgba(255, 255, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* アーティスト名の見出し */
+.artist {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-top: 24px;
+    padding: 8px 4px 5px;
+
+    font-size: 18px;
+    font-weight: 700;
+    /* 文字色を --text-color に統一 */
+    color: var(--text-color, #222222);
+
+    /* 下線は --theme-color を参照 */
+    border-bottom: 2px solid var(--theme-color, #184F88);
+    cursor: pointer;
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+.artist:first-child {
+    margin-top: 0;
+}
+
+.artist::after {
+    content: "−";
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.artist.collapsed::after {
+    content: "+";
+}
+
+.artist-songs {
+    overflow: hidden;
+}
+
+.artist-songs.collapsed {
+    display: none;
+}
+
+/* 各楽曲1件ごとのスタイル */
+.song {
+    padding: 9px 5px;
+    font-size: 16px;
+    /* 文字色を --text-color に統一 */
+    color: var(--text-color, #222222);
+}
+
+
+/* =========================================================
+   5. 下部コントロール・ソートエリア
+   ========================================================= */
+
+#bottom-controls,
+#sort-select,
+#sort-button,
+#view-toggle {
+    background: rgba(255, 255, 255, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+
+/* =========================================================
+   6. 50音インデックスナビ（画面下部固定）
+   ========================================================= */
+
+#artist-nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+
+    width: 100%;
+    padding: 8px;
+
+    background: rgba(255, 255, 255, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.08);
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+}
+
+#artist-nav button {
+    min-width: 38px;
+    min-height: 38px;
+    padding: 5px 8px;
+
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    border-radius: 8px;
+
+    background: rgba(255, 255, 255, 0.3);
+    color: var(--text-color, #222222); /* ナビ文字色も --text-color に統一 */
+
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+#artist-nav button.active {
+    background: var(--theme-color, rgba(34, 34, 34, 0.85));
+    color: #fff;
+    border-color: var(--theme-color, rgba(34, 34, 34, 0.85));
+}
+
+#artist-nav button:active {
+    transform: scale(0.95);
+}
+
+
+/* =========================================================
+   7. レスポンシブ対応：画面幅 400px 以下
+   ========================================================= */
+
+@media (max-width: 400px) {
+
+    body {
+        padding-bottom: 115px;
+    }
+
+    #page-header {
+        padding: 16px 12px 8px;
+    }
+
+    #streamer-name {
+        font-size: 22px;
+    }
+
+    #favorite-section,
+    #song-list {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .artist {
+        font-size: 17px;
+    }
+
+    .song {
+        font-size: 15px;
+    }
+
+    #artist-nav {
+        padding: 6px;
+        gap: 4px;
+    }
+
+    #artist-nav button {
+        min-width: 34px;
+        min-height: 34px;
+        padding: 4px 6px;
+        font-size: 13px;
+    }
+}
