@@ -52,10 +52,11 @@
     .success { background-color: #d4edda; color: #155724; }
     .error { background-color: #f8d7da; color: #721c24; }
   </style>
-  <!-- Supabase CDN (deferを追加して非同期読み込みの順番を制御) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-client@2" defer></script>
-  <!-- admin.js (deferを追加) -->
-  <script src="./admin.js" defer></script>
+  <!-- 1. 先に Supabase SDK を読み込む (defer は付けない) -->
+	<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-client@2"></script>
+
+	<!-- 2. その後に admin.js を defer 付きで読み込む -->
+	<script src="./admin.js" defer></script>
 </head>
 <body>
 
