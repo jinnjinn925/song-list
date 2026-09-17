@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					{
 						name: name,
 						url_id: urlId,
-						image_url: bgUrl || null  // ← image_url に変更
+						background_image: bgUrl || null  // ← image_url に変更
 					}
 				]);
 
