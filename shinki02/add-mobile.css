@@ -166,9 +166,6 @@ textarea {
     content: "自信曲";
 }
 
-.input-table td:nth-child(5)::before {
-    content: "イントロ";
-}
 
 .input-table input[type="text"],
 .input-table select,
@@ -302,9 +299,7 @@ textarea {
     content: "自信曲";
 }
 
-.preview-table td:nth-child(7)::before {
-    content: "イントロ";
-}
+
 
 .preview-table input[type="text"],
 .preview-table select,
@@ -376,9 +371,7 @@ textarea {
     content: "自信曲";
 }
 
-.registered-table td:nth-child(6)::before {
-    content: "イントロ";
-}
+
 
 .registered-table input[type="checkbox"] {
     width: 24px;
