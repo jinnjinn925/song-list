@@ -3,13 +3,13 @@ const supabaseKey = 'sb_publishable_JNz1mi6gysaFjOa0A4I5ow_iDe3PQbd';
 const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. DOM要素の取得（※必ず最初に行う）
+    // 1. DOM要素の取得
     const streamerIdInput = document.getElementById('streamer-id');
     const fontSelect = document.getElementById('font-family');
     const themeInput = document.getElementById('theme-color');
+    const themeCodeInput = document.getElementById('theme-color-code');
     const textInput = document.getElementById('text-color');
-    const themeCode = document.getElementById('theme-color-code');
-    const textCode = document.getElementById('text-color-code');
+    const textCodeInput = document.getElementById('text-color-code');
     const previewArea = document.getElementById('preview-area');
     const previewBtn = document.getElementById('preview-btn');
     const form = document.getElementById('custom-form');
@@ -21,13 +21,43 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (fontSelect) previewArea.style.fontFamily = fontSelect.value;
         if (textInput) previewArea.style.color = textInput.value;
         if (themeInput) previewBtn.style.backgroundColor = themeInput.value;
-        if (themeCode && themeInput) themeCode.textContent = themeInput.value;
-        if (textCode && textInput) textCode.textContent = textInput.value;
     }
 
+    // ★★★ ここに同期・プリセット用の処理を挿入します ★★★
+
+    // テーマカラー同期
+    function syncThemeColor(color) {
+        if (themeInput) themeInput.value = color;
+        if (themeCodeInput) themeCodeInput.value = color;
+        updatePreview();
+    }
+    if (themeInput) themeInput.addEventListener('input', (e) => syncThemeColor(e.target.value));
+    if (themeCodeInput) themeCodeInput.addEventListener('input', (e) => syncThemeColor(e.target.value));
+
+    // 文字色同期
+    function syncTextColor(color) {
+        if (textInput) textInput.value = color;
+        if (textCodeInput) textCodeInput.value = color;
+        updatePreview();
+    }
+    if (textInput) textInput.addEventListener('input', (e) => syncTextColor(e.target.value));
+    if (textCodeInput) textCodeInput.addEventListener('input', (e) => syncTextColor(e.target.value));
+
+    // プリセットチップクリック時の挙動
+    document.querySelectorAll('.color-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const target = chip.dataset.target;
+            const color = chip.dataset.color;
+
+            if (target === 'theme') {
+                syncThemeColor(color);
+            } else if (target === 'text') {
+                syncTextColor(color);
+            }
+        });
+    });
+
     if (fontSelect) fontSelect.addEventListener('change', updatePreview);
-    if (themeInput) themeInput.addEventListener('input', updatePreview);
-    if (textInput) textInput.addEventListener('input', updatePreview);
 
     // 3. Supabaseから既存データを読み込む関数
     async function loadCurrentDesign(id) {
@@ -44,13 +74,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (data) {
             if (fontSelect && data.font_family) fontSelect.value = data.font_family;
-            if (themeInput && data.theme_color) themeInput.value = data.theme_color;
-            if (textInput && data.text_color) textInput.value = data.text_color;
-            updatePreview();
+            if (data.theme_color) syncThemeColor(data.theme_color);
+            if (data.text_color) syncTextColor(data.text_color);
         }
     }
 
-    // 4. URLパラメータ取得とデータロード（※DOM要素宣言の後に実行）
+    // 4. URLパラメータ取得と初期データロード
     const urlParams = new URLSearchParams(window.location.search);
     const streamerId = parseInt(urlParams.get('id'), 10);
 
@@ -61,7 +90,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         alert('URLに配信者ID (?id=) が指定されていません。');
     }
 
-    // 5. 保存処理（管理キーのチェック付き）
+    // 5. 保存処理（フォーム送信）
     if (form) {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();

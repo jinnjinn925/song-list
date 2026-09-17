@@ -28,45 +28,67 @@
   <!-- デザインカスタマイズフォーム -->
   <section id="editor-section">
     <form id="custom-form">
-      <input type="hidden" id="streamer-id">
+	  <input type="hidden" id="streamer-id">
 
-      <!-- フォント指定 -->
-      <div class="form-group" style="margin-bottom:16px;">
-        <label for="font-family" style="display:block; font-weight:bold; margin-bottom:6px;">フォント (font_family)</label>
-        <select id="font-family" style="width:100%; height:42px; padding:0 10px; border-radius:8px; border:1px solid #ccc;">
-          <option value="sans-serif">ゴシック体 (sans-serif)</option>
-          <option value="serif">明朝体 (serif)</option>
-          <option value="'Yu Gothic', '遊ゴシック', sans-serif">遊ゴシック</option>
-          <option value="cursive">手書き風 (cursive)</option>
-        </select>
-      </div>
+	  <!-- 1. フォント指定 -->
+	  <div class="form-group" style="margin-bottom:20px;">
+		<label for="font-family" style="display:block; font-weight:bold; margin-bottom:8px;">フォント (font_family)</label>
+		<select id="font-family" style="width:100%; height:48px; padding:0 12px; border-radius:10px; border:1px solid #ccc; font-size:16px;">
+		  <option value="sans-serif">ゴシック体 (sans-serif)</option>
+		  <option value="serif">明朝体 (serif)</option>
+		  <option value="'Yu Gothic', '遊ゴシック', sans-serif">遊ゴシック</option>
+		  <option value="cursive">手書き風 (cursive)</option>
+		</select>
+	  </div>
 
-      <!-- テーマカラー -->
-      <div class="form-group" style="margin-bottom:16px;">
-        <label for="theme-color" style="display:block; font-weight:bold; margin-bottom:6px;">テーマカラー (theme_color)</label>
-        <div style="display:flex; align-items:center; gap:12px;">
-          <input type="color" id="theme-color" value="#007bff" style="width:50px; height:42px; border:none; cursor:pointer;">
-          <span id="theme-color-code">#007bff</span>
-        </div>
-      </div>
+	  <!-- 2. テーマカラー (theme_color) -->
+	  <div class="form-group" style="margin-bottom:20px;">
+		<label style="display:block; font-weight:bold; margin-bottom:8px;">テーマカラー (theme_color)</label>
 
-      <!-- 文字色 -->
-      <div class="form-group" style="margin-bottom:16px;">
-        <label for="text-color" style="display:block; font-weight:bold; margin-bottom:6px;">文字色 (text_color)</label>
-        <div style="display:flex; align-items:center; gap:12px;">
-          <input type="color" id="text-color" value="#333333" style="width:50px; height:42px; border:none; cursor:pointer;">
-          <span id="text-color-code">#333333</span>
-        </div>
-      </div>
+		<!-- プリセット（ワンタップ選択） -->
+		<div class="preset-colors" style="display:flex; gap:10px; margin-bottom:10px;">
+		  <button type="button" class="color-chip" style="background:#007bff;" data-target="theme" data-color="#007bff"></button>
+		  <button type="button" class="color-chip" style="background:#28a745;" data-target="theme" data-color="#28a745"></button>
+		  <button type="button" class="color-chip" style="background:#dc3545;" data-target="theme" data-color="#dc3545"></button>
+		  <button type="button" class="color-chip" style="background:#ffc107;" data-target="theme" data-color="#ffc107"></button>
+		  <button type="button" class="color-chip" style="background:#6f42c1;" data-target="theme" data-color="#6f42c1"></button>
+		  <button type="button" class="color-chip" style="background:#222222;" data-target="theme" data-color="#222222"></button>
+		</div>
 
-      <!-- プレビュー -->
-      <div id="preview-area" style="padding:16px; border:1px solid #ddd; border-radius:8px; text-align:center; margin-top:20px;">
-        <p style="margin:0 0 8px;">プレビュー表示（歌リストの見え方）</p>
-        <button type="button" id="preview-btn" style="padding:8px 16px; border:none; border-radius:4px; color:#fff;">テーマ色ボタン</button>
-      </div>
+		<!-- ピッカー ＋ コード直接入力 -->
+		<div style="display:flex; align-items:center; gap:10px;">
+		  <input type="color" id="theme-color" value="#007bff" style="width:50px; height:44px; border:none; background:none; cursor:pointer;">
+		  <input type="text" id="theme-color-code" value="#007bff" placeholder="#007bff" maxlength="7" style="width:120px; height:44px; padding:0 10px; border:1px solid #ccc; border-radius:8px; font-size:16px;">
+		</div>
+	  </div>
 
-      <button type="submit" id="save-design-btn" class="main-button" style="margin-top:20px;">デザイン設定を保存する</button>
-    </form>
+	  <!-- 3. 文字色 (text_color) -->
+	  <div class="form-group" style="margin-bottom:20px;">
+		<label style="display:block; font-weight:bold; margin-bottom:8px;">文字色 (text_color)</label>
+
+		<!-- プリセット（黒・ダークグレー・白・ライトグレー等） -->
+		<div class="preset-colors" style="display:flex; gap:10px; margin-bottom:10px;">
+		  <button type="button" class="color-chip" style="background:#222222;" data-target="text" data-color="#222222"></button>
+		  <button type="button" class="color-chip" style="background:#444444;" data-target="text" data-color="#444444"></button>
+		  <button type="button" class="color-chip" style="background:#184f88;" data-target="text" data-color="#184f88"></button>
+		  <button type="button" class="color-chip" style="background:#ffffff; border:1px solid #ccc;" data-target="text" data-color="#ffffff"></button>
+		</div>
+
+		<!-- ピッカー ＋ コード直接入力 -->
+		<div style="display:flex; align-items:center; gap:10px;">
+		  <input type="color" id="text-color" value="#222222" style="width:50px; height:44px; border:none; background:none; cursor:pointer;">
+		  <input type="text" id="text-color-code" value="#222222" placeholder="#222222" maxlength="7" style="width:120px; height:44px; padding:0 10px; border:1px solid #ccc; border-radius:8px; font-size:16px;">
+		</div>
+	  </div>
+
+	  <!-- 4. リアルタイムプレビュー -->
+	  <div id="preview-area" style="padding:16px; border:1px solid #ddd; border-radius:10px; text-align:center; margin-top:20px;">
+		<p style="margin:0 0 10px; font-weight:bold;">プレビュー表示（曲リストの見え方）</p>
+		<button type="button" id="preview-btn" style="padding:10px 20px; border:none; border-radius:6px; color:#fff; font-weight:bold;">サンプルボタン</button>
+	  </div>
+
+	  <button type="submit" id="save-design-btn" class="main-button" style="margin-top:24px; height:50px; font-size:16px;">デザイン設定を保存する</button>
+	</form>
 
     <div id="status-message" style="margin-top:16px; padding:10px; border-radius:8px; display:none;"></div>
   </section>
