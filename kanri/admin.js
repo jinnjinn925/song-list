@@ -1,7 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const SUPABASE_URL = 'https://dgssybbbgnnygmccjltn.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY'; // ご自身の anon key に書き換えてください
+const SUPABASE_ANON_KEY = 'sb_publishable_JNz1mi6gysaFjOa0A4I5ow_iDe3PQbd'; // ご自身の anon key に書き換えてください
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
