@@ -1399,8 +1399,20 @@ searchClear.addEventListener(
 );
 
 
+
+
 // =========================
 // 実行
 // =========================
 
-loadSongs();
+// DOMが読み込まれたら実行
+document.addEventListener('DOMContentLoaded', () => {
+  // URLに streamer パラメータがない場合のフォールバック（初期値指定）
+  const params = new URLSearchParams(window.location.search);
+  if (!params.get('streamer')) {
+    // 例: デフォルトで 'mikoto' を表示したい場合
+    // urlParamsを補完するか、リダイレクトなどの処理を行えます
+  }
+  
+  loadSongs();
+});
