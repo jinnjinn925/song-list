@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>管理画面 - 歌リスト管理</title>
+  <link rel="icon" href="data:,"> <!-- favicon 404防止 -->
   <style>
     body {
       font-family: sans-serif;
@@ -52,20 +53,15 @@
     .success { background-color: #d4edda; color: #155724; }
     .error { background-color: #f8d7da; color: #721c24; }
   </style>
-	 <!-- CORBエラーを回避するための固定バージョン指定 (unpkg CDN) -->
-	<script src="https://unpkg.com/@supabase/supabase-client@2.43.4/dist/umd/supabase.js"></script>
 
-	<!-- admin.js -->
-	<script src="admin.js" defer></script>
-	
-	<link rel="icon" href="data:,">
-	
+  <!-- type="module" を指定して admin.js のみを読み込む -->
+  <script type="module" src="./admin.js"></script>
 </head>
 <body>
 
   <h1>配信者・楽曲 管理画面</h1>
 
-  <!-- 1. 新規配信者登録フォーム -->
+  <!-- 新規配信者登録フォーム -->
   <section>
     <h2>新規配信者の追加</h2>
     <form id="add-streamer-form">
