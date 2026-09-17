@@ -15,8 +15,10 @@ html {
 body {
     margin: 0;
     padding: 0 0 120px 0;
+
     background: #f8f8f8;
-    color: #f8f8f8;
+
+    color: var(--text-color, #f8f8f8);
 
     font-family:
         "Noto Sans JP",
@@ -25,6 +27,8 @@ body {
         sans-serif;
 
     line-height: 1.6;
+
+    position: relative;
 }
 
 
@@ -204,11 +208,10 @@ body {
 }
 
 .favorite-button.active {
-    background: #222;/* 選択時の背景色（現在黒） */
-    color: #fff;/* 選択時の文字色（現在白） */
-    border-color: #222;/* 選択時の枠線色 */
+    background: var(--theme-color, #222);
+    color: #fff;
+    border-color: var(--theme-color, #222);
 }
-
 
 /* =========================
    曲一覧
@@ -234,7 +237,7 @@ body {
     font-weight: 700;
 	color: #DDDDDD;      /* ← 文字色を変更したい場合はここを追加（例: color: #fff; で白） */
 
-    border-bottom: 2px solid #184F88; /*アーティスト名の下の線の色*/
+    border-bottom: 2px solid var(--theme-color, #184F88); /*アーティスト名の下の線の色*/
 
     cursor: pointer;
 
@@ -391,26 +394,25 @@ body {
     }
 }
 /* 背景写真 */
-/* 既存の body から背景プロパティを外す */
-body {
-  /* background-image などの指定を削除 */
-  position: relative;
-}
+
 
 /* 擬似要素で固定背景を作成 */
 body::before {
-	content: "";
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100vw;
-	height: 100vh;
-	background-image: url("background.jpg");
-	background-size: cover;
- 	background-position: center;
- 	background-repeat: no-repeat;
-	z-index: -1; /* コンテンツの背面に配置 */
-	/*filter: brightness(0.95); /* 背景画像の調整 ← 追加例: 0.9などに下げると画像が少し暗くなり文字が読みやすくなります */
+    content: "";
+
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 100vw;
+    height: 100vh;
+
+    background-image: var(--background-image, none);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    z-index: -1;
 }
 
 /* メイン部分を少し透過 */
@@ -472,7 +474,9 @@ main {
 
 /* 選択中 */
 #artist-nav button.active {
-    background: rgba(255, 255, 255, 0.55);/* 選択中の背景透過度 */
+    background: var(--theme-color, rgba(255, 255, 255, 0.55));
+    color: #fff;
+    border-color: var(--theme-color, rgba(255, 255, 255, 0.55));
 }
 
 #song-search {

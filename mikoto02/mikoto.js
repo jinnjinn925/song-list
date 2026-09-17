@@ -1094,6 +1094,46 @@ async function loadSongs() {
 
     streamerName.textContent =
         streamer.name;
+	
+	
+	
+	// =========================
+	// ストリーマーごとのデザイン
+	// =========================
+
+	if (streamer.font_family) {
+		document.body.style.fontFamily =
+			streamer.font_family;
+	}
+
+	if (streamer.text_color) {
+		document.documentElement.style.setProperty(
+			'--text-color',
+			streamer.text_color
+		);
+	}
+
+	if (streamer.theme_color) {
+		document.documentElement.style.setProperty(
+			'--theme-color',
+			streamer.theme_color
+		);
+	}
+
+	if (streamer.background_image) {
+		document.body.style.backgroundImage =
+			`url("${streamer.background_image}")`;
+
+		document.body.style.backgroundSize =
+			'cover';
+
+		document.body.style.backgroundAttachment =
+			'fixed';
+
+		document.body.style.backgroundPosition =
+			'center';
+	}
+	
 
 
     // =========================
