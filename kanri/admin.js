@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const { data, error } = await supabase
                 .from('streamers')
                 .select('*')
-                .order('created_at', { ascending: false }); // 新しい順に並べ替え
+                .order('id', { ascending: false }); // 新しい順に並べ替え
 
             if (error) throw error;
 
