@@ -1,120 +1,111 @@
-// JavaScript Document
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const SUPABASE_URL = 'https://dgssybbbgnnygmccjltn.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_JNz1mi6gysaFjOa0A4I5ow_iDe3PQbd'; // ご自身の anon key を設定してください
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseUrl = 'https://dgssybbbgnnygmccjltn.supabase.co';
+const supabaseKey = 'sb_publishable_JNz1mi6gysaFjOa0A4I5ow_iDe3PQbd';
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const selectEl = document.getElementById('streamer-select');
+    // URLから streamerId を取得 (例: setting.html?id=1)
+    const urlParams = new URLSearchParams(window.location.search);
+    const streamerId = parseInt(urlParams.get('id'), 10);
+
+    const streamerIdInput = document.getElementById('streamer-id');
+    if (streamerId) {
+        streamerIdInput.value = streamerId;
+        await loadCurrentDesign(streamerId);
+    } else {
+        alert('URLに配信者ID (?id=) が指定されていません。');
+    }
+
     const fontSelect = document.getElementById('font-family');
     const themeInput = document.getElementById('theme-color');
     const textInput = document.getElementById('text-color');
-
     const themeCode = document.getElementById('theme-color-code');
     const textCode = document.getElementById('text-color-code');
-
     const previewArea = document.getElementById('preview-area');
     const previewBtn = document.getElementById('preview-btn');
     const form = document.getElementById('custom-form');
     const messageEl = document.getElementById('status-message');
 
-    let streamersData = [];
-
-    // 1. 配信者一覧を取得
-    try {
-        const { data, error } = await supabase
-            .from('streamers')
-            .select('*')
-            .order('name', { ascending: true });
-
-        if (error) throw error;
-
-        streamersData = data;
-        selectEl.innerHTML = '<option value="">配信者を選択してください</option>' + 
-            data.map(s => `<option value="${s.id}">${escapeHtml(s.name)} (@${escapeHtml(s.url_id)})</option>`).join('');
-
-    } catch (err) {
-        console.error('配信者取得エラー:', err);
-        selectEl.innerHTML = '<option value="">読み込み失敗</option>';
-    }
-
-    // 2. プレビューのリアルタイム更新
+    // プレビューリアルタイム反映
     function updatePreview() {
-        const fontVal = fontSelect.value;
-        const themeVal = themeInput.value;
-        const textVal = textInput.value;
-
-        themeCode.textContent = themeVal;
-        textCode.textContent = textVal;
-
-        previewArea.style.fontFamily = fontVal;
-        previewArea.style.color = textVal;
-        previewBtn.style.backgroundColor = themeVal;
+        previewArea.style.fontFamily = fontSelect.value;
+        previewArea.style.color = textInput.value;
+        previewBtn.style.backgroundColor = themeInput.value;
+        themeCode.textContent = themeInput.value;
+        textCode.textContent = textInput.value;
     }
 
     fontSelect.addEventListener('change', updatePreview);
     themeInput.addEventListener('input', updatePreview);
     textInput.addEventListener('input', updatePreview);
 
-    // 3. 配信者切替時にDBから取得した値を反映
-    selectEl.addEventListener('change', () => {
-        const selectedId = selectEl.value;
-        const streamer = streamersData.find(s => String(s.id) === String(selectedId));
+    // 既存のデザイン設定を Supabase から取得
+    async function loadCurrentDesign(id) {
+        const { data, error } = await supabaseClient
+            .from('streamers')
+            .select('font_family, theme_color, text_color')
+            .eq('id', id)
+            .maybeSingle();
 
-        if (streamer) {
-            fontSelect.value = streamer.font_family || 'sans-serif';
-            themeInput.value = streamer.theme_color || '#007bff';
-            textInput.value = streamer.text_color || '#333333';
-            updatePreview();
-        }
-    });
-
-    // 4. 設定の保存（UPDATE）
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const streamerId = selectEl.value;
-        if (!streamerId) {
-            alert('配信者を選択してください。');
+        if (error) {
+            console.error('デザイン取得エラー:', error);
             return;
         }
 
+        if (data) {
+            fontSelect.value = data.font_family || 'sans-serif';
+            themeInput.value = data.theme_color || '#007bff';
+            textInput.value = data.text_color || '#333333';
+            updatePreview();
+        }
+    }
+
+    // 保存処理（管理キーの検証付き）
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const managementKey = document.getElementById('management-key').value.trim();
+        if (!managementKey) {
+            alert('管理キーを入力してください。');
+            return;
+        }
+
+        const saveBtn = document.getElementById('save-design-btn');
+        saveBtn.disabled = true;
         messageEl.style.display = 'none';
 
         try {
-            const { error } = await supabase
-                .from('streamers')
-                .update({
-                    font_family: fontSelect.value,
-                    theme_color: themeInput.value,
-                    text_color: textInput.value
+            // Edge Function経由で管理キー認証を行ってデザイン更新する例
+            const response = await fetch(`${supabaseUrl}/functions/v1/management`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'update_design', // Edge Function側の分岐用アクション名
+                    streamer_id: streamerId,
+                    management_key: managementKey,
+                    design: {
+                        font_family: fontSelect.value,
+                        theme_color: themeInput.value,
+                        text_color: textInput.value
+                    }
                 })
-                .eq('id', streamerId);
+            });
 
-            if (error) throw error;
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.error || 'デザインの更新に失敗しました。');
 
+            messageEl.style.backgroundColor = '#d4edda';
+            messageEl.style.color = '#155724';
             messageEl.textContent = 'デザイン設定を保存しました！';
-            messageEl.className = 'message success';
             messageEl.style.display = 'block';
-
-            // キャッシュデータ更新
-            const target = streamersData.find(s => String(s.id) === String(streamerId));
-            if (target) {
-                target.font_family = fontSelect.value;
-                target.theme_color = themeInput.value;
-                target.text_color = textInput.value;
-            }
 
         } catch (err) {
-            console.error('保存エラー:', err);
-            messageEl.textContent = '保存に失敗しました: ' + err.message;
-            messageEl.className = 'message error';
+            console.error(err);
+            messageEl.style.backgroundColor = '#f8d7da';
+            messageEl.style.color = '#721c24';
+            messageEl.textContent = 'エラー: ' + err.message;
             messageEl.style.display = 'block';
+        } finally {
+            saveBtn.disabled = false;
         }
     });
-
-    function escapeHtml(str) {
-        return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
 });
