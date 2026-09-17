@@ -1095,6 +1095,14 @@ async function loadSongs() {
     streamerName.textContent =
         streamer.name;
 	
+	// 背景画像を設定
+	if (streamer.background_image) {
+	  document.body.style.backgroundImage = `url('${streamer.background_image}')`;
+	  document.body.style.backgroundSize = 'cover';
+	  document.body.style.backgroundPosition = 'center';
+	  document.body.style.backgroundAttachment = 'fixed';
+	}
+	
 	
 	
 	// =========================

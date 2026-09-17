@@ -407,7 +407,7 @@ body::before {
     width: 100vw;
     height: 100vh;
 
-    background-image: var(--background-image, none);
+    background-image: var(--background-image, url("background.jpg"));
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
