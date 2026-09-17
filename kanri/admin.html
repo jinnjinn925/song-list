@@ -54,10 +54,35 @@
     .error { background-color: #f8d7da; color: #721c24; }
 
     /* 配信者一覧用スタイル */
+    /* 配信者一覧用スタイル（修正箇所） */
     .streamer-list {
       list-style: none;
       padding: 0;
       margin-top: 15px;
+
+      /* スクロール用の設定 */
+      max-height: 300px; /* 表示エリアの最大高さ（お好みで調整してください） */
+      overflow-y: auto;  /* 中身が入りきらない場合に縦スクロールバーを表示 */
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 8px;
+      background-color: #fff;
+    }
+
+    .streamer-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      border: 1px solid #eee;
+      margin-bottom: 8px;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+    }
+
+    /* 最後のアイテムの下余白を削除 */
+    .streamer-item:last-child {
+      margin-bottom: 0;
     }
     .streamer-item {
       display: flex;
