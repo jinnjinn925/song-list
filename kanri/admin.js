@@ -29,14 +29,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const { data, error } = await supabase
-                .from('streamers')
-                .insert([
-                    {
-                        name: name,
-                        url_id: urlId,
-                        bg_image_url: background_image || null
-                    }
-                ]);
+				.from('streamers')
+				.insert([
+					{
+						name: name,
+						url_id: urlId,
+						image_url: bgUrl || null  // ← image_url に変更
+					}
+				]);
 
             if (error) throw error;
 
