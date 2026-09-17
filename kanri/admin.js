@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     {
                         name: name,
                         url_id: urlId,
-                        bg_image_url: bgUrl || null
+                        bg_image_url: background_image || null
                     }
                 ]);
 
