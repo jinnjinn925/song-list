@@ -38,6 +38,24 @@ function formatName(str) {
     return str.replace(/[\s\u3000]+/g, ' ').trim();
 }
 
+
+// 【新規追加】アーティスト名専用の整形関数
+function formatArtistName(str) {
+    if (!str) return '';
+    const trimmed = str.trim();
+    // ひらがな、カタカナ、漢字が含まれているか判定
+    const hasJapanese = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/u.test(trimmed);
+    
+    if (hasJapanese) {
+        // 日本語が含まれる場合はスペースをすべて削除
+        return trimmed.replace(/[\s\u3000]+/g, '');
+    } else {
+        // アルファベット等の場合は連続するスペースを半角1つに整理して残す
+        return trimmed.replace(/[\s\u3000]+/g, ' ');
+    }
+}
+
+
 function escapeHtml(str) {
     if (!str) return '';
     return String(str)
@@ -369,7 +387,7 @@ function collectInputRows() {
     let lastArtist = '';
 
     rows.forEach(tr => {
-        let artist = formatName(tr.querySelector('.row-artist').value);
+        let artist = formatArtistName(tr.querySelector('.row-artist').value);
         const title = formatName(tr.querySelector('.row-title').value);
         const complete = tr.querySelector('.row-complete').value;
         const confident = tr.querySelector('.row-confident').checked;
