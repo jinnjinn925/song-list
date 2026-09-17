@@ -745,3 +745,11 @@ textarea {
 .add-main {
     padding-bottom: 8px !important;
 }
+
+/* 処理中のボタンのスタイリング */
+#save-registered-changes-btn:disabled,
+#add-row-btn:disabled {
+    opacity: 0.6 !important;
+    cursor: wait !important;
+    pointer-events: none !important;
+}

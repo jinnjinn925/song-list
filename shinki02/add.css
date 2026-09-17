@@ -956,3 +956,11 @@ h3 {
     z-index: 10;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
+
+/* 処理中のボタンのスタイリング */
+#save-registered-changes-btn:disabled,
+#add-row-btn:disabled {
+    opacity: 0.6 !important;
+    cursor: wait !important;
+    pointer-events: none !important;
+}

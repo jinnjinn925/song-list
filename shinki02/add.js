@@ -561,13 +561,110 @@ function createPreviewRow(row, reading) {
     previewBody.appendChild(tr);
 }
 
+// ========================================
+// 1. 行追加ボタンの連続クリック防止（デバウンス・スロットル）
+// ========================================
+let isAddingRow = false;
+
 document.getElementById('add-row-btn')?.addEventListener('click', () => {
+    // すでに処理中の場合は連打を無視
+    if (isAddingRow) return;
+    
+    isAddingRow = true;
+    
     addInputRow();
+    
     const rows = inputBody.querySelectorAll('tr');
     if (rows.length > 0) {
         rows[rows.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+
+    // 250ミリ秒後に再度クリック可能にする
+    setTimeout(() => {
+        isAddingRow = false;
+    }, 250);
 });
+
+// ========================================
+// 2. 「変更を保存」ボタンの二重送信防止
+// ========================================
+if (saveRegisteredChangesBtn) {
+    saveRegisteredChangesBtn.addEventListener('click', async () => {
+        // すでに処理中の場合は中断
+        if (saveRegisteredChangesBtn.disabled) return;
+
+        const streamerId = parseInt(document.getElementById('streamer-id').value, 10);
+        const managementKey = document.getElementById('management-key').value.trim();
+
+        if (!managementKey) {
+            alert('管理キーを入力してください。');
+            return;
+        }
+
+        const songUpdates = [];
+        const rows = registeredBody.querySelectorAll('tr');
+
+        rows.forEach(tr => {
+            const selectComp = tr.querySelector('.registered-complete-select');
+            const checkConf = tr.querySelector('.registered-confident-checkbox');
+
+            if (selectComp && checkConf) {
+                const songId = parseInt(selectComp.dataset.id, 10);
+                const completeVal = selectComp.value;
+                let complete = null;
+                if (completeVal === 'complete') complete = true;
+                else if (completeVal === 'practice') complete = false;
+
+                songUpdates.push({
+                    id: songId,
+                    complete: complete,
+                    confident: checkConf.checked
+                });
+            }
+        });
+
+        if (songUpdates.length === 0) {
+            alert('更新対象の曲がありません。');
+            return;
+        }
+
+        // --- 連打防止の処理開始 ---
+        saveRegisteredChangesBtn.disabled = true;
+        saveRegisteredChangesBtn.dataset.originalText = saveRegisteredChangesBtn.textContent;
+        saveRegisteredChangesBtn.textContent = '保存中...';
+        
+        message.style.color = '';
+        message.textContent = '変更を保存しています...';
+
+        try {
+            const res = await fetch(`${supabaseUrl}/functions/v1/management`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'update_favorites_and_confident',
+                    streamer_id: streamerId,
+                    management_key: managementKey,
+                    song_updates: songUpdates
+                })
+            });
+
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || '更新に失敗しました。');
+
+            message.style.color = 'green';
+            message.textContent = '歌える状態・自信曲の変更を保存しました。';
+            await loadRegisteredSongs();
+        } catch (err) {
+            console.error(err);
+            message.style.color = 'red';
+            message.textContent = '保存エラー: ' + err.message;
+        } finally {
+            // --- 処理完了後にボタンを復帰 ---
+            saveRegisteredChangesBtn.disabled = false;
+            saveRegisteredChangesBtn.textContent = saveRegisteredChangesBtn.dataset.originalText || '変更を保存';
+        }
+    });
+}
 
 document.getElementById('generate-btn')?.addEventListener('click', async () => {
     const rows = collectInputRows();
