@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理画面 - 歌リスト管理</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 0 15px;
+      line-height: 1.6;
+    }
+    h1, h2 {
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 5px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    input[type="text"], input[type="password"], select {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .message {
+      margin-top: 10px;
+      padding: 10px;
+      display: none;
+    }
+    .success { background-color: #d4edda; color: #155724; }
+    .error { background-color: #f8d7da; color: #721c24; }
+  </style>
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-client@2"></script>
+</head>
+<body>
+
+  <h1>配信者・楽曲 管理画面</h1>
+
+  <!-- 1. 新規配信者登録フォーム -->
+  <section>
+    <h2>新規配信者の追加</h2>
+    <form id="add-streamer-form">
+      <div class="form-group">
+        <label for="streamer-name">配信者名（表示用）</label>
+        <input type="text" id="streamer-name" placeholder="例: 神楽みこと" required>
+      </div>
+
+      <div class="form-group">
+        <label for="streamer-url-id">URL ID（英数字）</label>
+        <input type="text" id="streamer-url-id" placeholder="例: mikoto" required>
+      </div>
+
+      <div class="form-group">
+        <label for="streamer-bg">背景画像URL（Supabase Storage等）</label>
+        <input type="text" id="streamer-bg" placeholder="https://...">
+      </div>
+
+      <button type="submit">配信者を登録する</button>
+    </form>
+    <div id="streamer-message" class="message"></div>
+  </section>
+
+  <script src="admin.js"></script>
+</body>
+</html>
