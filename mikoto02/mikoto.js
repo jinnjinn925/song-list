@@ -1114,10 +1114,19 @@ async function loadSongs() {
 			streamer.font_family;
 	}
 
-	if (streamer.text_color) {
+	// streamer.text_color から streamer.title_color に変更
+	if (streamer.title_color) {
 		document.documentElement.style.setProperty(
 			'--text-color',
-			streamer.text_color
+			streamer.title_color
+		);
+	}
+
+	// アーティスト名・曲名用の文字色を追加
+	if (streamer.artist_color) {
+		document.documentElement.style.setProperty(
+			'--artist-color',
+			streamer.artist_color
 		);
 	}
 
@@ -1126,20 +1135,6 @@ async function loadSongs() {
 			'--theme-color',
 			streamer.theme_color
 		);
-	}
-
-	if (streamer.background_image) {
-		document.body.style.backgroundImage =
-			`url("${streamer.background_image}")`;
-
-		document.body.style.backgroundSize =
-			'cover';
-
-		document.body.style.backgroundAttachment =
-			'fixed';
-
-		document.body.style.backgroundPosition =
-			'center';
 	}
 	
 
