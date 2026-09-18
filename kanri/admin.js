@@ -75,33 +75,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             try {
                 // 1. streamers テーブルに新規配信者を登録
-                const { data: streamerData, error: streamerError } = await supabase
-                    .from('streamers')
-                    .insert([
-                        {
-                            name: name,
-                            url_id: urlId,
-                            background_image: bgUrl || null
-                        }
-                    ])
-                    .select();
+                const { data, error } = await supabase.functions.invoke('management', {
+					body: {
+						action: 'create_streamer',
+						name: name,
+						url_id: urlId,
+						background_image: bgUrl || null,
+						management_key: managementKey,
+						reset_key: resetKey
+					}
+				});
 
-                if (streamerError) throw streamerError;
+				if (error) throw error;
 
-                const newStreamerId = streamerData[0].id;
-
-                // 2. management_keys テーブルに streamer_id, key_hash, reset_key_hash を登録
-                const { error: keyError } = await supabase
-                    .from('management_keys')
-                    .insert([
-                        {
-                            streamer_id: newStreamerId,
-                            key_hash: managementKey,
-                            reset_key_hash: resetKey
-                        }
-                    ]);
-
-                if (keyError) throw keyError;
+				if (!data || !data.success) {
+					throw new Error(data?.error || '配信者登録に失敗しました');
+				}
 
                 messageEl.textContent = `配信者「${name}」と管理キー・再設定コードを正常に登録しました！`;
                 messageEl.classList.add('success');
