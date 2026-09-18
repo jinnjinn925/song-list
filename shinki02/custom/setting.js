@@ -119,7 +119,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function loadCurrentDesign(id) {
         const { data, error } = await supabaseClient
             .from('streamers')
-            .select('font_family, theme_color, text_color, background_url')
+            .select('font_family, theme_color, text_color, background_image')
             .eq('id', id)
             .maybeSingle();
 
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (fontSelect && data.font_family) fontSelect.value = data.font_family;
             if (data.theme_color) syncThemeColor(data.theme_color);
             if (data.text_color) syncTextColor(data.text_color);
-            if (bgUrlInput && data.background_url) bgUrlInput.value = data.background_url;
+            if (bgUrlInput && data.background_image) bgUrlInput.value = data.background_image;
             updatePreview();
         }
     }
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                             font_family: fontSelect ? fontSelect.value : 'sans-serif',
                             theme_color: themeInput ? themeInput.value : '#007bff',
                             text_color: textInput ? textInput.value : '#333333',
-                            background_url: bgUrlInput ? bgUrlInput.value.trim() : ''
+                            background_image: bgUrlInput ? bgUrlInput.value.trim() : ''
                         }
                     })
                 });
