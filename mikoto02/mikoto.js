@@ -600,41 +600,27 @@ async function loadSongs() {
     // デザイン反映
     // デザイン反映
    // デザイン反映
+    // デザイン・フォント反映処理
     if (streamer.font_family) {
         const fontName = streamer.font_family.trim();
         
-        // 1. Google Fonts 用の <link> タグを生成して <head> に追加
+        // Google Fonts 用の URL 名整形（スペースを '+' に変換）
         const formattedFontName = fontName.replace(/ /g, '+');
-        const fontUrl = `https://fonts.googleapis.com/css2?family=${formattedFontName}:wght@400;700&display=swap`;
-        
-        const existingLink = document.getElementById('google-font-link');
-        if (existingLink) {
-            existingLink.href = fontUrl;
-        } else {
-            const link = document.createElement('link');
-            link.id = 'google-font-link';
-            link.rel = 'stylesheet';
-            link.href = fontUrl;
-            document.head.appendChild(link);
-        }
+        const fontImportUrl = `https://fonts.googleapis.com/css2?family=${formattedFontName}:wght@400;700&display=swap`;
 
-        // 2. CSS変数および全要素への個別適用（!important）
-        const fontCSS = `
-            :root {
-                --dynamic-font: '${fontName}', "Noto Sans JP", sans-serif;
-            }
-            body, body *, button, input {
-                font-family: '${fontName}', "Noto Sans JP", sans-serif !important;
-            }
-        `;
+        // <style id="dynamic-styles"> 要素を取得
+        const dynamicStyles = document.getElementById('dynamic-styles');
 
-        let dynamicStyles = document.getElementById('dynamic-styles');
-        if (!dynamicStyles) {
-            dynamicStyles = document.createElement('style');
-            dynamicStyles.id = 'dynamic-styles';
-            document.head.appendChild(dynamicStyles);
+        if (dynamicStyles) {
+            // 先頭に @import を記述し、全要素・ボタン・入力欄へ適用するCSSを設定
+            dynamicStyles.textContent = `
+                @import url('${fontImportUrl}');
+
+                body, body *, button, input {
+                    font-family: '${fontName}', "Noto Sans JP", sans-serif !important;
+                }
+            `;
         }
-        dynamicStyles.textContent = fontCSS;
     }
 
     if (streamer.title_color) {
