@@ -8,6 +8,12 @@
 
     <title>Song List</title>
     
+    <!-- 1. Google Fonts の読み込み（Noto Sans JP） -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- CSSの読み込み -->
     <link rel="stylesheet" href="mikoto.css">
 
     <!-- 動的に取得したデザイン（フォント・各文字色・背景など）を反映するための要素 -->
@@ -19,7 +25,7 @@
 <body>
 
     <header id="page-header">
-        <!-- 1. タイトル（title_color を反映する対象） -->
+        <!-- タイトル（title_color を反映する対象） -->
         <h1 id="streamer-name"></h1>
 
         <div id="song-count">
@@ -64,7 +70,7 @@
 
     <div id="artist-nav"></div>
 
-    <!-- 2. 曲一覧・アーティスト名部分（artist_color や font_family を反映する対象） -->
+    <!-- 曲一覧・アーティスト名部分 -->
     <div id="song-list">
         読み込み中...
     </div>
