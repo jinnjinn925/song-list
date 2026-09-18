@@ -602,28 +602,28 @@ async function loadSongs() {
         const dynamicStyles = document.getElementById('dynamic-styles');
 
         if (dynamicStyles) {
-            // カンマで区切られた先頭のフォント名を取得し、シングルクォーテーションを除去
+            // カンマで区切られた先頭のフォント名を取得し、クォーテーションを除去
             const primaryFont = rawFontFamily.split(',')[0].replace(/['"]/g, '').trim();
 
-            // Google Fonts に登録されているフォント群のリスト
-            const googleFonts = [
-                'M PLUS Rounded 1c',
-                'Kiwi Maru',
-                'Dela Gothic One',
-                'Shippori Mincho',
-                'Kaisei Tokumin'
-            ];
+            // Webフォント（Google Fonts）の読み込み設定マップ
+            const googleFontMap = {
+                'M PLUS Rounded 1c': 'family=M+PLUS+Rounded+1c:wght@400;700',
+                'Kiwi Maru': 'family=Kiwi+Maru:wght@400;500',
+                'Dela Gothic One': 'family=Dela+Gothic+One',
+                'Shippori Mincho': 'family=Shippori+Mincho:wght@400;700',
+                'Kaisei Tokumin': 'family=Kaisei+Tokumin:wght@400;700'
+            };
 
             let importCss = '';
 
-            // 選択されたフォントが Google Fonts に含まれている場合のみ @import を作成
-            if (googleFonts.includes(primaryFont)) {
-                const formattedFontName = primaryFont.replace(/ /g, '+');
-                const fontImportUrl = `https://fonts.googleapis.com/css2?family=${formattedFontName}:wght@400;700&display=swap`;
+            // 対象のGoogle Fontが存在する場合、適切なウェイト指定で@importを生成
+            if (googleFontMap[primaryFont]) {
+                const fontParam = googleFontMap[primaryFont];
+                const fontImportUrl = `https://fonts.googleapis.com/css2?${fontParam}&display=swap`;
                 importCss = `@import url('${fontImportUrl}');\n`;
             }
 
-            // CSSの適用（整形した font_family を指定）
+            // CSSの適用
             dynamicStyles.textContent = `
                 ${importCss}
                 body, body *, button, input {
