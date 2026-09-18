@@ -3,249 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- ここにあった shortcut icon の行を削除し、以下を追加 -->
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
 
     <title>Song List</title>
+    
+    <!-- 1. Google Fonts の読み込み（Noto Sans JP） -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- CSSの読み込み -->
+    <link rel="stylesheet" href="mikoto.css">
+
+    <!-- 動的に取得したデザイン（フォント・各文字色・背景など）を反映するための要素 -->
+    <style id="dynamic-styles"></style>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
-    <a href= "mikoto/mikoto.html">html/mikoto.html</a>
 
-    <h1>Song List</h1>
+    <header id="page-header">
+        <!-- タイトル（title_color を反映する対象） -->
+        <h1 id="streamer-name"></h1>
+
+        <div id="song-count">
+            曲数：読み込み中...
+        </div>
+    </header>
+
+    <div id="menu-panel" class="menu-panel">
+        <div class="search-box">
+            <input
+                id="song-search"
+                type="search"
+                placeholder="曲名・アーティスト名で検索"
+                autocomplete="off"
+            >
+            <button id="search-clear" type="button">クリア</button>
+        </div>
+    </div>
+
+    <section id="favorite-section">
+        <div id="complete-filter-buttons">
+            <button id="filter-all" class="favorite-button active">
+                すべて
+            </button>
+
+            <button id="filter-complete" class="favorite-button">
+                フル
+            </button>
+            
+            <button id="filter-partial" class="favorite-button">
+                途中まで
+            </button>
+
+            <button id="filter-practice" class="favorite-button">
+                練習中
+            </button>
+        </div>
+
+        <div id="favorite-artists">
+        </div>
+    </section>
 
     <div id="artist-nav"></div>
 
+    <!-- 曲一覧・アーティスト名部分 -->
     <div id="song-list">
         読み込み中...
     </div>
 
-
-    <script>
-
-        // Supabaseへの接続
-        const supabaseUrl = 'https://dgssybbbgnnygmccjltn.supabase.co';
-
-        const supabaseKey =
-            'sb_publishable_JNz1mi6gysaFjOa0A4I5ow_iDe3PQbd';
-
-        const supabaseClient =
-            window.supabase.createClient(
-                supabaseUrl,
-                supabaseKey
-            );
-
-
-        const list = document.getElementById('song-list');
-        const nav = document.getElementById('artist-nav');
-
-
-        // 50音・アルファベット
-        const initials = [
-            '一覧',
-            'A-Z',
-            'あ', 'か', 'さ', 'た', 'な',
-            'は', 'ま', 'や', 'ら', 'わ'
-        ];
-
-
-        // 各行に含まれる文字
-        const initialGroups = {
-            'あ': ['あ', 'い', 'う', 'え', 'お'],
-            'か': ['か', 'き', 'く', 'け', 'こ'],
-            'さ': ['さ', 'し', 'す', 'せ', 'そ'],
-            'た': ['た', 'ち', 'つ', 'て', 'と'],
-            'な': ['な', 'に', 'ぬ', 'ね', 'の'],
-            'は': ['は', 'ひ', 'ふ', 'へ', 'ほ'],
-            'ま': ['ま', 'み', 'む', 'め', 'も'],
-            'や': ['や', 'ゆ', 'よ'],
-            'ら': ['ら', 'り', 'る', 'れ', 'ろ'],
-            'わ': ['わ', 'を', 'ん']
-        };
-
-
-        // 曲を表示する関数
-        function displaySongs(songs) {
-
-            list.innerHTML = '';
-
-            let currentArtist = '';
-
-
-            songs.forEach(song => {
-
-                // アーティストが変わったら見出しを作る
-                if (song.artist !== currentArtist) {
-
-                    currentArtist = song.artist;
-
-                    const artistDiv =
-                        document.createElement('div');
-
-                    artistDiv.textContent = song.artist;
-                    artistDiv.className = 'artist';
-
-                    list.appendChild(artistDiv);
-                }
-
-
-                // 曲名を表示
-                const songDiv =
-                    document.createElement('div');
-
-                songDiv.textContent =
-                    song.title +
-                    (song.complete ? ' ★' : '');
-
-                songDiv.className = 'song';
-
-                list.appendChild(songDiv);
-            });
-        }
-
-
-        // 50音ボタンを作る
-        initials.forEach(initial => {
-
-            const button =
-                document.createElement('button');
-
-            button.textContent = initial;
-
-
-            // ボタンを押したとき
-            button.addEventListener('click', () => {
-
-                // A-Zの場合
-                if (initial === '一覧') {
-                    displaySongs(data);
-                    
-                }else if (initial === 'A-Z') {
-
-                    displaySongs(
-                        data.filter(song =>
-                            /^[a-z]/i.test(
-                                song.artist_initial
-                            )
-                        )
-                    );
-
-                    return;
-                }
-
-
-                // 50音の場合
-                const group =
-                    initialGroups[initial];
-
-
-                displaySongs(
-                    data.filter(song =>
-                        group.some(letter =>
-                            song.artist_initial
-                                .startsWith(letter)
-                        )
-                    )
-                );
-            });
-
-
-            nav.appendChild(button);
-        });
-
-
-        // Supabaseから曲を取得
-        async function loadSongs() {
-
-            // URLからストリーマーのIDを取得
-            const path = window.location.pathname;
-            const urlId = path.split('/').filter(Boolean).pop();
-
-
-            // streamersテーブルからストリーマーを探す
-            const {
-                data: streamer,
-                error: streamerError
-            } = await supabaseClient
-                .from('streamers')
-                .select('*')
-                .eq('url_id', urlId)
-                .single();
-
-
-            // ストリーマーが見つからなかった場合
-            if (streamerError || !streamer) {
-
-                console.error(streamerError);
-
-                list.textContent =
-                    'ストリーマーが見つかりません';
-
-                return;
-            }
-
-
-            // そのストリーマーの曲を取得
-            const {
-                data: songs,
-                error: songsError
-            } = await supabaseClient
-                .from('songs')
-                .select('*')
-                .eq('streamer_id', streamer.id);
-
-
-            // 曲の取得に失敗した場合
-            if (songsError) {
-
-                console.error(songsError);
-
-                list.textContent =
-                    '曲の読み込みに失敗しました';
-
-                return;
-            }
-
-
-            // 並び替え
-            const collator = new Intl.Collator('ja', {
-                sensitivity: 'base'
-            });
-
-
-            songs.sort((a, b) => {
-
-                // アーティストの読み順
-                const artistResult = collator.compare(
-                    a.artist_initial,
-                    b.artist_initial
-                );
-
-
-                if (artistResult !== 0) {
-                    return artistResult;
-                }
-
-
-                // 同じアーティストなら曲名の読み順
-                return collator.compare(
-                    a.title_initial,
-                    b.title_initial
-                );
-            });
-
-
-            // 曲データを保存
-            window.data = songs;
-
-
-            // 最初は全部表示
-            displaySongs(data);
-        }
-
-
-        loadSongs();
-    </script>
+    <script src="mikoto.js"></script>
 
 </body>
 </html>
