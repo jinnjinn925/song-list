@@ -167,7 +167,6 @@ textarea {
 }
 
 
-
 .input-table input[type="text"],
 .input-table select,
 .input-table textarea {
@@ -299,6 +298,7 @@ textarea {
 .preview-table td:nth-child(6)::before {
     content: "自信曲";
 }
+
 
 
 .preview-table input[type="text"],
@@ -744,4 +744,12 @@ textarea {
 
 .add-main {
     padding-bottom: 8px !important;
+}
+
+/* 処理中のボタンのスタイリング */
+#save-registered-changes-btn:disabled,
+#add-row-btn:disabled {
+    opacity: 0.6 !important;
+    cursor: wait !important;
+    pointer-events: none !important;
 }

@@ -18,11 +18,26 @@ let existingArtists = [];
 let favoriteArtistNames = [];
 let registeredSongsList = []; // 登録済み楽曲の一覧データ保持用
 
+// DOM要素の取得
 const favoriteArtistsSelected = document.getElementById('favorite-artists-selected');
 const favoriteArtistSearch = document.getElementById('favorite-artist-search');
 const favoriteArtistsList = document.getElementById('favorite-artists-list');
 const saveFavoriteArtistsBtn = document.getElementById('save-favorite-artists-btn');
 const favoriteArtistsMessage = document.getElementById('favorite-artists-message');
+
+const inputBody = document.getElementById('input-body');
+const previewBody = document.getElementById('preview-body');
+const inputSection = document.getElementById('input-section');
+const previewSection = document.getElementById('preview-section');
+const message = document.getElementById('message');
+
+const registeredBody = document.getElementById('registered-body');
+const selectAllSongs = document.getElementById('select-all-songs');
+const reloadSongsBtn = document.getElementById('reload-songs-btn');
+const deleteSelectedBtn = document.getElementById('delete-selected-btn');
+const saveRegisteredChangesBtn = document.getElementById('save-registered-changes-btn'); // 編集内容の一括保存ボタン
+const registeredSearchInput = document.getElementById('registered-search');
+const registeredSortSelect = document.getElementById('registered-sort');
 
 // ========================================
 // 文字列整形のヘルパー関数
@@ -36,6 +51,22 @@ function normalizeName(str) {
 function formatName(str) {
     if (!str) return '';
     return str.replace(/[\s\u3000]+/g, ' ').trim();
+}
+
+// アーティスト名専用の整形関数
+function formatArtistName(str) {
+    if (!str) return '';
+    const trimmed = str.trim();
+    // ひらがな、カタカナ、漢字が含まれているか判定
+    const hasJapanese = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/u.test(trimmed);
+    
+    if (hasJapanese) {
+        // 日本語が含まれる場合はスペースをすべて削除
+        return trimmed.replace(/[\s\u3000]+/g, '');
+    } else {
+        // アルファベット等の場合は連続するスペースを半角1つに整理して残す
+        return trimmed.replace(/[\s\u3000]+/g, ' ');
+    }
 }
 
 function escapeHtml(str) {
@@ -148,12 +179,6 @@ function renderFavoriteArtistList() {
 if (favoriteArtistSearch) {
     favoriteArtistSearch.addEventListener('input', renderFavoriteArtistList);
 }
-
-const inputBody = document.getElementById('input-body');
-const previewBody = document.getElementById('preview-body');
-const inputSection = document.getElementById('input-section');
-const previewSection = document.getElementById('preview-section');
-const message = document.getElementById('message');
 
 // ========================================
 // プレースホルダーの動的更新（「同上」表示）
@@ -369,7 +394,7 @@ function collectInputRows() {
     let lastArtist = '';
 
     rows.forEach(tr => {
-        let artist = formatName(tr.querySelector('.row-artist').value);
+        let artist = formatArtistName(tr.querySelector('.row-artist').value);
         const title = formatName(tr.querySelector('.row-title').value);
         const complete = tr.querySelector('.row-complete').value;
         const confident = tr.querySelector('.row-confident').checked;
@@ -543,14 +568,26 @@ function createPreviewRow(row, reading) {
     previewBody.appendChild(tr);
 }
 
+// 行追加ボタンのデバウンス処理
+let isAddingRow = false;
+
 document.getElementById('add-row-btn')?.addEventListener('click', () => {
+    if (isAddingRow) return;
+    
+    isAddingRow = true;
     addInputRow();
+    
     const rows = inputBody.querySelectorAll('tr');
     if (rows.length > 0) {
         rows[rows.length - 1].scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+
+    setTimeout(() => {
+        isAddingRow = false;
+    }, 250);
 });
 
+// 「まとめて登録する（読み仮名生成）」ボタン
 document.getElementById('generate-btn')?.addEventListener('click', async () => {
     const rows = collectInputRows();
 
@@ -589,6 +626,7 @@ document.getElementById('generate-btn')?.addEventListener('click', async () => {
     }
 });
 
+// 「入力に戻る」ボタン
 document.getElementById('back-btn')?.addEventListener('click', () => {
     inputSection.style.display = 'block';
     previewSection.style.display = 'none';
@@ -597,6 +635,7 @@ document.getElementById('back-btn')?.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
+// 「この内容で一括登録する」ボタン
 document.getElementById('submit-all-btn')?.addEventListener('click', async () => {
     const streamerId = parseInt(document.getElementById('streamer-id').value, 10);
     if (!Number.isInteger(streamerId)) {
@@ -639,8 +678,10 @@ document.getElementById('submit-all-btn')?.addEventListener('click', async () =>
 
     const button = document.getElementById('submit-all-btn');
     const submitError = document.getElementById('submit-error');
-    submitError.textContent = '';
-    submitError.style.color = '';
+    if (submitError) {
+        submitError.textContent = '';
+        submitError.style.color = '';
+    }
     button.disabled = true;
     message.style.color = '';
     message.textContent = '登録中...';
@@ -648,7 +689,8 @@ document.getElementById('submit-all-btn')?.addEventListener('click', async () =>
     try {
         const managementKey = document.getElementById('management-key').value.trim();
         if (!managementKey) {
-            submitError.textContent = '管理キーを入力してください。';
+            if (submitError) submitError.textContent = '管理キーを入力してください。';
+            alert('管理キーを入力してください。');
             return;
         }
 
@@ -665,13 +707,16 @@ document.getElementById('submit-all-btn')?.addEventListener('click', async () =>
 
         const result = await response.json();
         if (!response.ok) {
-            submitError.textContent = result.error || '曲の登録に失敗しました。';
+            if (submitError) submitError.textContent = result.error || '曲の登録に失敗しました。';
             return;
         }
 
-        submitError.style.color = 'green';
+        if (submitError) {
+            submitError.style.color = 'green';
+            submitError.textContent = insertData.length + '曲を登録しました。';
+        }
+        message.style.color = 'green';
         message.textContent = insertData.length + ' 曲の登録が完了しました。';
-        submitError.textContent = insertData.length + '曲を登録しました。';
 
         inputBody.innerHTML = '';
         previewBody.innerHTML = '';
@@ -704,14 +749,6 @@ document.getElementById('submit-all-btn')?.addEventListener('click', async () =>
 // 登録済み曲一覧・削除・変更・管理キー設定
 // ========================================
 
-const registeredBody = document.getElementById('registered-body');
-const selectAllSongs = document.getElementById('select-all-songs');
-const reloadSongsBtn = document.getElementById('reload-songs-btn');
-const deleteSelectedBtn = document.getElementById('delete-selected-btn');
-const saveRegisteredChangesBtn = document.getElementById('save-registered-changes-btn'); // 編集内容の一括保存ボタン
-const registeredSearchInput = document.getElementById('registered-search');
-const registeredSortSelect = document.getElementById('registered-sort');
-
 // 登録曲テーブルの描画関数
 function renderRegisteredSongs() {
     if (!registeredBody) return;
@@ -743,7 +780,7 @@ function renderRegisteredSongs() {
     });
 
     if (filtered.length === 0) {
-        registeredBody.innerHTML = '<tr><td colspan="4">該当する曲がありません。</td></tr>';
+        registeredBody.innerHTML = '<tr><td colspan="5">該当する曲がありません。</td></tr>';
         return;
     }
 
@@ -794,7 +831,7 @@ async function loadRegisteredSongs() {
     if (!Number.isInteger(streamerId)) return;
 
     if (registeredBody) {
-        registeredBody.innerHTML = '<tr><td colspan="4">読み込み中...</td></tr>';
+        registeredBody.innerHTML = '<tr><td colspan="5">読み込み中...</td></tr>';
     }
 
     const { data: streamerSongs, error } = await supabaseClient
@@ -819,7 +856,7 @@ async function loadRegisteredSongs() {
     if (error) {
         console.error(error);
         if (registeredBody) {
-            registeredBody.innerHTML = '<tr><td colspan="4">曲一覧の取得に失敗しました。</td></tr>';
+            registeredBody.innerHTML = '<tr><td colspan="5">曲一覧の取得に失敗しました。</td></tr>';
         }
         if (message) {
             message.style.color = 'red';
@@ -919,9 +956,11 @@ if (deleteSelectedBtn) {
     });
 }
 
-// 登録曲の「歌える状態」・「自信あり」の一括保存処理
+// 登録曲の「歌える状態」・「自信あり」の一括保存処理（単一化）
 if (saveRegisteredChangesBtn) {
     saveRegisteredChangesBtn.addEventListener('click', async () => {
+        if (saveRegisteredChangesBtn.disabled) return;
+
         const streamerId = parseInt(document.getElementById('streamer-id').value, 10);
         const managementKey = document.getElementById('management-key').value.trim();
 
@@ -958,6 +997,9 @@ if (saveRegisteredChangesBtn) {
         }
 
         saveRegisteredChangesBtn.disabled = true;
+        const originalText = saveRegisteredChangesBtn.textContent;
+        saveRegisteredChangesBtn.textContent = '保存中...';
+        
         message.style.color = '';
         message.textContent = '変更を保存しています...';
 
@@ -985,6 +1027,7 @@ if (saveRegisteredChangesBtn) {
             message.textContent = '保存エラー: ' + err.message;
         } finally {
             saveRegisteredChangesBtn.disabled = false;
+            saveRegisteredChangesBtn.textContent = originalText || '変更を保存';
         }
     });
 }

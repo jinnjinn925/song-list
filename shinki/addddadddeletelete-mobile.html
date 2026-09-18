@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex,nofollow">
     <title>レパートリー管理</title>
+	
+	<!-- アイコンの設定を追加 -->
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="../apple-touch-icon.png">
 
     <link rel="stylesheet" href="add-mobile.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -17,6 +21,12 @@
     <header class="page-header">
         <h1>レパートリー管理</h1>
         <p>スマートフォン用管理画面</p>
+		
+		<!-- ★移動ナビゲーションリンクを追加 -->
+        <div style="margin-top: 10px;">
+            <a href="#" class="nav-link-keep-params" data-target="custom/setting.html" style="text-decoration: underline; color: #007bff;">デザイン設定画面へ</a>
+        </div>
+		
     </header>
 
     <input type="hidden" id="streamer-id">
@@ -243,6 +253,21 @@
     <div id="message"></div>
 
 </main>
+	
+	<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchParams = window.location.search;
+      document.querySelectorAll('.nav-link-keep-params').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const target = link.getAttribute('data-target');
+          window.location.href = target + searchParams;
+        });
+      });
+    });
+  </script>
+
+	
 </body>
 </html>
 
