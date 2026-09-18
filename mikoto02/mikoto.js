@@ -597,8 +597,24 @@ async function loadSongs() {
     }
 
     // デザイン反映
+    // デザイン反映
     if (streamer.font_family) {
-        document.body.style.fontFamily = streamer.font_family;
+        const fontName = streamer.font_family;
+        
+        // Google Fontsからフォント定義を動的に取得して <style id="dynamic-styles"> に挿入
+        const dynamicStyles = document.getElementById('dynamic-styles');
+        if (dynamicStyles) {
+            const fontUrl = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;700&display=swap`;
+            
+            dynamicStyles.innerHTML += `
+                @import url('${fontUrl}');
+                body {
+                    font-family: '${fontName}', "Noto Sans JP", sans-serif !important;
+                }
+            `;
+        } else {
+            document.body.style.fontFamily = `'${fontName}', "Noto Sans JP", sans-serif`;
+        }
     }
 
     if (streamer.title_color) {
