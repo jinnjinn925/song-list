@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>配信者デザイン設定</title>
 
-  <!-- 404エラー防止用のファビコン指定 -->
-  <link rel="icon" href="data:,">
+  <!-- ここにあった 404エラー防止用のファビコン指定を削除し、以下を追加 -->
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
 
   <!-- Google Fonts 読み込み -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -84,6 +85,13 @@
 
 <main class="add-main" style="max-width: 600px; margin: 0 auto; padding: 20px;">
   <h2>配信者デザイン設定</h2>
+	
+	
+	<!-- ★移動ナビゲーションリンクを追加 -->
+	  <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+		<a href="#" class="nav-link-keep-params" data-target="../addddadddeletelete-mobile.html" style="text-decoration: underline; color: #007bff;">曲の登録・管理画面へ</a>
+	  </div>
+	
 
   <!-- 管理キー入力エリア -->
   <section id="management-key-section" style="margin-bottom: 20px;">
@@ -211,6 +219,21 @@
     <div id="status-message" style="margin-top:16px; padding:12px; border-radius:8px; display:none; text-align:center;"></div>
   </section>
 </main>
+	
+	
+	<script>
+    // URLのパラメータ (?以降) を保持したままリンク遷移する処理
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchParams = window.location.search;
+      document.querySelectorAll('.nav-link-keep-params').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const target = link.getAttribute('data-target');
+          window.location.href = target + searchParams;
+        });
+      });
+    });
+  </script>
 
 </body>
 </html>
