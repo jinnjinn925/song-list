@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // DBのカラム：text_color (タイトル用), artist_color (アーティスト・曲名用)
         const { data, error } = await supabaseClient
             .from('streamers')
-            .select('font_family, theme_color, text_color, artist_color, background_image')
+            .select('font_family, theme_color, title_color, artist_color, background_image')
             .eq('id', id)
             .maybeSingle();
 
@@ -160,7 +160,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (data) {
             if (fontSelect && data.font_family) fontSelect.value = data.font_family;
             if (data.theme_color) syncThemeColor(data.theme_color);
-            if (data.text_color) syncTitleTextColor(data.text_color);
+            if (data.title_color) syncTitleTextColor(data.title_color);
             if (data.artist_color) syncArtistTextColor(data.artist_color);
             if (bgUrlInput && data.background_image) bgUrlInput.value = data.background_image;
             updatePreview();
