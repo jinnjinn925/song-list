@@ -132,6 +132,21 @@
         <label for="streamer-bg">背景画像URL</label>
         <input type="text" id="streamer-bg" placeholder="https://...">
       </div>
+		
+		
+		
+		<!-- 追加：管理キー入力欄 -->
+      <div class="form-group">
+        <label for="management-key">管理キー</label>
+        <input type="text" id="management-key" placeholder="例: key_hash用の値" required>
+      </div>
+
+      <!-- 追加：再設定コード入力欄 -->
+      <div class="form-group">
+        <label for="reset-key">再設定コード</label>
+        <input type="text" id="reset-key" placeholder="例: reset_key_hash用の値" required>
+      </div>
+		
 
       <button type="submit">配信者を登録する</button>
     </form>

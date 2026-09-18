@@ -63,6 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const name = document.getElementById('streamer-name').value.trim();
             const urlId = document.getElementById('streamer-url-id').value.trim();
             const bgUrl = document.getElementById('streamer-bg').value.trim();
+            const managementKey = document.getElementById('management-key').value.trim(); // 管理キー
+            const resetKey = document.getElementById('reset-key').value.trim();         // 再設定コード
 
             const submitBtn = form.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
@@ -72,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
             messageEl.className = 'message';
 
             try {
-                // 1. streamers テーブルに新規配信者を登録（登録されたデータを取得するため .select() を付与）
+                // 1. streamers テーブルに新規配信者を登録
                 const { data: streamerData, error: streamerError } = await supabase
                     .from('streamers')
                     .insert([
@@ -86,24 +88,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (streamerError) throw streamerError;
 
-                // 登録された配信者のIDを取得
                 const newStreamerId = streamerData[0].id;
 
-                // 2. management_keys テーブルに streamer_id を登録
-                // ※ 必要に応じて管理キー文字列（key や token など）も一緒に生成・保存してください
+                // 2. management_keys テーブルに streamer_id, key_hash, reset_key_hash を登録
                 const { error: keyError } = await supabase
                     .from('management_keys')
                     .insert([
                         {
-                            streamer_id: newStreamerId
-                            // 例: 任意のキーを自動生成して保存する場合
-                            // key: Math.random().toString(36.substring(2)) などの値を入れるカラムがあればここに追加
+                            streamer_id: newStreamerId,
+                            key_hash: managementKey,
+                            reset_key_hash: resetKey
                         }
                     ]);
 
                 if (keyError) throw keyError;
 
-                messageEl.textContent = `配信者「${name}」と管理キーを正常に登録しました！`;
+                messageEl.textContent = `配信者「${name}」と管理キー・再設定コードを正常に登録しました！`;
                 messageEl.classList.add('success');
                 messageEl.style.display = 'block';
                 form.reset();
