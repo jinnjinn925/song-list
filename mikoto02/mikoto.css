@@ -16,6 +16,7 @@ html {
 }
 
 /* ページ全体の基本スタイル */
+/* ページ全体の基本スタイル */
 body {
     margin: 0;
     /* 下部に固定ナビ（50音ナビ等）が被らないよう余白を確保 */
@@ -27,12 +28,8 @@ body {
     /* 基本の文字色（タイトル・曲名等：--text-color） */
     color: var(--text-color, #222222);
 
-    /* 基本フォントの指定 */
-    font-family:
-        "Noto Sans JP",
-        "Hiragino Kaku Gothic ProN",
-        "Yu Gothic",
-        sans-serif;
+    /* ★ 修正：JavaScriptから指定される動的フォント変数を受け取れるように変更 */
+    font-family: var(--dynamic-font, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif);
 
     /* 行間を広げて読みやすく */
     line-height: 1.6;

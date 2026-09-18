@@ -599,11 +599,11 @@ async function loadSongs() {
     // デザイン反映
     // デザイン反映
     // デザイン反映
+   // デザイン反映
     if (streamer.font_family) {
         const fontName = streamer.font_family.trim();
         
-        // 1. Google Fonts 用の <link> タグを生成して <head> に追加（@import の構文エラーを防止）
-        // スペースを + に変換して URL エンコード
+        // 1. Google Fonts 用の <link> タグを生成して <head> に追加
         const formattedFontName = fontName.replace(/ /g, '+');
         const fontUrl = `https://fonts.googleapis.com/css2?family=${formattedFontName}:wght@400;700&display=swap`;
         
@@ -618,22 +618,23 @@ async function loadSongs() {
             document.head.appendChild(link);
         }
 
-        // 2. 全要素にフォントを適用する <style> タグを作成
-        const dynamicStyles = document.getElementById('dynamic-styles');
+        // 2. CSS変数および全要素への個別適用（!important）
         const fontCSS = `
-            body, body * {
+            :root {
+                --dynamic-font: '${fontName}', "Noto Sans JP", sans-serif;
+            }
+            body, body *, button, input {
                 font-family: '${fontName}', "Noto Sans JP", sans-serif !important;
             }
         `;
 
-        if (dynamicStyles) {
-            dynamicStyles.textContent = fontCSS;
-        } else {
-            const style = document.createElement('style');
-            style.id = 'dynamic-styles';
-            style.textContent = fontCSS;
-            document.head.appendChild(style);
+        let dynamicStyles = document.getElementById('dynamic-styles');
+        if (!dynamicStyles) {
+            dynamicStyles = document.createElement('style');
+            dynamicStyles.id = 'dynamic-styles';
+            document.head.appendChild(dynamicStyles);
         }
+        dynamicStyles.textContent = fontCSS;
     }
 
     if (streamer.title_color) {
