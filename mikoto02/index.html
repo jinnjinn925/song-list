@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	
-	<link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+    
+    <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
 
     <title>Song List</title>
-	
-	<link rel="stylesheet" href="mikoto.css">
+    
+    <link rel="stylesheet" href="mikoto.css">
+
+    <!-- 動的に取得したデザイン（フォント・各文字色・背景など）を反映するための要素 -->
+    <style id="dynamic-styles"></style>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -16,57 +19,57 @@
 <body>
 
     <header id="page-header">
-    	<h1 id="streamer-name"></h1>
+        <!-- 1. タイトル（text_color を反映する対象） -->
+        <h1 id="streamer-name"></h1>
 
-    	<div id="song-count">
-        	曲数：読み込み中...
-    	</div>
-	</header>
+        <div id="song-count">
+            曲数：読み込み中...
+        </div>
+    </header>
 
-	<div id="menu-panel" class="menu-panel">
-    	<div class="search-box">
-        	<input
-            	id="song-search"
-            	type="search"
-            	placeholder="曲名・アーティスト名で検索"
-            	autocomplete="off"
-        	>
-        	<button id="search-clear" type="button">クリア</button>
-    	</div>
-	</div>
+    <div id="menu-panel" class="menu-panel">
+        <div class="search-box">
+            <input
+                id="song-search"
+                type="search"
+                placeholder="曲名・アーティスト名で検索"
+                autocomplete="off"
+            >
+            <button id="search-clear" type="button">クリア</button>
+        </div>
+    </div>
 
     <section id="favorite-section">
-    	<div id="complete-filter-buttons">
-        	<button id="filter-all" class="favorite-button active">
-            	すべて
-        	</button>
+        <div id="complete-filter-buttons">
+            <button id="filter-all" class="favorite-button active">
+                すべて
+            </button>
 
-        	<button id="filter-complete" class="favorite-button">
-            	フル
-        	</button>
-			
-			<button id="filter-partial" class="favorite-button">
-            	途中まで
-        	</button>
+            <button id="filter-complete" class="favorite-button">
+                フル
+            </button>
+            
+            <button id="filter-partial" class="favorite-button">
+                途中まで
+            </button>
 
-        	<button id="filter-practice" class="favorite-button">
-            	練習中
-        	</button>
-    	</div>
+            <button id="filter-practice" class="favorite-button">
+                練習中
+            </button>
+        </div>
 
-    	<div id="favorite-artists">
-    	</div>
-	</section>
-
+        <div id="favorite-artists">
+        </div>
+    </section>
 
     <div id="artist-nav"></div>
 
+    <!-- 2. 曲一覧・アーティスト名部分（artist_color や font_family を反映する対象） -->
     <div id="song-list">
         読み込み中...
     </div>
 
-
-    <script src ="mikoto.js"></script>
+    <script src="mikoto.js"></script>
 
 </body>
 </html>

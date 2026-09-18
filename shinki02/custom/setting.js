@@ -8,25 +8,45 @@ document.addEventListener('DOMContentLoaded', async () => {
     const fontSelect = document.getElementById('font-family');
     const themeInput = document.getElementById('theme-color');
     const themeCodeInput = document.getElementById('theme-color-code');
-    const textInput = document.getElementById('text-color');
-    const textCodeInput = document.getElementById('text-color-code');
+    
+    // 【文字色】タイトル用（既存の text_color に対応）
+    const titleTextInput = document.getElementById('title-text-color') || document.getElementById('text-color');
+    const titleTextCodeInput = document.getElementById('title-text-color-code') || document.getElementById('text-color-code');
+    
+    // 【文字色】アーティスト・曲名用（新規 artist_color に対応）
+    const artistTextInput = document.getElementById('artist-text-color');
+    const artistTextCodeInput = document.getElementById('artist-text-color-code');
+
     const bgFileInput = document.getElementById('bg-file-input');
     const bgUrlInput = document.getElementById('background-url');
     const removeBgBtn = document.getElementById('remove-bg-btn');
     const previewArea = document.getElementById('preview-area');
+    const previewTitle = document.getElementById('preview-title'); 
+    const previewArtist = document.getElementById('preview-artist'); 
     const previewBtn = document.getElementById('preview-btn');
     const form = document.getElementById('custom-form');
     const messageEl = document.getElementById('status-message');
 
     // 2. プレビューのリアルタイム反映処理
     function updatePreview() {
-        if (!previewArea || !previewBtn) return;
+        if (!previewArea) return;
 
         if (fontSelect) previewArea.style.fontFamily = fontSelect.value;
-        if (textInput) previewArea.style.color = textInput.value;
-        if (themeInput) previewBtn.style.backgroundColor = themeInput.value;
+        if (themeInput && previewBtn) previewBtn.style.backgroundColor = themeInput.value;
 
-        // 背景画像のプレビュー反映
+        // タイトル文字色
+        if (titleTextInput && previewTitle) {
+            previewTitle.style.color = titleTextInput.value;
+        } else if (titleTextInput) {
+            previewArea.style.color = titleTextInput.value;
+        }
+
+        // アーティスト・曲名文字色
+        if (artistTextInput && previewArtist) {
+            previewArtist.style.color = artistTextInput.value;
+        }
+
+        // 背景画像
         if (bgUrlInput && bgUrlInput.value.trim()) {
             previewArea.style.backgroundImage = `url('${bgUrlInput.value.trim()}')`;
             previewArea.style.backgroundSize = 'cover';
@@ -43,17 +63,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         updatePreview();
     }
 
-    function syncTextColor(color) {
-        if (textInput) textInput.value = color;
-        if (textCodeInput) textCodeInput.value = color;
+    function syncTitleTextColor(color) {
+        if (titleTextInput) titleTextInput.value = color;
+        if (titleTextCodeInput) titleTextCodeInput.value = color;
         updatePreview();
     }
 
-    // イベントリスナーのセット（カラー・入力欄）
+    function syncArtistTextColor(color) {
+        if (artistTextInput) artistTextInput.value = color;
+        if (artistTextCodeInput) artistTextCodeInput.value = color;
+        updatePreview();
+    }
+
+    // イベントリスナーのセット
     if (themeInput) themeInput.addEventListener('input', (e) => syncThemeColor(e.target.value));
     if (themeCodeInput) themeCodeInput.addEventListener('input', (e) => syncThemeColor(e.target.value));
-    if (textInput) textInput.addEventListener('input', (e) => syncTextColor(e.target.value));
-    if (textCodeInput) textCodeInput.addEventListener('input', (e) => syncTextColor(e.target.value));
+    
+    if (titleTextInput) titleTextInput.addEventListener('input', (e) => syncTitleTextColor(e.target.value));
+    if (titleTextCodeInput) titleTextCodeInput.addEventListener('input', (e) => syncTitleTextColor(e.target.value));
+    if (artistTextInput) artistTextInput.addEventListener('input', (e) => syncArtistTextColor(e.target.value));
+    if (artistTextCodeInput) artistTextCodeInput.addEventListener('input', (e) => syncArtistTextColor(e.target.value));
+    
     if (fontSelect) fontSelect.addEventListener('change', updatePreview);
 
     // プリセットチップのクリック処理
@@ -62,7 +92,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const target = chip.dataset.target;
             const color = chip.dataset.color;
             if (target === 'theme') syncThemeColor(color);
-            if (target === 'text') syncTextColor(color);
+            if (target === 'title-text' || target === 'text') syncTitleTextColor(color);
+            if (target === 'artist-text') syncArtistTextColor(color);
         });
     });
 
@@ -82,7 +113,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const filePath = `streamer_${streamerId}_${Date.now()}.${fileExt}`;
 
             try {
-                // background バケットにアップロード
                 const { error: uploadError } = await supabaseClient
                     .storage
                     .from('background')
@@ -90,7 +120,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 if (uploadError) throw uploadError;
 
-                // パブリックURLを取得
                 const { data: publicUrlData } = supabaseClient
                     .storage
                     .from('background')
@@ -106,7 +135,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // 背景画像削除ボタン
     if (removeBgBtn) {
         removeBgBtn.addEventListener('click', () => {
             if (bgFileInput) bgFileInput.value = '';
@@ -117,9 +145,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 5. Supabaseから既存デザイン設定の取得
     async function loadCurrentDesign(id) {
+        // DBのカラム：text_color (タイトル用), artist_color (アーティスト・曲名用)
         const { data, error } = await supabaseClient
             .from('streamers')
-            .select('font_family, theme_color, text_color, background_image')
+            .select('font_family, theme_color, text_color, artist_color, background_image')
             .eq('id', id)
             .maybeSingle();
 
@@ -131,7 +160,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (data) {
             if (fontSelect && data.font_family) fontSelect.value = data.font_family;
             if (data.theme_color) syncThemeColor(data.theme_color);
-            if (data.text_color) syncTextColor(data.text_color);
+            if (data.text_color) syncTitleTextColor(data.text_color);
+            if (data.artist_color) syncArtistTextColor(data.artist_color);
             if (bgUrlInput && data.background_image) bgUrlInput.value = data.background_image;
             updatePreview();
         }
@@ -148,7 +178,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         alert('URLに配信者ID (?id=) が指定されていません。');
     }
 
-    // 7. 保存処理（管理キーの送信 ＋ Edge Function呼び出し）
+    // 7. 保存処理（Edge Function呼び出し）
     if (form) {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -174,7 +204,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         design: {
                             font_family: fontSelect ? fontSelect.value : 'sans-serif',
                             theme_color: themeInput ? themeInput.value : '#007bff',
-                            text_color: textInput ? textInput.value : '#333333',
+                            text_color: titleTextInput ? titleTextInput.value : '#333333',
+                            artist_color: artistTextInput ? artistTextInput.value : '#666666',
                             background_image: bgUrlInput ? bgUrlInput.value.trim() : ''
                         }
                     })

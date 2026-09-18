@@ -24,7 +24,7 @@ body {
     /* 背景色（画像が読み込まれるまでのフォールバック） */
     background: #f8f8f8;
     
-    /* 基本の文字色（CSS変数 --text-color で全体を一括管理） */
+    /* 基本の文字色（タイトル等：--text-color） */
     color: var(--text-color, #222222);
 
     /* 基本フォントの指定 */
@@ -144,7 +144,7 @@ main {
     border-radius: 10px;
 
     background: rgba(255, 255, 255, 0.35);
-    color: var(--text-color, #222222); /* 入力文字色も --text-color に統一 */
+    color: var(--text-color, #222222); /* 入力文字色は --text-color */
 
     font-family: inherit;
     font-size: 16px;
@@ -189,11 +189,12 @@ main {
     display: block;
 }
 
-/* 配信者名などのタイトルテキスト */
+/* 配信者名などのタイトルテキスト（--text-color を使用） */
 #streamer-name {
     margin: 0 0 5px;
     font-size: 24px;
     font-weight: 700;
+    color: var(--text-color, #222222);
 }
 
 /* 件数表示 */
@@ -268,7 +269,7 @@ main {
     border-radius: 999px;
 
     background: rgba(255, 255, 255, 0.35);
-    color: var(--text-color, #222222);
+    color: var(--artist-color, var(--text-color, #222222)); /* ボタンテキストもアーテイスト色または標準文字色 */
 
     font-family: inherit;
     font-size: 13px;
@@ -310,7 +311,7 @@ main {
     -webkit-backdrop-filter: blur(8px);
 }
 
-/* アーティスト名の見出し */
+/* 【変更】アーティスト名の見出し（--artist-color を参照） */
 .artist {
     display: flex;
     align-items: center;
@@ -321,8 +322,8 @@ main {
 
     font-size: 18px;
     font-weight: 700;
-    /* 文字色を --text-color に統一 */
-    color: var(--text-color, #222222);
+    /* 文字色を --artist-color（未設定時は --text-color）に指定 */
+    color: var(--artist-color, var(--text-color, #222222));
 
     /* 下線は --theme-color を参照 */
     border-bottom: 2px solid var(--theme-color, #184F88);
@@ -353,12 +354,12 @@ main {
     display: none;
 }
 
-/* 各楽曲1件ごとのスタイル */
+/* 【変更】各楽曲1件ごとのスタイル（--artist-color を参照） */
 .song {
     padding: 9px 5px;
     font-size: 16px;
-    /* 文字色を --text-color に統一 */
-    color: var(--text-color, #222222);
+    /* 文字色を --artist-color（未設定時は --text-color）に指定 */
+    color: var(--artist-color, var(--text-color, #222222));
 }
 
 
@@ -410,7 +411,7 @@ main {
     border-radius: 8px;
 
     background: rgba(255, 255, 255, 0.3);
-    color: var(--text-color, #222222); /* ナビ文字色も --text-color に統一 */
+    color: var(--artist-color, var(--text-color, #222222));
 
     font-family: inherit;
     font-size: 14px;

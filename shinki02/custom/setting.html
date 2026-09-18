@@ -163,10 +163,11 @@
       </div>
 
       <!-- 3. 文字色 (text_color) -->
+      <!-- 1. タイトル文字色 (text_color) -->
       <div class="form-group" style="margin-bottom:20px;">
-        <label style="display:block; font-weight:bold; margin-bottom:8px;">文字色 (text_color)</label>
+        <label style="display:block; font-weight:bold; margin-bottom:8px;">タイトル文字色 (text_color)</label>
 
-        <!-- プリセット（黒・ダークグレー・白・ネイビー等） -->
+        <!-- プリセット -->
         <div class="preset-colors">
           <button type="button" class="color-chip" style="background:#222222;" data-target="text" data-color="#222222"></button>
           <button type="button" class="color-chip" style="background:#444444;" data-target="text" data-color="#444444"></button>
@@ -178,6 +179,25 @@
         <div style="display:flex; align-items:center; gap:10px;">
           <input type="color" id="text-color" value="#222222" style="width:50px; height:44px; border:none; background:none; cursor:pointer;">
           <input type="text" id="text-color-code" value="#222222" placeholder="#222222" maxlength="7" style="width:120px; height:44px; padding:0 10px; border:1px solid #ccc; border-radius:8px; font-size:16px;">
+        </div>
+      </div>
+
+      <!-- 2. アーティスト・曲名文字色 (artist_color) -->
+      <div class="form-group" style="margin-bottom:20px;">
+        <label style="display:block; font-weight:bold; margin-bottom:8px;">アーティスト・曲名文字色 (artist_color)</label>
+
+        <!-- プリセット -->
+        <div class="preset-colors">
+          <button type="button" class="color-chip" style="background:#222222;" data-target="artist-text" data-color="#222222"></button>
+          <button type="button" class="color-chip" style="background:#444444;" data-target="artist-text" data-color="#444444"></button>
+          <button type="button" class="color-chip" style="background:#184f88;" data-target="artist-text" data-color="#184f88"></button>
+          <button type="button" class="color-chip" style="background:#ffffff; border:1px solid #ccc;" data-target="artist-text" data-color="#ffffff"></button>
+        </div>
+
+        <!-- ピッカー ＋ コード直接入力 -->
+        <div style="display:flex; align-items:center; gap:10px;">
+          <input type="color" id="artist-text-color" value="#444444" style="width:50px; height:44px; border:none; background:none; cursor:pointer;">
+          <input type="text" id="artist-text-color-code" value="#444444" placeholder="#444444" maxlength="7" style="width:120px; height:44px; padding:0 10px; border:1px solid #ccc; border-radius:8px; font-size:16px;">
         </div>
       </div>
 
