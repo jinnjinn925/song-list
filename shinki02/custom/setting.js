@@ -31,19 +31,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     function updatePreview() {
         if (!previewArea) return;
 
+        // 要素を毎回確実に取得
+        const currentTitle = document.getElementById('preview-title');
+        const currentArtist = document.getElementById('preview-artist');
+
         if (fontSelect) previewArea.style.fontFamily = fontSelect.value;
         if (themeInput && previewBtn) previewBtn.style.backgroundColor = themeInput.value;
 
         // タイトル文字色
-        if (titleTextInput && previewTitle) {
-            previewTitle.style.color = titleTextInput.value;
-        } else if (titleTextInput) {
-            previewArea.style.color = titleTextInput.value;
+        if (titleTextInput && currentTitle) {
+            currentTitle.style.color = titleTextInput.value;
         }
 
         // アーティスト・曲名文字色
-        if (artistTextInput && previewArtist) {
-            previewArtist.style.color = artistTextInput.value;
+        if (artistTextInput && currentArtist) {
+            currentArtist.style.color = artistTextInput.value;
         }
 
         // 背景画像
