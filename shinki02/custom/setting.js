@@ -200,9 +200,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        // ★ Edge Function 側で定義されているアクション名に変更してください
-                        // 例: 'update_streamer_design' や 'update_streamer' など
-                        action: 'update_streamer_design', 
+                        action: 'update_design', // ★ ここを 'update_design' に変更
                         streamer_id: streamerId,
                         management_key: managementKey,
                         design: {
