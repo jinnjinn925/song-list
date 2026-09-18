@@ -9,11 +9,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const themeInput = document.getElementById('theme-color');
     const themeCodeInput = document.getElementById('theme-color-code');
     
-    // 【文字色】タイトル用（既存の text_color に対応）
+    // 【文字色】タイトル用（DBの title_color に対応）
     const titleTextInput = document.getElementById('title-text-color') || document.getElementById('text-color');
     const titleTextCodeInput = document.getElementById('title-text-color-code') || document.getElementById('text-color-code');
     
-    // 【文字色】アーティスト・曲名用（新規 artist_color に対応）
+    // 【文字色】アーティスト・曲名用（DBの artist_color に対応）
     const artistTextInput = document.getElementById('artist-text-color');
     const artistTextCodeInput = document.getElementById('artist-text-color-code');
 
@@ -21,8 +21,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const bgUrlInput = document.getElementById('background-url');
     const removeBgBtn = document.getElementById('remove-bg-btn');
     const previewArea = document.getElementById('preview-area');
-    const previewTitle = document.getElementById('preview-title'); 
-    const previewArtist = document.getElementById('preview-artist'); 
     const previewBtn = document.getElementById('preview-btn');
     const form = document.getElementById('custom-form');
     const messageEl = document.getElementById('status-message');
@@ -31,7 +29,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     function updatePreview() {
         if (!previewArea) return;
 
-        // 要素を毎回確実に取得
         const currentTitle = document.getElementById('preview-title');
         const currentArtist = document.getElementById('preview-artist');
 
@@ -147,7 +144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 5. Supabaseから既存デザイン設定の取得
     async function loadCurrentDesign(id) {
-        // DBのカラム：text_color (タイトル用), artist_color (アーティスト・曲名用)
+        // DBのカラム名: title_color を指定
         const { data, error } = await supabaseClient
             .from('streamers')
             .select('font_family, theme_color, title_color, artist_color, background_image')
@@ -200,13 +197,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        action: 'update_design', // ★ ここを 'update_design' に変更
+                        action: 'update_design',
                         streamer_id: streamerId,
                         management_key: managementKey,
                         design: {
                             font_family: fontSelect ? fontSelect.value : 'sans-serif',
                             theme_color: themeInput ? themeInput.value : '#007bff',
-                            text_color: titleTextInput ? titleTextInput.value : '#333333',
+                            title_color: titleTextInput ? titleTextInput.value : '#333333', // ★ここも title_color に統一
                             artist_color: artistTextInput ? artistTextInput.value : '#666666',
                             background_image: bgUrlInput ? bgUrlInput.value.trim() : ''
                         }

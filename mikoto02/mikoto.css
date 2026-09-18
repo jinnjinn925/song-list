@@ -24,7 +24,7 @@ body {
     /* 背景色（画像が読み込まれるまでのフォールバック） */
     background: #f8f8f8;
     
-    /* 基本の文字色（タイトル等：--text-color） */
+    /* 基本の文字色（タイトル・曲名等：--text-color） */
     color: var(--text-color, #222222);
 
     /* 基本フォントの指定 */
@@ -97,7 +97,7 @@ main {
     -webkit-tap-highlight-color: transparent;
 }
 
-/* 検索や設定を格納するパネル（後ろの半透明箱を削除） */
+/* 検索や設定を格納するパネル */
 .menu-panel {
     position: sticky;
     top: 0;
@@ -108,7 +108,6 @@ main {
     margin: 0 auto;
     padding: 8px 16px;
 
-    /* 後ろの半透明背景とすりガラス効果を解除 */
     background: transparent;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
@@ -143,8 +142,8 @@ main {
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 10px;
 
-    background: rgba(255, 255, 255, 0.35);
-    color: var(--text-color, #222222); /* 入力文字色は --text-color */
+    background: rgba(255, 255, 255, 0.45);
+    color: var(--text-color, #222222);
 
     font-family: inherit;
     font-size: 16px;
@@ -162,7 +161,7 @@ main {
 /* 検索入力欄にフォーカスが当たった時のスタイル */
 #song-search:focus {
     border-color: #888;
-    background: rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.6);
 }
 
 /* 検索文字のクリアボタン */
@@ -173,7 +172,7 @@ main {
 
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.45);
     color: var(--text-color, #222222);
 
     font-family: inherit;
@@ -189,7 +188,7 @@ main {
     display: block;
 }
 
-/* 配信者名などのタイトルテキスト（--text-color を使用） */
+/* 配信者名などのタイトルテキスト */
 #streamer-name {
     margin: 0 0 5px;
     font-size: 24px;
@@ -201,7 +200,7 @@ main {
 #song-count {
     margin-bottom: 14px;
     font-size: 14px;
-    color: #666;
+    color: #555;
 }
 
 
@@ -268,8 +267,8 @@ main {
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 999px;
 
-    background: rgba(255, 255, 255, 0.35);
-    color: var(--artist-color, var(--text-color, #222222)); /* ボタンテキストもアーテイスト色または標準文字色 */
+    background: rgba(255, 255, 255, 0.4);
+    color: var(--text-color, #222222);
 
     font-family: inherit;
     font-size: 13px;
@@ -285,9 +284,9 @@ main {
 
 /* フィルターが選択・アクティブな状態 */
 .favorite-button.active {
-    background: var(--theme-color, #222);
-    color: #fff;
-    border-color: var(--theme-color, #222);
+    background: var(--theme-color, #222222);
+    color: #ffffff;
+    border-color: var(--theme-color, #222222);
 }
 
 
@@ -302,16 +301,16 @@ main {
     margin: 0 auto;
     padding: 10px 16px;
 
-    background: rgba(255, 255, 255, 0.25);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 18px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
 
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
 
-/* 【変更】アーティスト名の見出し（--artist-color を参照） */
+/* アーティスト名の見出し（--artist-color を参照） */
 .artist {
     display: flex;
     align-items: center;
@@ -322,7 +321,6 @@ main {
 
     font-size: 18px;
     font-weight: 700;
-    /* 文字色を --artist-color（未設定時は --text-color）に指定 */
     color: var(--artist-color, var(--text-color, #222222));
 
     /* 下線は --theme-color を参照 */
@@ -354,32 +352,16 @@ main {
     display: none;
 }
 
-/* 【変更】各楽曲1件ごとのスタイル（--artist-color を参照） */
+/* 各楽曲1件ごとのスタイル（本文の文字色 --text-color に設定） */
 .song {
     padding: 9px 5px;
     font-size: 16px;
-    /* 文字色を --artist-color（未設定時は --text-color）に指定 */
-    color: var(--artist-color, var(--text-color, #222222));
+    color: var(--text-color, #222222);
 }
 
 
 /* =========================================================
-   5. 下部コントロール・ソートエリア
-   ========================================================= */
-
-#bottom-controls,
-#sort-select,
-#sort-button,
-#view-toggle {
-    background: rgba(255, 255, 255, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
-
-
-/* =========================================================
-   6. 50音インデックスナビ（画面下部固定）
+   5. 50音インデックスナビ（画面下部固定）
    ========================================================= */
 
 #artist-nav {
@@ -392,7 +374,7 @@ main {
     width: 100%;
     padding: 8px;
 
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.3);
     border-top: 1px solid rgba(255, 255, 255, 0.5);
     box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.08);
 
@@ -400,6 +382,9 @@ main {
     flex-wrap: wrap;
     justify-content: center;
     gap: 5px;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 #artist-nav button {
@@ -407,25 +392,22 @@ main {
     min-height: 38px;
     padding: 5px 8px;
 
-    border: 1px solid rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: 8px;
 
-    background: rgba(255, 255, 255, 0.3);
-    color: var(--artist-color, var(--text-color, #222222));
+    background: rgba(255, 255, 255, 0.4);
+    color: var(--text-color, #222222);
 
     font-family: inherit;
     font-size: 14px;
     cursor: pointer;
-
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
 
     -webkit-tap-highlight-color: transparent;
 }
 
 #artist-nav button.active {
     background: var(--theme-color, rgba(34, 34, 34, 0.85));
-    color: #fff;
+    color: #ffffff;
     border-color: var(--theme-color, rgba(34, 34, 34, 0.85));
 }
 
@@ -435,7 +417,7 @@ main {
 
 
 /* =========================================================
-   7. レスポンシブ対応：画面幅 400px 以下
+   6. レスポンシブ対応：画面幅 400px 以下
    ========================================================= */
 
 @media (max-width: 400px) {
