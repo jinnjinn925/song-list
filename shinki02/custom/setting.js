@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const themeCodeInput = document.getElementById('theme-color-code');
     const textInput = document.getElementById('text-color');
     const textCodeInput = document.getElementById('text-color-code');
+    const bgFileInput = document.getElementById('bg-file-input');
+    const bgUrlInput = document.getElementById('background-url');
+    const removeBgBtn = document.getElementById('remove-bg-btn');
     const previewArea = document.getElementById('preview-area');
     const previewBtn = document.getElementById('preview-btn');
     const form = document.getElementById('custom-form');
@@ -18,52 +21,105 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 2. プレビューのリアルタイム反映処理
     function updatePreview() {
         if (!previewArea || !previewBtn) return;
+
         if (fontSelect) previewArea.style.fontFamily = fontSelect.value;
         if (textInput) previewArea.style.color = textInput.value;
         if (themeInput) previewBtn.style.backgroundColor = themeInput.value;
+
+        // 背景画像のプレビュー反映
+        if (bgUrlInput && bgUrlInput.value.trim()) {
+            previewArea.style.backgroundImage = `url('${bgUrlInput.value.trim()}')`;
+            previewArea.style.backgroundSize = 'cover';
+            previewArea.style.backgroundPosition = 'center';
+        } else {
+            previewArea.style.backgroundImage = 'none';
+        }
     }
 
-    // ★★★ ここに同期・プリセット用の処理を挿入します ★★★
-
-    // テーマカラー同期
+    // 3. 同期用ヘルパー関数
     function syncThemeColor(color) {
         if (themeInput) themeInput.value = color;
         if (themeCodeInput) themeCodeInput.value = color;
         updatePreview();
     }
-    if (themeInput) themeInput.addEventListener('input', (e) => syncThemeColor(e.target.value));
-    if (themeCodeInput) themeCodeInput.addEventListener('input', (e) => syncThemeColor(e.target.value));
 
-    // 文字色同期
     function syncTextColor(color) {
         if (textInput) textInput.value = color;
         if (textCodeInput) textCodeInput.value = color;
         updatePreview();
     }
+
+    // イベントリスナーのセット（カラー・入力欄）
+    if (themeInput) themeInput.addEventListener('input', (e) => syncThemeColor(e.target.value));
+    if (themeCodeInput) themeCodeInput.addEventListener('input', (e) => syncThemeColor(e.target.value));
     if (textInput) textInput.addEventListener('input', (e) => syncTextColor(e.target.value));
     if (textCodeInput) textCodeInput.addEventListener('input', (e) => syncTextColor(e.target.value));
+    if (fontSelect) fontSelect.addEventListener('change', updatePreview);
 
-    // プリセットチップクリック時の挙動
+    // プリセットチップのクリック処理
     document.querySelectorAll('.color-chip').forEach(chip => {
         chip.addEventListener('click', () => {
             const target = chip.dataset.target;
             const color = chip.dataset.color;
-
-            if (target === 'theme') {
-                syncThemeColor(color);
-            } else if (target === 'text') {
-                syncTextColor(color);
-            }
+            if (target === 'theme') syncThemeColor(color);
+            if (target === 'text') syncTextColor(color);
         });
     });
 
-    if (fontSelect) fontSelect.addEventListener('change', updatePreview);
+    // 4. 背景画像ファイルの Supabase Storage アップロード処理
+    if (bgFileInput) {
+        bgFileInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
 
-    // 3. Supabaseから既存データを読み込む関数
+            const streamerId = streamerIdInput ? streamerIdInput.value : null;
+            if (!streamerId) {
+                alert('配信者IDが読み込まれていません。');
+                return;
+            }
+
+            const fileExt = file.name.split('.').pop();
+            const filePath = `streamer_${streamerId}_${Date.now()}.${fileExt}`;
+
+            try {
+                // background バケットにアップロード
+                const { error: uploadError } = await supabaseClient
+                    .storage
+                    .from('background')
+                    .upload(filePath, file, { cacheControl: '3600', upsert: true });
+
+                if (uploadError) throw uploadError;
+
+                // パブリックURLを取得
+                const { data: publicUrlData } = supabaseClient
+                    .storage
+                    .from('background')
+                    .getPublicUrl(filePath);
+
+                if (bgUrlInput) bgUrlInput.value = publicUrlData.publicUrl;
+                updatePreview();
+
+            } catch (err) {
+                console.error('画像アップロードエラー:', err);
+                alert('画像のアップロードに失敗しました: ' + err.message);
+            }
+        });
+    }
+
+    // 背景画像削除ボタン
+    if (removeBgBtn) {
+        removeBgBtn.addEventListener('click', () => {
+            if (bgFileInput) bgFileInput.value = '';
+            if (bgUrlInput) bgUrlInput.value = '';
+            updatePreview();
+        });
+    }
+
+    // 5. Supabaseから既存デザイン設定の取得
     async function loadCurrentDesign(id) {
         const { data, error } = await supabaseClient
             .from('streamers')
-            .select('font_family, theme_color, text_color')
+            .select('font_family, theme_color, text_color, background_url')
             .eq('id', id)
             .maybeSingle();
 
@@ -76,10 +132,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (fontSelect && data.font_family) fontSelect.value = data.font_family;
             if (data.theme_color) syncThemeColor(data.theme_color);
             if (data.text_color) syncTextColor(data.text_color);
+            if (bgUrlInput && data.background_url) bgUrlInput.value = data.background_url;
+            updatePreview();
         }
     }
 
-    // 4. URLパラメータ取得と初期データロード
+    // 6. URLパラメータ取得 & 初期表示
     const urlParams = new URLSearchParams(window.location.search);
     const streamerId = parseInt(urlParams.get('id'), 10);
 
@@ -90,7 +148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         alert('URLに配信者ID (?id=) が指定されていません。');
     }
 
-    // 5. 保存処理（フォーム送信）
+    // 7. 保存処理（管理キーの送信 ＋ Edge Function呼び出し）
     if (form) {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -116,7 +174,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                         design: {
                             font_family: fontSelect ? fontSelect.value : 'sans-serif',
                             theme_color: themeInput ? themeInput.value : '#007bff',
-                            text_color: textInput ? textInput.value : '#333333'
+                            text_color: textInput ? textInput.value : '#333333',
+                            background_url: bgUrlInput ? bgUrlInput.value.trim() : ''
                         }
                     })
                 });

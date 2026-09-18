@@ -109,20 +109,51 @@
           <option value="cursive">手書き風 (cursive)</option>
         </select>
       </div>
+		
+	
+		<!-- 4. 背景画像 (Storage連携) -->
+	<div class="form-group" style="margin-bottom:20px;">
+	  <label style="display:block; font-weight:bold; margin-bottom:8px;">背景画像</label>
+
+	  <!-- ファイルアップロード -->
+	  <input 
+		type="file" 
+		id="bg-file-input" 
+		accept="image/*"
+		style="width:100%; padding:8px; border:1px solid #ccc; border-radius:8px; background:#fff; font-size:14px;"
+	  >
+
+	  <!-- URL直接保持用（非表示） -->
+	  <input type="hidden" id="background-url">
+
+	  <!-- 削除・クリアボタン -->
+	  <div style="margin-top:8px;">
+		<button type="button" id="remove-bg-btn" style="padding:6px 12px; border:1px solid #dc3545; color:#dc3545; background:#fff; border-radius:6px; font-size:12px; cursor:pointer;">背景画像を削除する</button>
+	  </div>
+	</div>
+		
+		
 
       <!-- 2. テーマカラー (theme_color) -->
       <div class="form-group" style="margin-bottom:20px;">
         <label style="display:block; font-weight:bold; margin-bottom:8px;">テーマカラー (theme_color)</label>
 
         <!-- プリセット（ワンタップ選択） -->
-        <div class="preset-colors">
-          <button type="button" class="color-chip" style="background:#007bff;" data-target="theme" data-color="#007bff"></button>
-          <button type="button" class="color-chip" style="background:#28a745;" data-target="theme" data-color="#28a745"></button>
-          <button type="button" class="color-chip" style="background:#dc3545;" data-target="theme" data-color="#dc3545"></button>
-          <button type="button" class="color-chip" style="background:#ffc107;" data-target="theme" data-color="#ffc107"></button>
-          <button type="button" class="color-chip" style="background:#6f42c1;" data-target="theme" data-color="#6f42c1"></button>
-          <button type="button" class="color-chip" style="background:#222222;" data-target="theme" data-color="#222222"></button>
-        </div>
+        <!-- テーマカラー (theme_color) のプリセットを変更 -->
+		<div class="preset-colors">
+		  <!-- くすみブルー (落ち着いたメイン) -->
+		  <button type="button" class="color-chip" style="background:#4A7C59;" data-target="theme" data-color="#4A7C59"></button>
+		  <!-- スモーキーブルー -->
+		  <button type="button" class="color-chip" style="background:#4A6FA5;" data-target="theme" data-color="#4A6FA5"></button>
+		  <!-- くすみピンク / ローズ -->
+		  <button type="button" class="color-chip" style="background:#B86B77;" data-target="theme" data-color="#B86B77"></button>
+		  <!-- アッシュパープル -->
+		  <button type="button" class="color-chip" style="background:#7B68EE;" data-target="theme" data-color="#7B68EE"></button>
+		  <!-- マスタード / ウォームオークル -->
+		  <button type="button" class="color-chip" style="background:#C68B59;" data-target="theme" data-color="#C68B59"></button>
+		  <!-- チャコールブラック -->
+		  <button type="button" class="color-chip" style="background:#2C3E50;" data-target="theme" data-color="#2C3E50"></button>
+		</div>
 
         <!-- ピッカー ＋ コード直接入力 -->
         <div style="display:flex; align-items:center; gap:10px;">
