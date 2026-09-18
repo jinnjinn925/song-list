@@ -598,22 +598,41 @@ async function loadSongs() {
 
     // デザイン反映
     // デザイン反映
+    // デザイン反映
     if (streamer.font_family) {
-        const fontName = streamer.font_family;
+        const fontName = streamer.font_family.trim();
         
-        // Google Fontsからフォント定義を動的に取得して <style id="dynamic-styles"> に挿入
-        const dynamicStyles = document.getElementById('dynamic-styles');
-        if (dynamicStyles) {
-            const fontUrl = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;700&display=swap`;
-            
-            dynamicStyles.innerHTML += `
-                @import url('${fontUrl}');
-                body {
-                    font-family: '${fontName}', "Noto Sans JP", sans-serif !important;
-                }
-            `;
+        // 1. Google Fonts 用の <link> タグを生成して <head> に追加（@import の構文エラーを防止）
+        // スペースを + に変換して URL エンコード
+        const formattedFontName = fontName.replace(/ /g, '+');
+        const fontUrl = `https://fonts.googleapis.com/css2?family=${formattedFontName}:wght@400;700&display=swap`;
+        
+        const existingLink = document.getElementById('google-font-link');
+        if (existingLink) {
+            existingLink.href = fontUrl;
         } else {
-            document.body.style.fontFamily = `'${fontName}', "Noto Sans JP", sans-serif`;
+            const link = document.createElement('link');
+            link.id = 'google-font-link';
+            link.rel = 'stylesheet';
+            link.href = fontUrl;
+            document.head.appendChild(link);
+        }
+
+        // 2. 全要素にフォントを適用する <style> タグを作成
+        const dynamicStyles = document.getElementById('dynamic-styles');
+        const fontCSS = `
+            body, body * {
+                font-family: '${fontName}', "Noto Sans JP", sans-serif !important;
+            }
+        `;
+
+        if (dynamicStyles) {
+            dynamicStyles.textContent = fontCSS;
+        } else {
+            const style = document.createElement('style');
+            style.id = 'dynamic-styles';
+            style.textContent = fontCSS;
+            document.head.appendChild(style);
         }
     }
 
