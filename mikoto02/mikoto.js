@@ -596,28 +596,38 @@ async function loadSongs() {
         document.body.style.backgroundAttachment = 'fixed';
     }
 
-    // デザイン反映
-    // デザイン反映
-    // デザイン反映
-   // デザイン反映
     // デザイン・フォント反映処理
     if (streamer.font_family) {
-        const fontName = streamer.font_family.trim();
-        
-        // Google Fonts 用の URL 名整形（スペースを '+' に変換）
-        const formattedFontName = fontName.replace(/ /g, '+');
-        const fontImportUrl = `https://fonts.googleapis.com/css2?family=${formattedFontName}:wght@400;700&display=swap`;
-
-        // <style id="dynamic-styles"> 要素を取得
+        const rawFontFamily = streamer.font_family.trim();
         const dynamicStyles = document.getElementById('dynamic-styles');
 
         if (dynamicStyles) {
-            // 先頭に @import を記述し、全要素・ボタン・入力欄へ適用するCSSを設定
-            dynamicStyles.textContent = `
-                @import url('${fontImportUrl}');
+            // カンマで区切られた先頭のフォント名を取得し、シングルクォーテーションを除去
+            const primaryFont = rawFontFamily.split(',')[0].replace(/['"]/g, '').trim();
 
+            // Google Fonts に登録されているフォント群のリスト
+            const googleFonts = [
+                'M PLUS Rounded 1c',
+                'Kiwi Maru',
+                'Dela Gothic One',
+                'Shippori Mincho',
+                'Kaisei Tokumin'
+            ];
+
+            let importCss = '';
+
+            // 選択されたフォントが Google Fonts に含まれている場合のみ @import を作成
+            if (googleFonts.includes(primaryFont)) {
+                const formattedFontName = primaryFont.replace(/ /g, '+');
+                const fontImportUrl = `https://fonts.googleapis.com/css2?family=${formattedFontName}:wght@400;700&display=swap`;
+                importCss = `@import url('${fontImportUrl}');\n`;
+            }
+
+            // CSSの適用（整形した font_family を指定）
+            dynamicStyles.textContent = `
+                ${importCss}
                 body, body *, button, input {
-                    font-family: '${fontName}', "Noto Sans JP", sans-serif !important;
+                    font-family: ${rawFontFamily} !important;
                 }
             `;
         }
