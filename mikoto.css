@@ -353,7 +353,7 @@ main {
 .song {
     padding: 9px 5px;
     font-size: 16px;
-    color: var(--text-color, #222222);
+    color: var(--artist-color, #222222);
 }
 
 
