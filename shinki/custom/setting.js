@@ -97,40 +97,65 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // 4. 背景画像ファイルの Supabase Storage アップロード処理
+    // 4. 背景画像ファイルの Edge Function 経由アップロード処理
     if (bgFileInput) {
         bgFileInput.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
             const streamerId = streamerIdInput ? streamerIdInput.value : null;
+            const managementKey = document.getElementById('management-key').value.trim();
+
             if (!streamerId) {
                 alert('配信者IDが読み込まれていません。');
+                bgFileInput.value = '';
+                return;
+            }
+            if (!managementKey) {
+                alert('画像をアップロードするには、先に「管理キー」を入力してください。');
+                bgFileInput.value = ''; // ファイル選択をリセット
                 return;
             }
 
-            const fileExt = file.name.split('.').pop();
-            const filePath = `streamer_${streamerId}_${Date.now()}.${fileExt}`;
+            // FileReaderでファイルをBase64文字列に変換
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = async () => {
+                const base64Data = reader.result;
 
-            try {
-                const { error: uploadError } = await supabaseClient
-                    .storage
-                    .from('background')
-                    .upload(filePath, file, { cacheControl: '3600', upsert: true });
+                try {
+                    const response = await fetch(`${supabaseUrl}/functions/v1/management`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            action: 'upload_background', // Edge側で判定するアクション
+                            streamer_id: streamerId,
+                            management_key: managementKey,
+                            file_name: file.name,
+                            file_data: base64Data
+                        })
+                    });
 
-                if (uploadError) throw uploadError;
+                    const result = await response.json();
+                    if (!response.ok) throw new Error(result.error || '画像のアップロードに失敗しました。');
 
-                const { data: publicUrlData } = supabaseClient
-                    .storage
-                    .from('background')
-                    .getPublicUrl(filePath);
+                    // アップロード成功したらPublic URLをインプットにセット
+                    if (bgUrlInput) bgUrlInput.value = result.publicUrl;
+                    updatePreview();
+                    
+                    // ※この時点ではまだ「デザイン設定を保存する」ボタンを押していないため、
+                    // プレビュー＆URL保持状態になります（「保存する」を押すとDBに反映されます）
 
-                if (bgUrlInput) bgUrlInput.value = publicUrlData.publicUrl;
-                updatePreview();
-
-            } catch (err) {
-                console.error('画像アップロードエラー:', err);
-                alert('画像のアップロードに失敗しました: ' + err.message);
-            }
+                } catch (err) {
+                    console.error('画像アップロードエラー:', err);
+                    alert('画像のアップロードに失敗しました: ' + err.message);
+                    bgFileInput.value = '';
+                }
+            };
+            reader.onerror = (error) => {
+                console.error('ファイル読み込みエラー:', error);
+                alert('ファイルの読み込みに失敗しました。');
+            };
         });
     }
 
