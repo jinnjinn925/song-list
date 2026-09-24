@@ -568,16 +568,14 @@ function buildNavMenu() {
         sortOrder = 'artist';
         artistSortBtn.classList.add('active');
         titleSortBtn.classList.remove('active');
-        render();
+        render(); // 再描画のみ行い、メニューは閉じない
     });
 
     titleSortBtn.addEventListener('click', () => {
         sortOrder = 'title';
-        artistSortBtn.classList.add('active');
-        titleSortBtn.classList.remove('active');
-        // ナビメニューボタンの選択状態も更新して表示を全開状態にする
-        buildNavMenu();
-        render();
+        titleSortBtn.classList.add('active');
+        artistSortBtn.classList.remove('active');
+        render(); // 再描画のみ行い、メニューは閉じない
     });
 
     sortContainer.appendChild(artistSortBtn);
