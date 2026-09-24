@@ -132,8 +132,8 @@ main {
 #song-search {
     flex: 1;
     min-width: 0;
-    height: 44px;
-    padding: 0 14px;
+    height: 42px;
+    padding: 0 10px;
 
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 10px;
@@ -142,7 +142,7 @@ main {
     color: var(--text-color, #222222);
 
     font-family: inherit;
-    font-size: 16px;
+    font-size: 13px;
     outline: none;
 
     backdrop-filter: blur(8px);
@@ -152,6 +152,7 @@ main {
 /* 検索入力欄のプレースホルダー */
 #song-search::placeholder {
     color: #666;
+	font-size: 13px;
 }
 
 /* 検索入力欄にフォーカスが当たった時のスタイル */
