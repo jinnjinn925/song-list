@@ -36,6 +36,12 @@ const tabComplete = document.getElementById('filter-complete');
 const tabPartial = document.getElementById('filter-partial');
 const tabPractice = document.getElementById('filter-practice');
 
+// 完成度フィルターボタンの取得
+const filterAll = document.getElementById('filter-all');
+const filterComplete = document.getElementById('filter-complete');
+const filterPartial = document.getElementById('filter-partial');
+const filterPractice = document.getElementById('filter-practice');
+
 // クイックフィルター（自信曲・お気に入り）用コンテナ
 const favoriteArtistsContainer = document.getElementById('favorite-artists');
 
@@ -393,6 +399,26 @@ function updateSongCount() {
 // =========================
 // 完成度フィルターイベント
 // =========================
+
+
+// 完成度タブの切り替え処理
+function setStatusFilter(type, activeTab) {
+    statusFilter = type;
+    
+    // すべてのタブから active クラスを外し、押されたタブだけに付与
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    activeTab.classList.add('active');
+    
+    render();
+}
+
+// 各ボタンのクリックイベント
+if (filterAll) filterAll.addEventListener('click', () => setStatusFilter('all', filterAll));
+if (filterComplete) filterComplete.addEventListener('click', () => setStatusFilter('complete', filterComplete));
+if (filterPartial) filterPartial.addEventListener('click', () => setStatusFilter('partial', filterPartial));
+if (filterPractice) filterPractice.addEventListener('click', () => setStatusFilter('practice', filterPractice));
+
+
 
 filterAll.addEventListener('click', () => {
     completeFilter = 'all';
