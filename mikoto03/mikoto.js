@@ -469,8 +469,7 @@ function closeAllMenus() {
     if (artistNav) artistNav.classList.remove('open');
     if (modeMenu) modeMenu.classList.remove('open');
     if (menuButton) {
-        menuButton.classList.remove('open');
-        menuButton.textContent = '☰';
+        menuButton.classList.remove('open'); // ★ textContent の指定を削除
     }
     if (currentMode) currentMode.classList.remove('open');
 }
@@ -484,8 +483,7 @@ if (menuButton) {
 
         if (!isCurrentlyOpen) {
             artistNav.classList.add('open');
-            menuButton.classList.add('open');
-            menuButton.textContent = '✕';
+            menuButton.classList.add('open'); // ★ textContent の指定を削除し、.open クラスの付与のみでアニメーションさせる
         }
     });
 }
