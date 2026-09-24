@@ -701,17 +701,60 @@ async function loadSongs() {
 
 
 // =========================
-// ハンバーガー・メニュー開閉
+// ハンバーガー・メニュー開閉制御（スマート仕様）
 // =========================
 
-menuButton.addEventListener('click', () => {
-    artistNav.classList.toggle('open');
+// すべてのメニューを閉じる共通関数
+function closeAllMenus() {
+    artistNav.classList.remove('open');
     modeMenu.classList.remove('open');
+    menuButton.classList.remove('open');
+    menuButton.textContent = '☰';
+}
+
+// 50音メニュー（ハンバーガーボタン）の開閉
+menuButton.addEventListener('click', (e) => {
+    e.stopPropagation(); // 外側タップ判定への伝播を防ぐ
+    
+    const isOpen = artistNav.classList.contains('open');
+    
+    closeAllMenus();
+
+    if (!isOpen) {
+        artistNav.classList.add('open');
+        menuButton.classList.add('open');
+        menuButton.textContent = '✕';
+    }
 });
 
-currentMode.addEventListener('click', () => {
-    modeMenu.classList.toggle('open');
-    artistNav.classList.remove('open');
+// 表示状態メニュー（すべて ▼）の開閉
+currentMode.addEventListener('click', (e) => {
+    e.stopPropagation(); // 外側タップ判定への伝播を防ぐ
+    
+    const isOpen = modeMenu.classList.contains('open');
+    
+    closeAllMenus();
+
+    if (!isOpen) {
+        modeMenu.classList.add('open');
+    }
+});
+
+// パネル操作中のクリックでメニューが意図せず閉じないように保護
+document.getElementById('menu-panel').addEventListener('click', (e) => {
+    e.stopPropagation();
+});
+
+// メニューの外側（楽曲リストなど）をタップしたら自動で閉じる
+document.addEventListener('click', () => {
+    closeAllMenus();
+});
+
+// ESCキー対応
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeAllMenus();
+    }
 });
 
 
