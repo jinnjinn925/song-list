@@ -26,7 +26,7 @@ const modeMenu = document.getElementById('mode-menu');
 const menuButton = document.getElementById('menu-button');
 const currentMode = document.getElementById('current-mode');
 const artistNav = document.getElementById('artist-nav');
-const nav = document.getElementById('artist-nav'); // ★ nav エラー回避のため追加
+const nav = document.getElementById('artist-nav');
 const songSearch = document.getElementById('song-search');
 const searchClear = document.getElementById('search-clear');
 
@@ -67,11 +67,12 @@ let data = [];
 let currentRow = null;
 let searchQuery = '';
 
-// アプローチ1用の状態変数
+// 状態変数
 let statusFilter = 'all';       // 'all' | 'complete' | 'partial' | 'practice'
 let isConfidentFilter = false;  // true / false
 let isArtistFilter = false;     // true / false
 let favoriteArtistList = [];
+let sortOrder = 'artist';       // 'artist' (アーティスト順) | 'title' (曲名順)
 
 
 // =========================
@@ -122,7 +123,7 @@ function getRow(text) {
         }
     }
 
-    return '';
+    return 'その他';
 }
 
 
@@ -209,7 +210,7 @@ function compareReading(a, b) {
 
 
 // =========================
-// 表示する曲を決定（掛け合わせ検索）
+// 表示する曲を決定（掛け合わせ検索 & ソート）
 // =========================
 
 function getVisibleSongs() {
@@ -236,7 +237,10 @@ function getVisibleSongs() {
 
     // 4. 50音フィルター
     if (currentRow) {
-        songs = songs.filter(song => getRow(song.artist_initial) === currentRow);
+        songs = songs.filter(song => {
+            const targetInitial = sortOrder === 'artist' ? song.artist_initial : song.title_initial;
+            return getRow(targetInitial) === currentRow;
+        });
     }
 
     // 5. 検索キーワード
@@ -257,6 +261,28 @@ function getVisibleSongs() {
         });
     }
 
+    // 6. ソート実行
+    songs.sort((a, b) => {
+        if (sortOrder === 'artist') {
+            const artistResult = compareReading(a.artist_initial, b.artist_initial);
+            if (artistResult !== 0) return artistResult;
+
+            const titleResult = compareReading(a.title_initial, b.title_initial);
+            if (titleResult !== 0) return titleResult;
+
+            return collator.compare(a.title, b.title);
+        } else {
+            // 曲名順
+            const titleResult = compareReading(a.title_initial, b.title_initial);
+            if (titleResult !== 0) return titleResult;
+
+            const artistResult = compareReading(a.artist_initial, b.artist_initial);
+            if (artistResult !== 0) return artistResult;
+
+            return collator.compare(a.artist, b.artist);
+        }
+    });
+
     return songs;
 }
 
@@ -273,56 +299,65 @@ function displaySongs(songs) {
         return;
     }
 
-    let currentArtist = '';
-    let artistSongs = null;
+    let currentGroup = '';
+    let groupSongsContainer = null;
+
+    const shouldOpen = isConfidentFilter || (
+        !searchQuery &&
+        currentRow === null &&
+        !isArtistFilter &&
+        statusFilter === 'all'
+    );
 
     songs.forEach(song => {
-        if (song.artist !== currentArtist) {
-            currentArtist = song.artist;
+        // グループ名の判定（アーティスト順なら「歌手名」、曲名順なら「五十音の行」）
+        const groupKey = sortOrder === 'artist' 
+            ? song.artist 
+            : (getRow(song.title_initial) ? getRow(song.title_initial) + '行' : 'その他');
 
-            const artistDiv = document.createElement('div');
-            artistDiv.textContent = song.artist;
-            artistDiv.className = 'artist';
+        if (groupKey !== currentGroup) {
+            currentGroup = groupKey;
 
-            const newArtistSongs = document.createElement('div');
-            newArtistSongs.className = 'artist-songs';
+            const groupHeaderDiv = document.createElement('div');
+            groupHeaderDiv.textContent = groupKey;
+            groupHeaderDiv.className = 'artist'; // スタイル統一のためクラス名はartistを流用
 
-            // 自信曲ON時、または全体表示時は展開する
-            const shouldOpen = isConfidentFilter || (
-                !searchQuery &&
-                currentRow === null &&
-                !isArtistFilter &&
-                statusFilter === 'all'
-            );
+            const newGroupSongs = document.createElement('div');
+            newGroupSongs.className = 'artist-songs';
 
             if (shouldOpen) {
-                newArtistSongs.classList.remove('collapsed');
-                artistDiv.classList.remove('collapsed');
+                newGroupSongs.classList.remove('collapsed');
+                groupHeaderDiv.classList.remove('collapsed');
             } else {
-                newArtistSongs.classList.add('collapsed');
-                artistDiv.classList.add('collapsed');
+                newGroupSongs.classList.add('collapsed');
+                groupHeaderDiv.classList.add('collapsed');
             }
 
-            artistDiv.addEventListener('click', () => {
-                artistDiv.classList.toggle('collapsed');
-                newArtistSongs.classList.toggle('collapsed');
+            groupHeaderDiv.addEventListener('click', () => {
+                groupHeaderDiv.classList.toggle('collapsed');
+                newGroupSongs.classList.toggle('collapsed');
                 updateSongCount();
             });
 
-            list.appendChild(artistDiv);
-            list.appendChild(newArtistSongs);
+            list.appendChild(groupHeaderDiv);
+            list.appendChild(newGroupSongs);
 
-            artistSongs = newArtistSongs;
+            groupSongsContainer = newGroupSongs;
         }
 
         const songDiv = document.createElement('div');
         songDiv.className = 'song';
 
         const titleDiv = document.createElement('div');
-        titleDiv.textContent = song.title + (song.complete ? ' *' : '');
+        // 曲名順表示の時は「曲名 - アーティスト名」の表示にすると分かりやすい
+        if (sortOrder === 'title') {
+            titleDiv.textContent = `${song.title} (${song.artist})${song.complete ? ' *' : ''}`;
+        } else {
+            titleDiv.textContent = song.title + (song.complete ? ' *' : '');
+        }
 
         songDiv.appendChild(titleDiv);
-        artistSongs.appendChild(songDiv);
+        groupSongsContainer.appendChild(songDiv);
     });
 }
 
@@ -383,7 +418,7 @@ function displayFavoriteArtists(favoriteList) {
     // 好きな歌手ボタン
     if (favoriteArtistList.length > 0) {
         const artistButton = document.createElement('button');
-        artistButton.textContent = '♥ 好きな歌手';
+        artistButton.textContent = '好きな歌手';
         artistButton.className = 'chip-btn';
         artistButton.addEventListener('click', () => {
             isArtistFilter = !isArtistFilter;
@@ -395,7 +430,7 @@ function displayFavoriteArtists(favoriteList) {
 
     // 自信曲ボタン
     const confidentButton = document.createElement('button');
-    confidentButton.textContent = '★ 自信曲';
+    confidentButton.textContent = '自信曲';
     confidentButton.className = 'chip-btn';
     confidentButton.addEventListener('click', () => {
         isConfidentFilter = !isConfidentFilter;
@@ -439,7 +474,6 @@ function updateCurrentMode() {
 // 現在の条件で再表示
 // =========================
 
-
 function render() {
     const visibleSongs = getVisibleSongs();
     displaySongs(visibleSongs);
@@ -449,38 +483,78 @@ function render() {
 
 
 // =========================
-// 50音ボタン生成
+// ナビゲーションメニュー（50音＋ソート切替）生成
 // =========================
 
-initials.forEach(initial => {
-    const button = document.createElement('button');
-    button.textContent = initial;
+function buildNavMenu() {
+    nav.innerHTML = '';
 
-    button.addEventListener('click', () => {
-        if (initial === '一覧') {
-            currentRow = null;
+    // ソート切替ボタンエリア
+    const sortContainer = document.createElement('div');
+    sortContainer.style.cssText = `
+        display: flex;
+        gap: 8px;
+        padding: 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        margin-bottom: 8px;
+    `;
+
+    const artistSortBtn = document.createElement('button');
+    artistSortBtn.textContent = '歌手順';
+    artistSortBtn.className = sortOrder === 'artist' ? 'active' : '';
+    artistSortBtn.style.flex = '1';
+
+    const titleSortBtn = document.createElement('button');
+    titleSortBtn.textContent = '曲名順';
+    titleSortBtn.className = sortOrder === 'title' ? 'active' : '';
+    titleSortBtn.style.flex = '1';
+
+    artistSortBtn.addEventListener('click', () => {
+        sortOrder = 'artist';
+        artistSortBtn.classList.add('active');
+        titleSortBtn.classList.remove('active');
+        render();
+    });
+
+    titleSortBtn.addEventListener('click', () => {
+        sortOrder = 'title';
+        titleSortBtn.classList.add('active');
+        artistSortBtn.classList.remove('active');
+        render();
+    });
+
+    sortContainer.appendChild(artistSortBtn);
+    sortContainer.appendChild(titleSortBtn);
+    nav.appendChild(sortContainer);
+
+    // 50音ボタン
+    initials.forEach(initial => {
+        const button = document.createElement('button');
+        button.textContent = initial;
+        if ((initial === '一覧' && currentRow === null) || initial === currentRow) {
+            button.classList.add('active');
+        }
+
+        button.addEventListener('click', () => {
+            if (initial === '一覧') {
+                currentRow = null;
+            } else {
+                currentRow = initial;
+            }
 
             document.querySelectorAll('#artist-nav button').forEach(navButton => {
-                navButton.classList.remove('active');
+                if (navButton !== artistSortBtn && navButton !== titleSortBtn) {
+                    navButton.classList.remove('active');
+                }
             });
 
             button.classList.add('active');
             render();
-            return;
-        }
-
-        currentRow = initial;
-
-        document.querySelectorAll('#artist-nav button').forEach(navButton => {
-            navButton.classList.remove('active');
         });
 
-        button.classList.add('active');
-        render();
+        nav.appendChild(button);
     });
-
-    nav.appendChild(button);
-});
+}
 
 
 // =========================
@@ -523,7 +597,7 @@ async function loadSongs() {
                 'M PLUS Rounded 1c': 'family=M+PLUS+Rounded+1c:wght@400;700',
                 'Kiwi Maru': 'family=Kiwi+Maru:wght@400;500',
                 'Dela Gothic One': 'family=Dela+Gothic+One',
-                'Shippori Mincho': 'family=Shippori+Mincho:wght@400;700',
+                'Shippori Mincho': 'family=ShipporiMincho:wght@400;700',
                 'Kaisei Tokumin': 'family=Kaisei+Tokumin:wght@400;700'
             };
 
@@ -606,25 +680,9 @@ async function loadSongs() {
             };
         });
 
-    songs.sort((a, b) => {
-        const artistResult = compareReading(a.artist_initial, b.artist_initial);
-        if (artistResult !== 0) return artistResult;
-
-        const titleResult = compareReading(a.title_initial, b.title_initial);
-        if (titleResult !== 0) return titleResult;
-
-        return collator.compare(a.title, b.title);
-    });
-
     data = songs;
 
-    updateSongCount();
-
-    const firstNavButton = document.querySelector('#artist-nav button');
-    if (firstNavButton) {
-        firstNavButton.classList.add('active');
-    }
-
+    buildNavMenu();
     render();
 }
 
