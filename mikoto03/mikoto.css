@@ -165,7 +165,7 @@ main {
 
 
 /* =========================================================
-   シンプル＆モダンなフィルターボタン（フラットデザイン）
+   丸み（ピル型）ベースのシンプル＆統一感のあるデザイン
    ========================================================= */
 
 /* --- 1. 下部フィルター開閉ボタン --- */
@@ -173,31 +173,31 @@ main {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 8px 16px;
+    gap: 6px;
+    padding: 8px 18px;
     font-size: 13px;
     font-weight: 600;
-    color: var(--text-color, #1a1a1a);
+    color: var(--text-color, #333333);
     background-color: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 6px; /* 丸みを抑えてソリッドに */
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+    border-radius: 9999px; /* 完全なピル型（カプセル形状） */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
     cursor: pointer;
-    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    transition: all 0.2s ease;
     user-select: none;
 }
 
 #current-mode:hover {
-    background-color: #f8f9fa;
-    border-color: #cccccc;
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
 }
 
-/* フィルター適用中・ONの状態 */
+/* フィルター適用中・メニュー展開時 */
 #current-mode.filtering,
 #current-mode.open {
     color: #ffffff;
-    background-color: var(--theme-color, #1a1a1a);
-    border-color: var(--theme-color, #1a1a1a);
+    background-color: var(--theme-color, #333333);
+    border-color: var(--theme-color, #333333);
 }
 
 
@@ -205,49 +205,50 @@ main {
 .chip-btn {
     display: inline-flex;
     align-items: center;
-    padding: 5px 12px;
+    padding: 6px 14px;
     font-size: 12px;
     font-weight: 500;
-    color: #4a4a4a;
-    background-color: #f0f0f0;
+    color: #475569;
+    background-color: #f1f5f9;
     border: 1px solid transparent;
-    border-radius: 4px;
+    border-radius: 9999px; /* 丸みを統一 */
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all 0.2s ease;
 }
 
 .chip-btn:hover {
-    background-color: #e4e4e4;
-    color: #1a1a1a;
+    background-color: #e2e8f0;
+    color: #0f172a;
 }
 
 .chip-btn.active {
     color: #ffffff;
-    background-color: var(--theme-color, #1a1a1a);
+    background-color: var(--theme-color, #333333);
 }
 
 
 /* --- 3. 完成度タブボタン（「フル」「途中まで」など） --- */
 .tab-btn {
-    padding: 8px 14px;
-    font-size: 13px;
+    padding: 6px 14px;
+    font-size: 12px;
     font-weight: 500;
-    color: #707070;
+    color: #64748b;
     background: transparent;
-    border: none;
-    border-bottom: 2px solid transparent;
+    border: 1px solid transparent;
+    border-radius: 9999px; /* 下線形式ではなく丸型カプセルで統一 */
     cursor: pointer;
-    transition: color 0.15s ease, border-color 0.15s ease;
+    transition: all 0.2s ease;
 }
 
 .tab-btn:hover {
-    color: #1a1a1a;
+    color: #0f172a;
+    background-color: #f8fafc;
 }
 
 .tab-btn.active {
-    color: var(--theme-color, #1a1a1a);
+    color: var(--theme-color, #333333);
+    background-color: rgba(0, 0, 0, 0.05);
     font-weight: 600;
-    border-bottom-color: var(--theme-color, #1a1a1a);
 }
 
 
