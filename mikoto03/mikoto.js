@@ -297,7 +297,8 @@ function displaySongs(songs) {
     let currentGroup = '';
     let groupSongsContainer = null;
 
-    const shouldOpen = isConfidentFilter || (
+    // 曲名順（sortOrder === 'title'）の場合もアコーディオンを全開にする判定を追加
+    const shouldOpen = sortOrder === 'title' || isConfidentFilter || (
         !searchQuery &&
         currentRow === null &&
         !isArtistFilter &&
@@ -572,8 +573,10 @@ function buildNavMenu() {
 
     titleSortBtn.addEventListener('click', () => {
         sortOrder = 'title';
-        titleSortBtn.classList.add('active');
-        artistSortBtn.classList.remove('active');
+        artistSortBtn.classList.add('active');
+        titleSortBtn.classList.remove('active');
+        // ナビメニューボタンの選択状態も更新して表示を全開状態にする
+        buildNavMenu();
         render();
     });
 
@@ -695,6 +698,7 @@ async function loadSongs() {
             streamer.artist_color
         );
     }
+
 
     if (streamer.theme_color) {
         document.documentElement.style.setProperty(
