@@ -269,23 +269,31 @@ main {
    4. ポップアップメニュー（フィルター & 50音）
    ========================================================= */
 
-/* --- A. フィルターメニュー（透明感を高めたトーン） --- */
+/* --- A. フィルターメニュー（透明感のあるガラス質感＋元通りのボタンデザイン） --- */
 #mode-menu {
     position: absolute;
     bottom: calc(100% + 8px);
     left: 0;
 
-    /* ボタン全体の大きさ・形は変更せず、背景の透明感とぼかしを強化 */
-    background: rgba(255, 255, 255, 0.45); /* 白の透明度を上げて軽やかに */
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    width: 100%;
+    max-height: 50vh;
+    overflow-y: auto;
+
+    padding: 14px;
+    border-radius: 20px;
+    
+    /* 背景を白すぎず黒すぎない透明なすりガラスに変更 */
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-
-    border-radius: 16px;
-    padding: 8px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 
-    /* アニメーション（左下起点の展開） */
+    /* アニメーション（左下起点） */
     transform-origin: bottom left;
     opacity: 0;
     visibility: hidden;
@@ -305,32 +313,7 @@ main {
     transform: scale(1) translateY(0);
 }
 
-/* メニュー内アイテムのテキスト・見た目（元の明るいデザインに合わせる） */
-#mode-menu .mode-option,
-#mode-menu button,
-#mode-menu a {
-    color: var(--text-color, #222222); /* 文字色は元通りのダークカラー */
-    background: transparent;
-    border-radius: 10px;
-    padding: 8px 12px;
-    transition: background 0.15s ease, color 0.15s ease;
-}
-
-/* ホバー時 */
-#mode-menu .mode-option:hover,
-#mode-menu button:hover,
-#mode-menu a:hover {
-    background: rgba(255, 255, 255, 0.5);
-}
-
-/* 選択中（アクティブ）項目 */
-#mode-menu .mode-option.active,
-#mode-menu button.active {
-    background: rgba(255, 255, 255, 0.75);
-    font-weight: 600;
-}
-
-/* フィルター内パーツ */
+/* --- 元のフィルター内パーツ（形状・サイズ完全復元） --- */
 .filter-section {
     display: flex;
     flex-direction: column;
@@ -348,13 +331,13 @@ main {
 /* タブ背景（すべて・フル・途中まで・練習中） */
 .filter-tabs {
     display: flex;
-    background: rgba(0, 0, 0, 0.05);
-    border-radius: 9999px; /* カプセル型に修正 */
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 9999px;
     padding: 3px;
     gap: 3px;
 }
 
-/* タブボタン自体（丸みに変更） */
+/* タブボタン */
 .tab-btn {
     flex: 1;
     border: none;
@@ -363,7 +346,7 @@ main {
     font-size: 12px;
     font-weight: 600;
     color: var(--text-color, #222222);
-    border-radius: 9999px; /* 中のボタンも完全な丸みに修正 */
+    border-radius: 9999px;
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: center;
@@ -389,7 +372,7 @@ main {
     padding: 6px 14px;
     font-size: 12px;
     font-weight: 600;
-    border-radius: 9999px; /* 丸みに統一 */
+    border-radius: 9999px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
