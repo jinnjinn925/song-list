@@ -43,14 +43,20 @@ const filterPartial =
 const filterPractice =
     document.getElementById('filter-practice');
 
-const favoriteSection =
-    document.getElementById('favorite-section');
-
 const favoriteArtists =
     document.getElementById('favorite-artists');
 
-const menuPanel =
-    document.getElementById('menu-panel');
+const modeMenu =
+    document.getElementById('mode-menu');
+
+const menuButton =
+    document.getElementById('menu-button');
+
+const currentMode =
+    document.getElementById('current-mode');
+
+const artistNav =
+    document.getElementById('artist-nav');
 
 const songSearch =
     document.getElementById('song-search');
@@ -431,21 +437,31 @@ function updateSongCount() {
 filterAll.addEventListener('click', () => {
     completeFilter = 'all';
     render();
+	
+	modeMenu.classList.remove('open');
 });
 
 filterComplete.addEventListener('click', () => {
     completeFilter = 'complete';
     render();
+	
+	modeMenu.classList.remove('open');
 });
 
 filterPartial.addEventListener('click', () => {
     completeFilter = 'partial';
     render();
+	
+	
+	modeMenu.classList.remove('open');
 });
 
 filterPractice.addEventListener('click', () => {
     completeFilter = 'practice';
     render();
+	
+	
+	modeMenu.classList.remove('open');
 });
 
 
@@ -780,7 +796,19 @@ async function loadSongs() {
 // =========================
 
 menuButton.addEventListener('click', () => {
-    menuPanel.classList.toggle('open');
+    artistNav.classList.toggle('open');
+
+    // 状態メニューが開いていたら閉じる
+    modeMenu.classList.remove('open');
+});
+
+
+
+currentMode.addEventListener('click', () => {
+    modeMenu.classList.toggle('open');
+
+    // 50音メニューが開いていたら閉じる
+    artistNav.classList.remove('open');
 });
 
 

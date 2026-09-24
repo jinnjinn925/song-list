@@ -438,51 +438,34 @@ main {
 
 
 /* =========================================================
-   下部操作バー
+   操作エリア
    ========================================================= */
 
-#menu-panel {
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    z-index: 1000;
-
-    width: 100%;
-    padding: 8px;
-
-    background: rgba(255, 255, 255, 0.3);
-    border-top: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.08);
-
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-}
-
-/* 下部の通常状態 */
-#bottom-controls {
+#control-area {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 8px;
 
     width: 100%;
     max-width: 600px;
-    margin: 0 auto;
+
+    margin: 8px auto 0;
+    padding: 0 16px;
 }
 
-/* 現在のモード */
+
+/* 現在の表示状態 */
 #current-mode {
     flex-shrink: 0;
 
-    height: 44px;
+    height: 42px;
     padding: 0 12px;
 
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 10px;
 
-    background: rgba(255, 255, 255, 0.4);
-    color: var(--text-color, #222222);
+    background: rgba(255, 255, 255, 0.45);
+    color: var(--text-color, #222);
 
     font-family: inherit;
     font-size: 13px;
@@ -494,28 +477,32 @@ main {
     -webkit-backdrop-filter: blur(8px);
 }
 
-/* 検索欄 */
-#bottom-controls .search-box {
+
+/* 検索 */
+#control-area .search-box {
     flex: 1;
     min-width: 0;
+
+    display: flex;
 }
 
-#bottom-controls #song-search {
+#control-area #song-search {
     width: 100%;
 }
+
 
 /* ハンバーガー */
 #menu-button {
     flex-shrink: 0;
 
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
 
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 10px;
 
-    background: rgba(255, 255, 255, 0.4);
-    color: var(--text-color, #222222);
+    background: rgba(255, 255, 255, 0.45);
+    color: var(--text-color, #222);
 
     font-family: inherit;
     font-size: 22px;
@@ -528,15 +515,43 @@ main {
     -webkit-tap-highlight-color: transparent;
 }
 
-/* 50音メニュー */
+
+/* =========================================================
+   表示状態メニュー
+   ========================================================= */
+
+#mode-menu {
+    display: none;
+
+    width: 100%;
+    max-width: 600px;
+
+    margin: 8px auto 0;
+    padding: 8px 16px;
+
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+
+/* 表示状態メニューを開いた状態 */
+#mode-menu.open {
+    display: flex;
+}
+
+
+/* =========================================================
+   50音メニュー
+   ========================================================= */
+
 #artist-nav {
     display: none;
 
     width: 100%;
     max-width: 600px;
-    margin: 8px auto 0;
 
-    padding: 8px;
+    margin: 8px auto 0;
+    padding: 8px 16px;
 
     gap: 5px;
     flex-wrap: wrap;
@@ -547,32 +562,28 @@ main {
     background: rgba(255, 255, 255, 0.35);
 }
 
-/* メニューを開いた状態 */
-#menu-panel.open #artist-nav {
+
+/* ハンバーガーを押したとき */
+#artist-nav.open {
     display: flex;
 }
 
+
+/* 50音ボタン */
 #artist-nav button {
     min-width: 38px;
     min-height: 38px;
-    padding: 5px 8px;
 
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    padding: 4px 8px;
+
+    border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 8px;
 
-    background: rgba(255, 255, 255, 0.4);
-    color: var(--text-color, #222222);
+    background: rgba(255, 255, 255, 0.5);
+    color: var(--text-color, #222);
 
     font-family: inherit;
-    font-size: 14px;
+    font-size: 13px;
 
     cursor: pointer;
-
-    -webkit-tap-highlight-color: transparent;
-}
-
-#artist-nav button.active {
-    background: var(--theme-color, rgba(34, 34, 34, 0.85));
-    color: #ffffff;
-    border-color: var(--theme-color, rgba(34, 34, 34, 0.85));
 }
