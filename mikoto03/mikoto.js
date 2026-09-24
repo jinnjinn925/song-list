@@ -489,14 +489,16 @@ function render() {
 function buildNavMenu() {
     nav.innerHTML = '';
 
-    // ソート切替ボタンエリア
+    // 1. ソート切替ボタンエリア
     const sortContainer = document.createElement('div');
+    sortContainer.className = 'sort-container';
     sortContainer.style.cssText = `
         display: flex;
         gap: 8px;
-        padding: 8px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 4px;
         margin-bottom: 8px;
+        width: 100%;
+        box-sizing: border-box;
     `;
 
     const artistSortBtn = document.createElement('button');
@@ -527,7 +529,18 @@ function buildNavMenu() {
     sortContainer.appendChild(titleSortBtn);
     nav.appendChild(sortContainer);
 
-    // 50音ボタン
+    // 2. 50音ボタンエリア（専用のコンテナを作成）
+    const initialsContainer = document.createElement('div');
+    initialsContainer.className = 'initials-container';
+    initialsContainer.style.cssText = `
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        justify-content: center;
+        width: 100%;
+    `;
+
+    // 50音ボタンの生成
     initials.forEach(initial => {
         const button = document.createElement('button');
         button.textContent = initial;
@@ -542,18 +555,18 @@ function buildNavMenu() {
                 currentRow = initial;
             }
 
-            document.querySelectorAll('#artist-nav button').forEach(navButton => {
-                if (navButton !== artistSortBtn && navButton !== titleSortBtn) {
-                    navButton.classList.remove('active');
-                }
+            document.querySelectorAll('.initials-container button').forEach(navButton => {
+                navButton.classList.remove('active');
             });
 
             button.classList.add('active');
             render();
         });
 
-        nav.appendChild(button);
+        initialsContainer.appendChild(button);
     });
+
+    nav.appendChild(initialsContainer);
 }
 
 
