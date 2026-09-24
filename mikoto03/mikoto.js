@@ -1,18 +1,14 @@
-// JavaScript Do // Supabaseへの接続
-const supabaseUrl = 'https://dgssybbbgnnygmccjltn.supabase.co';
-
-const supabaseKey =
-    'sb_publishable_JNz1mi6gysaFjOa0A4I5ow_iDe3PQbd';
-
 // =========================
 // Supabaseへの接続
 // =========================
 
-const supabaseClient =
-    window.supabase.createClient(
-        supabaseUrl,
-        supabaseKey
-    );
+const supabaseUrl = 'https://dgssybbbgnnygmccjltn.supabase.co';
+const supabaseKey = 'sb_publishable_JNz1mi6gysaFjOa0A4I5ow_iDe3PQbd';
+
+const supabaseClient = window.supabase.createClient(
+    supabaseUrl,
+    supabaseKey
+);
 
 
 // =========================
@@ -131,11 +127,10 @@ function getRow(text) {
 // 日本語の並び順
 // =========================
 
-const collator =
-    new Intl.Collator('ja', {
-        sensitivity: 'base',
-        numeric: false
-    });
+const collator = new Intl.Collator('ja', {
+    sensitivity: 'base',
+    numeric: false
+});
 
 
 // =========================
@@ -310,7 +305,6 @@ function displaySongs(songs) {
     );
 
     songs.forEach(song => {
-        // グループ名の判定（アーティスト順なら「歌手名」、曲名順なら「五十音の行」）
         const groupKey = sortOrder === 'artist' 
             ? song.artist 
             : (getRow(song.title_initial) ? getRow(song.title_initial) + '行' : 'その他');
@@ -320,7 +314,7 @@ function displaySongs(songs) {
 
             const groupHeaderDiv = document.createElement('div');
             groupHeaderDiv.textContent = groupKey;
-            groupHeaderDiv.className = 'artist'; // スタイル統一のためクラス名はartistを流用
+            groupHeaderDiv.className = 'artist';
 
             const newGroupSongs = document.createElement('div');
             newGroupSongs.className = 'artist-songs';
@@ -349,7 +343,6 @@ function displaySongs(songs) {
         songDiv.className = 'song';
 
         const titleDiv = document.createElement('div');
-        // 曲名順表示の時は「曲名 - アーティスト名」の表示にすると分かりやすい
         if (sortOrder === 'title') {
             titleDiv.textContent = `${song.title} (${song.artist})${song.complete ? ' *' : ''}`;
         } else {
@@ -468,10 +461,9 @@ function updateCurrentMode() {
 
 
 // =========================
-// メニュー開閉制御（修正版）
+// メニュー開閉制御（修正一本化版）
 // =========================
 
-// すべてのメニューを閉じる共通関数
 function closeAllMenus() {
     if (artistNav) artistNav.classList.remove('open');
     if (modeMenu) modeMenu.classList.remove('open');
@@ -482,16 +474,13 @@ function closeAllMenus() {
     if (currentMode) currentMode.classList.remove('open');
 }
 
-// 50音メニュー（ハンバーガーボタン）
+// 50音メニューボタン
 if (menuButton) {
     menuButton.addEventListener('click', (e) => {
-        e.stopPropagation(); // documentへのイベント伝播をストップ
-        
+        e.stopPropagation();
         const isCurrentlyOpen = artistNav.classList.contains('open');
-        
         closeAllMenus();
 
-        // 開いていなかった場合のみ開く
         if (!isCurrentlyOpen) {
             artistNav.classList.add('open');
             menuButton.classList.add('open');
@@ -500,16 +489,13 @@ if (menuButton) {
     });
 }
 
-// フィルターメニュー（フィルターボタン）
+// フィルターメニューボタン
 if (currentMode) {
     currentMode.addEventListener('click', (e) => {
-        e.stopPropagation(); // documentへのイベント伝播をストップ
-        
+        e.stopPropagation();
         const isCurrentlyOpen = modeMenu.classList.contains('open');
-        
         closeAllMenus();
 
-        // 開いていなかった場合のみ開く
         if (!isCurrentlyOpen) {
             modeMenu.classList.add('open');
             currentMode.classList.add('open');
@@ -517,17 +503,15 @@ if (currentMode) {
     });
 }
 
-// パネル内部をクリックした時にメニューが閉じないように保護
-const menuPanel = document.getElementById('menu-panel');
-if (menuPanel) {
-    menuPanel.addEventListener('click', (e) => {
-        e.stopPropagation();
-    });
-}
+// メニュー枠外（背景等）をクリックした時のみメニューを閉じる
+document.addEventListener('click', (e) => {
+    const isClickInsideMenu = e.target.closest('#mode-menu') || 
+                              e.target.closest('#artist-nav') || 
+                              e.target.closest('#control-area');
 
-// メニュー以外の画面外をタップした時に自動で閉じる
-document.addEventListener('click', () => {
-    closeAllMenus();
+    if (!isClickInsideMenu) {
+        closeAllMenus();
+    }
 });
 
 // ESCキー対応
@@ -597,7 +581,7 @@ function buildNavMenu() {
     sortContainer.appendChild(titleSortBtn);
     nav.appendChild(sortContainer);
 
-    // 2. 50音ボタンエリア（専用のコンテナを作成）
+    // 2. 50音ボタンエリア
     const initialsContainer = document.createElement('div');
     initialsContainer.className = 'initials-container';
     initialsContainer.style.cssText = `
@@ -608,7 +592,6 @@ function buildNavMenu() {
         width: 100%;
     `;
 
-    // 50音ボタンの生成
     initials.forEach(initial => {
         const button = document.createElement('button');
         button.textContent = initial;
@@ -766,64 +749,6 @@ async function loadSongs() {
     buildNavMenu();
     render();
 }
-
-
-// =========================
-// ハンバーガー・メニュー開閉制御（スマート仕様）
-// =========================
-
-// すべてのメニューを閉じる共通関数
-function closeAllMenus() {
-    artistNav.classList.remove('open');
-    modeMenu.classList.remove('open');
-    menuButton.classList.remove('open');
-    menuButton.textContent = '☰';
-}
-
-// 50音メニュー（ハンバーガーボタン）の開閉
-menuButton.addEventListener('click', (e) => {
-    e.stopPropagation(); // 外側タップ判定への伝播を防ぐ
-    
-    const isOpen = artistNav.classList.contains('open');
-    
-    closeAllMenus();
-
-    if (!isOpen) {
-        artistNav.classList.add('open');
-        menuButton.classList.add('open');
-        menuButton.textContent = '✕';
-    }
-});
-
-// 表示状態メニュー（すべて ▼）の開閉
-currentMode.addEventListener('click', (e) => {
-    e.stopPropagation(); // 外側タップ判定への伝播を防ぐ
-    
-    const isOpen = modeMenu.classList.contains('open');
-    
-    closeAllMenus();
-
-    if (!isOpen) {
-        modeMenu.classList.add('open');
-    }
-});
-
-// パネル操作中のクリックでメニューが意図せず閉じないように保護
-document.getElementById('menu-panel').addEventListener('click', (e) => {
-    e.stopPropagation();
-});
-
-// メニューの外側（楽曲リストなど）をタップしたら自動で閉じる
-document.addEventListener('click', () => {
-    closeAllMenus();
-});
-
-// ESCキー対応
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-        closeAllMenus();
-    }
-});
 
 
 // =========================
