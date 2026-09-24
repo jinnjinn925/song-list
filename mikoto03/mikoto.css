@@ -163,65 +163,107 @@ main {
 
 
 /* =========================================================
-   4. ボタンデザイン（フィルター ▼ / ☰）
+   フィルターボタン & メニューデザインの刷新
    ========================================================= */
 
-#current-mode,
-#menu-button {
-    height: 40px;
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.55);
-    color: var(--text-color, #222);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-    transition: all 0.2s ease;
-    -webkit-tap-highlight-color: transparent;
-}
-
+/* --- 1. 下部フィルター開閉ボタン --- */
 #current-mode {
-    flex-shrink: 0;
-    padding: 0 12px;
-    white-space: nowrap;
-}
-
-#menu-button {
-    position: static;
-    flex-shrink: 0;
-    width: 40px;
-    font-size: 18px;
-    line-height: 1;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-}
-
-#current-mode.open,
-#menu-button.open {
-    background: var(--theme-color, #222222);
-    color: #ffffff;
-    border-color: var(--theme-color, #222222);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-#menu-button.open {
-    transform: rotate(90deg);
-}
-
-#current-mode.filtering:not(.open) {
+    gap: 6px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--text-color, #333333);
     background: rgba(255, 255, 255, 0.85);
-    border-color: var(--theme-color, #222222);
-    box-shadow: 0 0 0 1.5px var(--theme-color, #222222);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 9999px; /* 丸みを持たせたピル型 */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    user-select: none;
 }
 
-#current-mode:active,
-#menu-button:active {
-    transform: scale(0.96);
+/* ホバー・アクティブ時 */
+#current-mode:hover {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+#current-mode:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* フィルター適用中・メニュー展開中の強調ハイライト */
+#current-mode.filtering,
+#current-mode.open {
+    color: #ffffff;
+    background: var(--theme-color, #3b82f6);
+    border-color: transparent;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+#current-mode.filtering:hover,
+#current-mode.open:hover {
+    filter: brightness(1.08);
+}
+
+
+/* --- 2. クイックフィルターボタン（「自信曲」「好きな歌手」など） --- */
+.chip-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #555555;
+    background-color: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.chip-btn:hover {
+    background-color: #e5e7eb;
+    color: #111111;
+}
+
+/* 選択された（ON状態の）ボタン */
+.chip-btn.active {
+    color: #ffffff;
+    background-color: var(--theme-color, #3b82f6);
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+
+/* --- 3. 完成度タブボタン（「フル」「途中まで」など） --- */
+.tab-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b7280;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    color: #111827;
+}
+
+.tab-btn.active {
+    color: var(--theme-color, #3b82f6);
+    border-bottom-color: var(--theme-color, #3b82f6);
 }
 
 
