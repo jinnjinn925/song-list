@@ -384,11 +384,11 @@ main {
 }
 
 
-/* --- B. 50音メニュー（下の隙間を詰めて綺麗に接続） --- */
+
+/* --- B. 50音メニュー（ぐにゅっと浮き出るバウンドアニメーション） --- */
 #artist-nav {
     position: absolute;
-    /* 下パネルとの隙間を 12px から 6px に縮小 */
-    bottom: calc(100% + 6px); 
+    bottom: calc(100% + 6px);
     right: 0;
 
     display: flex;
@@ -403,22 +403,27 @@ main {
 
     padding: 14px 10px;
     border-radius: 20px;
-    
-    /* フィルターメニューと揃えた透明感のあるガラス調 */
+
     background: rgba(255, 255, 255, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 
-    /* スライドイン表示アニメーション */
+    /* 伸び縮みの起点（右下のハンバーガーボタンの位置） */
+    transform-origin: bottom right;
+
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: translateY(12px); /* 16px から 12px に調整して動きを締める */
-    transition: opacity 0.2s ease,
-                transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                visibility 0.25s;
+
+    /* 初期状態：ボタンの中に小さく潰れて収まっている状態 */
+    transform: scale(0.2, 0.4) translateY(20px);
+
+    /* イージングで強い反動（ゴムのような弾力）をつける */
+    transition: opacity 0.15s ease,
+                transform 0.4s cubic-bezier(0.34, 1.8, 0.64, 1),
+                visibility 0.4s;
 
     z-index: 1002;
 }
@@ -427,7 +432,9 @@ main {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    transform: translateY(0);
+
+    /* 展開時：100%の大きさに戻る（途中過程で一度100%を超えてグニャッと広がってから戻る） */
+    transform: scale(1, 1) translateY(0);
 }
 
 /* 50音ボタン（丸型カプセルに修正） */
