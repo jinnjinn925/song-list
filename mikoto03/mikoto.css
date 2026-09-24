@@ -5,38 +5,24 @@
    1. 全体設定・ルート変数
    ========================================================= */
 
-/* ボックスモデルの共通化 */
 * {
     box-sizing: border-box;
 }
 
-/* ルートのフォントサイズ定義 */
 html {
     font-size: 16px;
 }
 
-/* ページ全体の基本スタイル */
-/* ページ全体の基本スタイル */
 body {
     margin: 0;
-    /* 下部に固定ナビ（50音ナビ等）が被らないよう余白を確保 */
     padding: 0 0 140px 0;
-
-    /* 背景色（画像が読み込まれるまでのフォールバック） */
     background: #f8f8f8;
-    
-    /* 基本の文字色（タイトル・曲名等：--text-color） */
     color: var(--text-color, #222222);
-
-    /* ★ 修正：JavaScriptから指定される動的フォント変数を受け取れるように変更 */
     font-family: var(--dynamic-font, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif);
-
-    /* 行間を広げて読みやすく */
     line-height: 1.6;
     position: relative;
 }
 
-/* 疑似要素を使った画面固定背景 */
 body::before {
     content: "";
     position: fixed;
@@ -44,17 +30,13 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-
-    /* 背景画像の設定 */
     background-image: var(--background-image, none);
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-
     z-index: -1;
 }
 
-/* メインコンテンツエリア：背景画像の上に透ける白レイヤー */
 main {
     background: transparent;
 }
@@ -64,7 +46,6 @@ main {
    2. ヘッダーエリア
    ========================================================= */
 
-/* ページ上部のヘッダー外枠 */
 #page-header {
     position: relative;
     width: 100%;
@@ -73,43 +54,38 @@ main {
     padding: 20px 16px 10px;
 }
 
-/* メニュー開閉ボタン（右上アイコン） */
-#menu-button {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-
-    width: 44px;
-    height: 44px;
-
-    border: none;
-    border-radius: 10px;
-    background: transparent;
-    color: #f8f8f8;
-
-    font-size: 26px;
-    cursor: pointer;
-    z-index: 1001;
-
-    -webkit-tap-highlight-color: transparent;
+#streamer-name {
+    margin: 0 0 5px;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-color, #222222);
 }
 
-/* 下部固定操作パネル */
+#song-count {
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: #555;
+}
+
+
+/* =========================================================
+   3. 下部固定操作パネル & 検索ボックス
+   ========================================================= */
+
 .menu-panel {
     position: fixed;
     bottom: 0;
     left: 50%;
-    transform: translateX(-50%); /* 画面中央に配置 */
+    transform: translateX(-50%);
     z-index: 1000;
 
     width: 100%;
     max-width: 600px;
-    padding: 8px 16px 16px; /* iPhoneの下部バー対策で下余白を広めに確保 */
+    padding: 8px 16px 16px;
 
-    /* すりガラス風の背景グラデーション（背景画像になじませる） */
     background: rgba(255, 255, 255, 0.75);
     border-top: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 18px 18px 0 0; /* 上側の角を丸く */
+    border-radius: 18px 18px 0 0;
 
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -117,26 +93,22 @@ main {
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
 }
 
-/* メニューオープン時の表示切り替え用クラス */
-.menu-panel.open {
-    display: block;
+#control-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0;
 }
 
-/* パネル内の見出しラベル */
-.menu-panel label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
-    font-weight: 700;
-}
-
-/* 検索窓とクリアボタンを横並びにするコンテナ */
 .search-box {
     display: flex;
     gap: 8px;
+    flex: 1;
 }
 
-/* 楽曲検索入力テキストボックス */
 #song-search {
     flex: 1;
     min-width: 0;
@@ -157,22 +129,19 @@ main {
     -webkit-backdrop-filter: blur(8px);
 }
 
-/* 検索入力欄のプレースホルダー */
 #song-search::placeholder {
     color: #666;
-	font-size: 13px;
+    font-size: 13px;
 }
 
-/* 検索入力欄にフォーカスが当たった時のスタイル */
 #song-search:focus {
     border-color: #888;
     background: rgba(255, 255, 255, 0.6);
 }
 
-/* 検索文字のクリアボタン */
 #search-clear {
     display: none;
-    height: 44px;
+    height: 42px;
     padding: 0 14px;
 
     border: 1px solid rgba(255, 255, 255, 0.5);
@@ -181,43 +150,89 @@ main {
     color: var(--text-color, #222222);
 
     font-family: inherit;
-    font-size: 14px;
+    font-size: 13px;
     cursor: pointer;
 
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
 
-/* 検索文字がある時に表示されるクラス */
 #search-clear.visible {
     display: block;
 }
 
-/* 配信者名などのタイトルテキスト */
-#streamer-name {
-    margin: 0 0 5px;
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--text-color, #222222);
+
+/* =========================================================
+   4. ボタンデザイン（フィルター ▼ / ☰）
+   ========================================================= */
+
+#current-mode,
+#menu-button {
+    height: 42px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.5);
+    color: var(--text-color, #222);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* 件数表示 */
-#song-count {
-    margin-bottom: 14px;
-    font-size: 14px;
-    color: #555;
+#current-mode {
+    flex-shrink: 0;
+    padding: 0 14px;
+    white-space: nowrap;
+}
+
+#menu-button {
+    position: static;
+    flex-shrink: 0;
+    width: 42px;
+    font-size: 18px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#current-mode.open,
+#menu-button.open {
+    background: var(--theme-color, #222222);
+    color: #ffffff;
+    border-color: var(--theme-color, #222222);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+#menu-button.open {
+    transform: translateY(-2px) rotate(90deg);
+}
+
+#current-mode.filtering:not(.open) {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: var(--theme-color, #222222);
+    box-shadow: 0 0 0 1.5px var(--theme-color, #222222);
+}
+
+#current-mode:active,
+#menu-button:active {
+    transform: scale(0.96);
 }
 
 
 /* =========================================================
-   表示状態メニュー & 50音メニュー（共通コンテナ & スマートアニメーション）
+   5. ポップアップメニュー（フィルター & 50音）
    ========================================================= */
 
-/* メニュー共通のポップアップ基盤 */
 #mode-menu,
 #artist-nav {
     display: flex;
-    flex-direction: column;
     width: 100%;
     max-width: 600px;
 
@@ -225,48 +240,45 @@ main {
     padding: 12px 16px;
 
     border-radius: 16px;
-    background: rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.6);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 
-    /* --- アニメーション用初期状態（非表示） --- */
+    /* 表示切替のアニメーション一括管理 */
     opacity: 0;
     visibility: hidden;
-    transform: translateY(12px) scale(0.98);
+    pointer-events: none;
+    transform: translateY(10px) scale(0.98);
     transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
                 transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
                 visibility 0.25s;
 
-    pointer-events: none; /* 非表示時にタップを無効化 */
+    position: relative;
+    z-index: 10;
 }
 
-/* メニューオープン時（ふわっと下から出現） */
 #mode-menu.open,
 #artist-nav.open {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0) scale(1);
     pointer-events: auto;
+    transform: translateY(0) scale(1);
 }
 
-/* ---------------------------------------------------------
-   表示状態メニュー内部（レイアウト・ボタン）
-   --------------------------------------------------------- */
-
-.mode-menu {
+/* --- フィルターメニュー内部構造 --- */
+#mode-menu {
+    flex-direction: column;
     gap: 12px;
 }
 
-/* グループのセクション */
 .filter-section {
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
 
-/* 見出し（ラベル） */
 .filter-label {
     font-size: 11px;
     font-weight: bold;
@@ -276,7 +288,6 @@ main {
     letter-spacing: 0.05em;
 }
 
-/* 1. 完成度タブ（横並び / 均等配置） */
 .filter-tabs {
     display: flex;
     background: rgba(0, 0, 0, 0.06);
@@ -299,14 +310,12 @@ main {
     text-align: center;
 }
 
-/* 選択中のタブ */
 .tab-btn.active {
     background: #ffffff;
     color: #222222;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* 2. 絞り込みチップ（トグルボタン） */
 .filter-chips {
     display: flex;
     flex-wrap: wrap;
@@ -323,11 +332,8 @@ main {
     border-radius: 20px;
     cursor: pointer;
     transition: all 0.2s ease;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
 }
 
-/* ON状態（選択中）のチップ */
 .chip-btn.active {
     background: var(--theme-color, #222222);
     color: #ffffff;
@@ -335,24 +341,42 @@ main {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* ---------------------------------------------------------
-   ハンバーガーボタン（アイコン切り替え用アニメーション）
-   --------------------------------------------------------- */
-
-#menu-button {
-    transition: transform 0.2s ease, background-color 0.2s ease;
+/* --- 50音メニュー内部構造 --- */
+#artist-nav {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
 }
 
-#menu-button.open {
-    transform: rotate(90deg);
-    background: rgba(0, 0, 0, 0.08);
+#artist-nav button {
+    min-width: 38px;
+    min-height: 38px;
+    padding: 4px 8px;
+
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+
+    background: rgba(255, 255, 255, 0.6);
+    color: var(--text-color, #222222);
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
+
+#artist-nav button.active {
+    background: var(--theme-color, #222222);
+    color: #ffffff;
+    border-color: var(--theme-color, #222222);
+}
+
 
 /* =========================================================
-   4. 楽曲リストエリア
+   6. 楽曲リストエリア
    ========================================================= */
 
-/* 楽曲リストのメインカード枠 */
 #song-list {
     width: 100%;
     max-width: 600px;
@@ -368,7 +392,6 @@ main {
     -webkit-backdrop-filter: blur(8px);
 }
 
-/* アーティスト名の見出し（--artist-color を参照） */
 .artist {
     display: flex;
     align-items: center;
@@ -380,8 +403,6 @@ main {
     font-size: 18px;
     font-weight: 700;
     color: var(--artist-color, var(--text-color, #222222));
-
-    /* 下線は --theme-color を参照 */
     border-bottom: 2px solid var(--theme-color, #184F88);
     cursor: pointer;
 
@@ -410,7 +431,6 @@ main {
     display: none;
 }
 
-/* 各楽曲1件ごとのスタイル（本文の文字色 --text-color に設定） */
 .song {
     padding: 9px 5px;
     font-size: 16px;
@@ -419,46 +439,10 @@ main {
 
 
 /* =========================================================
-   5. 50音インデックスナビ（画面下部固定）
-   ========================================================= */
-
-
-
-#artist-nav button {
-    min-width: 38px;
-    min-height: 38px;
-    padding: 5px 8px;
-
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 8px;
-
-    background: rgba(255, 255, 255, 0.4);
-    color: var(--text-color, #222222);
-
-    font-family: inherit;
-    font-size: 14px;
-    cursor: pointer;
-
-    -webkit-tap-highlight-color: transparent;
-}
-
-#artist-nav button.active {
-    background: var(--theme-color, rgba(34, 34, 34, 0.85));
-    color: #ffffff;
-    border-color: var(--theme-color, rgba(34, 34, 34, 0.85));
-}
-
-#artist-nav button:active {
-    transform: scale(0.95);
-}
-
-
-/* =========================================================
-   6. レスポンシブ対応：画面幅 400px 以下
+   7. レスポンシブ対応 (400px以下)
    ========================================================= */
 
 @media (max-width: 400px) {
-
     body {
         padding-bottom: 115px;
     }
@@ -471,7 +455,6 @@ main {
         font-size: 22px;
     }
 
-    #favorite-section,
     #song-list {
         padding-left: 12px;
         padding-right: 12px;
@@ -485,174 +468,10 @@ main {
         font-size: 15px;
     }
 
-    #artist-nav {
-        padding: 6px;
-        gap: 4px;
-    }
-
     #artist-nav button {
         min-width: 34px;
         min-height: 34px;
         padding: 4px 6px;
-        font-size: 13px;
+        font-size: 12px;
     }
-}
-
-
-/* =========================================================
-   操作バー & ボタンのスタイル強化
-   ========================================================= */
-
-#control-area {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    max-width: 600px;
-    margin: 8px auto 0;
-    padding: 0;
-}
-
-/* フィルターボタン & 50音メニューボタン共通ベース */
-#current-mode,
-#menu-button {
-    height: 42px;
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.5);
-    color: var(--text-color, #222);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    -webkit-tap-highlight-color: transparent;
-}
-
-/* フィルターボタン特有 */
-#current-mode {
-    flex-shrink: 0;
-    padding: 0 14px;
-    white-space: nowrap;
-}
-
-/* 50音メニューボタン特有 */
-#menu-button {
-    position: static;
-    flex-shrink: 0;
-    width: 42px;
-    font-size: 18px;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* --- 開いた状態（.open）のスタイリング --- */
-
-#current-mode.open,
-#menu-button.open {
-    background: var(--theme-color, #222222);
-    color: #ffffff;
-    border-color: var(--theme-color, #222222);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-}
-
-/* 50音ボタンが開いている時は「✕」にして少し回転 */
-#menu-button.open {
-    transform: translateY(-2px) rotate(90deg);
-}
-
-/* 絞り込み条件が効いている時のハイライト（メニューを閉じている時） */
-#current-mode.filtering:not(.open) {
-    background: rgba(255, 255, 255, 0.85);
-    border-color: var(--theme-color, #222222);
-    box-shadow: 0 0 0 1.5px var(--theme-color, #222222);
-}
-
-/* ボタンホバー・タップ時のフィードバック */
-#current-mode:active,
-#menu-button:active {
-    transform: scale(0.96);
-}
-
-/* =========================================================
-   表示状態メニュー
-   ========================================================= */
-
-/* 非表示時の基本 */
-#mode-menu,
-#artist-nav {
-    display: flex;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
-    transform: translateY(10px);
-}
-
-/* open クラスがついた時（表示） */
-#mode-menu.open,
-#artist-nav.open {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    transform: translateY(0);
-}
-
-/* =========================================================
-   50音メニュー
-   ========================================================= */
-
-#artist-nav {
-    display: none;
-
-    width: 100%;
-    max-width: 600px;
-
-    margin: 8px auto 0;
-    padding: 8px 16px;
-
-    gap: 5px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    border-radius: 12px;
-
-    background: rgba(255, 255, 255, 0.35);
-}
-
-/* ハンバーガーを押したとき */
-#artist-nav.open {
-    display: flex;
-}
-
-/* 50音ボタン */
-#artist-nav button {
-    min-width: 38px;
-    min-height: 38px;
-
-    padding: 4px 8px;
-
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 8px;
-
-    background: rgba(255, 255, 255, 0.5);
-    color: var(--text-color, #222);
-
-    font-family: inherit;
-    font-size: 13px;
-
-    cursor: pointer;
-}
-
-
-/* 表示状態メニュー・50音メニューを操作バーの上に配置する調整 */
-#mode-menu,
-#artist-nav {
-    margin-bottom: 8px; /* 操作ボタンとの間に間隔をあける */
 }
