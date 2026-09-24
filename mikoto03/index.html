@@ -36,70 +36,61 @@
     </header>
 
     <!-- 下部操作バー -->
-	<div id="menu-panel" class="menu-panel">
+    <div id="menu-panel" class="menu-panel">
 
-		<!-- 表示操作エリア -->
-		<div id="control-area">
+        <!-- 表示操作エリア（一列に並ぶ3つの要素） -->
+        <div id="control-area">
 
-			<!-- 現在の表示状態 -->
-			<button id="current-mode" type="button">
-				すべて ▼
-			</button>
+            <!-- 1. 現在の表示状態 -->
+            <button id="current-mode" type="button">
+                すべて ▼
+            </button>
 
-			<!-- 検索 -->
-			<div class="search-box">
-				<input
-					id="song-search"
-					type="search"
-					placeholder="曲名・アーティスト名で検索"
-					autocomplete="off"
-				>
-				<button id="search-clear" type="button">
-					クリア
-				</button>
-			</div>
+            <!-- 2. 検索 -->
+            <div class="search-box">
+                <input
+                    id="song-search"
+                    type="search"
+                    placeholder="曲名・アーティスト名で検索"
+                    autocomplete="off"
+                >
+                <button id="search-clear" type="button">
+                    クリア
+                </button>
+            </div>
 
-			<!-- ハンバーガー -->
-			<button
-				id="menu-button"
-				type="button"
-				aria-label="50音メニュー"
-			>
-				☰
-			</button>
+            <!-- 3. ハンバーガーボタン -->
+            <button
+                id="menu-button"
+                type="button"
+                aria-label="50音メニュー"
+            >
+                ☰
+            </button>
 
-		</div>
+        </div>
 
-		<!-- 現在の表示状態の選択メニュー -->
-		<div id="mode-menu">
+        <!-- 現在の表示状態の選択メニュー -->
+        <div id="mode-menu">
+            <button id="filter-all" class="favorite-button active">
+                すべて
+            </button>
+            <button id="filter-complete" class="favorite-button">
+                フル
+            </button>
+            <button id="filter-partial" class="favorite-button">
+                途中まで
+            </button>
+            <button id="filter-practice" class="favorite-button">
+                練習中
+            </button>
+            <div id="favorite-artists"></div>
+        </div>
 
-			<button id="filter-all" class="favorite-button active">
-				すべて
-			</button>
+        <!-- 50音メニュー（1つだけに整理） -->
+        <div id="artist-nav"></div>
 
-			<button id="filter-complete" class="favorite-button">
-				フル
-			</button>
-
-			<button id="filter-partial" class="favorite-button">
-				途中まで
-			</button>
-
-			<button id="filter-practice" class="favorite-button">
-				練習中
-			</button>
-
-			<div id="favorite-artists"></div>
-
-		</div>
-
-		<!-- 50音メニュー -->
-		<div id="artist-nav"></div>
-
-		<!-- ハンバーガーで開く50音 -->
-		<div id="artist-nav"></div>
-
-	</div>
+    </div>
 
     
 
