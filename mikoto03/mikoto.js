@@ -452,10 +452,10 @@ function updateCurrentMode() {
     if (isArtistFilter) labels.push('好きな歌手');
 
     if (labels.length > 0) {
-        currentMode.textContent = labels.join(' + ') + ' ▼';
+        currentMode.textContent = labels.join(' + ') + ' ▾';
         currentMode.classList.add('filtering');
     } else {
-        currentMode.textContent = 'フィルター ▼';
+        currentMode.textContent = 'フィルター ▾';
         currentMode.classList.remove('filtering');
     }
 }
