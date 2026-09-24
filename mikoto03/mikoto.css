@@ -270,10 +270,11 @@ main {
    ========================================================= */
 
 
-/* --- A. フィルターメニュー（下からのスライドインに統一） --- */
+/* --- A. フィルターメニュー（下パネルと隙間なしで接続） --- */
 #mode-menu {
     position: absolute;
-    bottom: calc(100% + 6px); /* 隙間を詰めて自然に接続 */
+    /* 隙間を無くして下にピッタリ接着 */
+    bottom: 100%;
     left: 0;
 
     display: flex;
@@ -285,20 +286,19 @@ main {
     overflow-y: auto;
 
     padding: 14px;
-    border-radius: 20px;
+    border-radius: 20px 20px 8px 8px; /* 下側の角丸を少し抑えて接続感を向上 */
 
-    /* 透明感のあるすりガラス質感 */
     background: rgba(255, 255, 255, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
 
-    /* スライドイン設定 */
+    /* スライドイン表示設定 */
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: translateY(12px); /* 下からの直線的な移動 */
+    transform: translateY(8px);
     transition: opacity 0.2s ease,
                 transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
                 visibility 0.25s;
@@ -385,10 +385,11 @@ main {
 
 
 
-/* --- B. 50音メニュー（バウンドなしのぐにゅっと広がるアニメーション） --- */
+/* --- B. 50音メニュー（下パネルと隙間なしで接続） --- */
 #artist-nav {
     position: absolute;
-    bottom: calc(100% + 6px);
+    /* 隙間を無くして下にピッタリ接着 */
+    bottom: 100%;
     right: 0;
 
     display: flex;
@@ -402,25 +403,20 @@ main {
     overflow-y: auto;
 
     padding: 14px 10px;
-    border-radius: 20px;
+    border-radius: 20px 20px 8px 8px; /* 下側の角丸を少し抑えて接続感を向上 */
 
     background: rgba(255, 255, 255, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
 
-    /* 変形の起点（右下のハンバーガーボタン） */
     transform-origin: bottom right;
 
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-
-    /* 初期状態：ボタン位置で横長・縦潰れに大きく変形 */
-    transform: scale(0.1, 0.3) translateY(12px);
-
-    /* 跳ね返りを一切排除し、ヌルッと戻るソフトなイージング */
+    transform: scale(0.1, 0.3) translateY(8px);
     transition: opacity 0.2s ease,
                 transform 0.32s cubic-bezier(0.0, 0.7, 0.1, 1.0),
                 visibility 0.32s;
@@ -432,8 +428,6 @@ main {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-
-    /* 膨らみきってピタッと停止（1.0 を超えない） */
     transform: scale(1, 1) translateY(0);
 }
 
