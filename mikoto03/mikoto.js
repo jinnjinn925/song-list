@@ -468,41 +468,72 @@ function updateCurrentMode() {
 
 
 // =========================
-// メニュー開閉制御（ボタン連動）
+// メニュー開閉制御（修正版）
 // =========================
 
+// すべてのメニューを閉じる共通関数
 function closeAllMenus() {
-    artistNav.classList.remove('open');
-    modeMenu.classList.remove('open');
-    menuButton.classList.remove('open');
-    currentMode.classList.remove('open');
-    menuButton.textContent = '☰';
+    if (artistNav) artistNav.classList.remove('open');
+    if (modeMenu) modeMenu.classList.remove('open');
+    if (menuButton) {
+        menuButton.classList.remove('open');
+        menuButton.textContent = '☰';
+    }
+    if (currentMode) currentMode.classList.remove('open');
 }
 
-// 50音メニュー（☰）
-menuButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = artistNav.classList.contains('open');
-    
-    closeAllMenus();
+// 50音メニュー（ハンバーガーボタン）
+if (menuButton) {
+    menuButton.addEventListener('click', (e) => {
+        e.stopPropagation(); // documentへのイベント伝播をストップ
+        
+        const isCurrentlyOpen = artistNav.classList.contains('open');
+        
+        closeAllMenus();
 
-    if (!isOpen) {
-        artistNav.classList.add('open');
-        menuButton.classList.add('open');
-        menuButton.textContent = '✕';
-    }
+        // 開いていなかった場合のみ開く
+        if (!isCurrentlyOpen) {
+            artistNav.classList.add('open');
+            menuButton.classList.add('open');
+            menuButton.textContent = '✕';
+        }
+    });
+}
+
+// フィルターメニュー（フィルターボタン）
+if (currentMode) {
+    currentMode.addEventListener('click', (e) => {
+        e.stopPropagation(); // documentへのイベント伝播をストップ
+        
+        const isCurrentlyOpen = modeMenu.classList.contains('open');
+        
+        closeAllMenus();
+
+        // 開いていなかった場合のみ開く
+        if (!isCurrentlyOpen) {
+            modeMenu.classList.add('open');
+            currentMode.classList.add('open');
+        }
+    });
+}
+
+// パネル内部をクリックした時にメニューが閉じないように保護
+const menuPanel = document.getElementById('menu-panel');
+if (menuPanel) {
+    menuPanel.addEventListener('click', (e) => {
+        e.stopPropagation();
+    });
+}
+
+// メニュー以外の画面外をタップした時に自動で閉じる
+document.addEventListener('click', () => {
+    closeAllMenus();
 });
 
-// フィルターメニュー
-currentMode.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const isOpen = modeMenu.classList.contains('open');
-    
-    closeAllMenus();
-
-    if (!isOpen) {
-        modeMenu.classList.add('open');
-        currentMode.classList.add('open');
+// ESCキー対応
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeAllMenus();
     }
 });
 

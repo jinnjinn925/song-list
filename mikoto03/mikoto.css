@@ -584,24 +584,25 @@ main {
    表示状態メニュー
    ========================================================= */
 
-#mode-menu {
-    display: none;
-
-    width: 100%;
-    max-width: 600px;
-
-    margin: 8px auto 0;
-    padding: 8px 16px;
-
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-/* 表示状態メニューを開いた状態 */
-#mode-menu.open {
+/* 非表示時の基本 */
+#mode-menu,
+#artist-nav {
     display: flex;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+    transform: translateY(10px);
 }
 
+/* open クラスがついた時（表示） */
+#mode-menu.open,
+#artist-nav.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+}
 
 /* =========================================================
    50音メニュー
