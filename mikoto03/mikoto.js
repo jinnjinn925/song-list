@@ -469,7 +469,7 @@ function displayFavoriteArtists(favoriteList) {
     favoriteArtistList = favoriteList || [];
 
     favoriteArtists.innerHTML = '';
-    favoriteSection.style.display = 'block';
+    
 
     // 好きな歌手ボタン
     const artistButton = document.createElement('button');
