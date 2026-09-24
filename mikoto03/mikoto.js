@@ -19,50 +19,25 @@ const supabaseClient =
 // HTMLの要素を取得
 // =========================
 
-const list =
-    document.getElementById('song-list');
+// HTMLの要素を取得
+const list = document.getElementById('song-list');
+const streamerName = document.getElementById('streamer-name');
+const songCount = document.getElementById('song-count');
+const modeMenu = document.getElementById('mode-menu');
+const menuButton = document.getElementById('menu-button');
+const currentMode = document.getElementById('current-mode');
+const artistNav = document.getElementById('artist-nav');
+const songSearch = document.getElementById('song-search');
+const searchClear = document.getElementById('search-clear');
 
-const nav =
-    document.getElementById('artist-nav');
+// 完成度タブボタン
+const tabAll = document.getElementById('filter-all');
+const tabComplete = document.getElementById('filter-complete');
+const tabPartial = document.getElementById('filter-partial');
+const tabPractice = document.getElementById('filter-practice');
 
-const streamerName =
-    document.getElementById('streamer-name');
-
-const songCount =
-    document.getElementById('song-count');
-
-const filterAll =
-    document.getElementById('filter-all');
-
-const filterComplete =
-    document.getElementById('filter-complete');
-
-const filterPartial =
-    document.getElementById('filter-partial');
-
-const filterPractice =
-    document.getElementById('filter-practice');
-
-const favoriteArtists =
-    document.getElementById('favorite-artists');
-
-const modeMenu =
-    document.getElementById('mode-menu');
-
-const menuButton =
-    document.getElementById('menu-button');
-
-const currentMode =
-    document.getElementById('current-mode');
-
-const artistNav =
-    document.getElementById('artist-nav');
-
-const songSearch =
-    document.getElementById('song-search');
-
-const searchClear =
-    document.getElementById('search-clear');
+// クイックフィルター（自信曲・お気に入り）用コンテナ
+const favoriteArtistsContainer = document.getElementById('favorite-artists');
 
 
 
@@ -90,12 +65,16 @@ const initials = [
 // 現在の表示状態
 // =========================
 
+// 現在の検索・フィルター状態
 let data = [];
 let currentRow = null;
-let favoriteMode = null;
-let favoriteArtistList = [];
-let completeFilter = 'all';
 let searchQuery = '';
+
+// アプローチ1用の状態変数
+let statusFilter = 'all';       // 'all' | 'complete' | 'partial' | 'practice'
+let isConfidentFilter = false;  // true / false
+let isArtistFilter = false;     // true / false
+let favoriteArtistList = [];
 
 // =========================
 // 50音用の読みを整理
@@ -258,52 +237,37 @@ function compareReading(a, b) {
 // 表示する曲を決定
 // =========================
 
+// 表示する曲を決定（掛け合わせ検索）
 function getVisibleSongs() {
     let songs = [...data];
 
-    // お気に入りアーティスト・自信曲で絞る
-    if (favoriteMode === 'artist') {
-        songs = songs.filter(
-            song => favoriteArtistList.includes(song.artist)
-        );
+    // 1. 完成度フィルター
+    if (statusFilter === 'complete') {
+        songs = songs.filter(song => song.complete === true);
+    } else if (statusFilter === 'partial') {
+        songs = songs.filter(song => song.complete === null || song.complete === undefined);
+    } else if (statusFilter === 'practice') {
+        songs = songs.filter(song => song.complete === false);
     }
 
-    if (favoriteMode === 'confident') {
-        songs = songs.filter(
-            song => song.confident === true
-        );
+    // 2. 自信曲フィルター（ONの場合のみ絞り込む）
+    if (isConfidentFilter) {
+        songs = songs.filter(song => song.confident === true);
     }
 
-    // 50音で絞る
+    // 3. 好きな歌手フィルター（ONの場合のみ絞り込む）
+    if (isArtistFilter) {
+        songs = songs.filter(song => favoriteArtistList.includes(song.artist));
+    }
+
+    // 4. 50音フィルター
     if (currentRow) {
-        songs = songs.filter(
-            song => getRow(song.artist_initial) === currentRow
-        );
+        songs = songs.filter(song => getRow(song.artist_initial) === currentRow);
     }
 
-    // 完成度フィルター
-    if (completeFilter === 'complete') {
-        songs = songs.filter(
-            song => song.complete === true
-        );
-    }
-
-    if (completeFilter === 'partial') {
-        songs = songs.filter(
-            song => song.complete === null || song.complete === undefined
-        );
-    }
-
-    if (completeFilter === 'practice') {
-        songs = songs.filter(
-            song => song.complete === false
-        );
-    }
-
-    // 曲名・アーティスト名で検索
+    // 5. 検索キーワード
     if (searchQuery) {
         const query = searchQuery.toLowerCase();
-
         songs = songs.filter(song => {
             const artist = (song.artist || '').toLowerCase();
             const title = (song.title || '').toLowerCase();
@@ -465,53 +429,47 @@ filterPractice.addEventListener('click', () => {
 // お気に入りアーティスト表示
 // =========================
 
+// クイックフィルターボタンの描画・イベント設定
 function displayFavoriteArtists(favoriteList) {
     favoriteArtistList = favoriteList || [];
-
-    favoriteArtists.innerHTML = '';
-    
+    favoriteArtistsContainer.innerHTML = '';
 
     // 好きな歌手ボタン
-    const artistButton = document.createElement('button');
-    artistButton.textContent = '好きな歌手';
-    artistButton.className = 'favorite-button';
-
-    artistButton.addEventListener('click', () => {
-        favoriteMode = (favoriteMode === 'artist') ? null : 'artist';
-        currentRow = null;
-
-        document.querySelectorAll('#artist-nav button').forEach(navButton => {
-            navButton.classList.remove('active');
+    if (favoriteArtistList.length > 0) {
+        const artistButton = document.createElement('button');
+        artistButton.textContent = '♥ 好きな歌手';
+        artistButton.className = 'chip-btn';
+        artistButton.addEventListener('click', () => {
+            isArtistFilter = !isArtistFilter; // ON/OFFトグル
+            artistButton.classList.toggle('active', isArtistFilter);
+            render();
         });
-
-        artistButton.classList.toggle('active', favoriteMode === 'artist');
-        confidentButton.classList.remove('active');
-
-        render();
-    });
-
-    favoriteArtists.appendChild(artistButton);
+        favoriteArtistsContainer.appendChild(artistButton);
+    }
 
     // 自信曲ボタン
     const confidentButton = document.createElement('button');
-    confidentButton.textContent = '自信曲';
-    confidentButton.className = 'favorite-button';
-
+    confidentButton.textContent = '★ 自信曲';
+    confidentButton.className = 'chip-btn';
     confidentButton.addEventListener('click', () => {
-        favoriteMode = (favoriteMode === 'confident') ? null : 'confident';
-        currentRow = null;
-
-        document.querySelectorAll('#artist-nav button').forEach(navButton => {
-            navButton.classList.remove('active');
-        });
-
-        confidentButton.classList.toggle('active', favoriteMode === 'confident');
-        artistButton.classList.remove('active');
-
+        isConfidentFilter = !isConfidentFilter; // ON/OFFトグル
+        confidentButton.classList.toggle('active', isConfidentFilter);
         render();
     });
+    favoriteArtistsContainer.appendChild(confidentButton);
+}
 
-    favoriteArtists.appendChild(confidentButton);
+// 完成度タブのイベント登録
+tabAll.addEventListener('click', () => { setStatusFilter('all', tabAll); });
+tabComplete.addEventListener('click', () => { setStatusFilter('complete', tabComplete); });
+tabPartial.addEventListener('click', () => { setStatusFilter('partial', tabPartial); });
+tabPractice.addEventListener('click', () => { setStatusFilter('practice', tabPractice); });
+
+function setStatusFilter(type, activeTab) {
+    statusFilter = type;
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    activeTab.classList.add('active');
+    render();
 }
 
 

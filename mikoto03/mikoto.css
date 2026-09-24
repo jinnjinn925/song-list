@@ -210,90 +210,92 @@ main {
 
 
 /* =========================================================
-   3. お気に入り・フィルターボタンエリア
+   表示状態メニュー（アプローチ1：グループ分け）
    ========================================================= */
 
-/* フィルターボタン群の親コンテナ */
-#favorite-section {
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 5px 16px 15px;
+/* メニュー全体のレイアウト */
+.mode-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 4px;
 }
 
-/* お気に入りアーティストボタンのラッパー */
-#favorite-artists {
+/* グループのセクション */
+.filter-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* 見出し（ラベル） */
+.filter-label {
+    font-size: 11px;
+    font-weight: bold;
+    color: var(--text-color, #222222);
+    opacity: 0.7;
+    padding-left: 4px;
+    letter-spacing: 0.05em;
+}
+
+/* 1. 完成度タブ（横並び / 均等配置） */
+.filter-tabs {
+    display: flex;
+    background: rgba(0, 0, 0, 0.06);
+    border-radius: 10px;
+    padding: 3px;
+    gap: 2px;
+}
+
+.tab-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 8px 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-color, #222222);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+/* 選択中のタブ */
+.tab-btn.active {
+    background: #ffffff;
+    color: #222222;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 2. 絞り込みチップ（トグルボタン） */
+.filter-chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 7px;
-    width: 100%;
+    gap: 8px;
 }
 
-/* 総合フィルターボタンエリア */
-#complete-filter-buttons {
-    display: flex;
-    gap: 7px;
-    width: 100%;
-    margin-bottom: 7px;
-}
-
-#complete-filter-buttons .favorite-button {
-    flex: 1;
-}
-
-/* フィルターボタンエリア全体の並び */
-#filter-buttons {
-    display: flex;
-    gap: 7px;
-    width: 100%;
-}
-
-#filter-buttons > #complete-filter {
-    flex: 1;
-    width: auto;
-}
-
-#filter-buttons > #favorite-artists {
-    display: flex;
-    flex: 2;
-    gap: 7px;
-}
-
-#filter-buttons .favorite-button {
-    flex: 1;
-}
-
-/* フィルター用カプセル型ボタンの共通デザイン */
-.favorite-button {
-    flex: 1;
-    min-width: 0;
-    padding: 8px 12px;
-
+.chip-btn {
     border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 999px;
-
-    background: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.45);
     color: var(--text-color, #222222);
-
-    font-family: inherit;
-    font-size: 13px;
-    text-align: center;
-    white-space: nowrap;
-
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
-
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
 }
 
-/* フィルターが選択・アクティブな状態 */
-.favorite-button.active {
+/* ON状態（選択中）のチップ */
+.chip-btn.active {
     background: var(--theme-color, #222222);
     color: #ffffff;
     border-color: var(--theme-color, #222222);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
-
 
 /* =========================================================
    4. 楽曲リストエリア

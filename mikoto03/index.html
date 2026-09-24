@@ -35,63 +35,49 @@
         </div>
     </header>
 
-    <!-- 下部固定操作バー -->
-    <div id="menu-panel" class="menu-panel">
+    <!-- 下部固定操作パネル -->
+	<div id="menu-panel" class="menu-panel">
 
-        <!-- 1. 現在の表示状態の選択メニュー（上に開く） -->
-        <div id="mode-menu">
-            <button id="filter-all" class="favorite-button active">
-                すべて
-            </button>
-            <button id="filter-complete" class="favorite-button">
-                フル
-            </button>
-            <button id="filter-partial" class="favorite-button">
-                途中まで
-            </button>
-            <button id="filter-practice" class="favorite-button">
-                練習中
-            </button>
-            <div id="favorite-artists"></div>
-        </div>
+		<!-- メニュー展開エリア（「すべて▼」で開閉） -->
+		<div id="mode-menu" class="mode-menu">
 
-        <!-- 2. 50音メニュー（上に開く） -->
-        <div id="artist-nav"></div>
+			<!-- グループ1：完成度（単一選択） -->
+			<div class="filter-section">
+				<span class="filter-label">完成度</span>
+				<div class="filter-tabs">
+					<button id="filter-all" class="tab-btn active">すべて</button>
+					<button id="filter-complete" class="tab-btn">フル</button>
+					<button id="filter-partial" class="tab-btn">途中まで</button>
+					<button id="filter-practice" class="tab-btn">練習中</button>
+				</div>
+			</div>
 
-        <!-- 3. 表示操作エリア（常に一番下に表示） -->
-        <div id="control-area">
+			<!-- グループ2：クイックフィルター（ON/OFFトグル） -->
+			<div class="filter-section">
+				<span class="filter-label">絞り込み</span>
+				<div id="favorite-artists" class="filter-chips">
+					<!-- JSで「★ 自信曲」「♥ 好きな歌手」などをチップ形式で描画 -->
+					<button class="chip-btn" data-type="confident">★ 自信曲</button>
+					<button class="chip-btn" data-type="favorite">♥ 好きな歌手</button>
+				</div>
+			</div>
 
-            <!-- 現在の表示状態 -->
-            <button id="current-mode" type="button">
-                すべて ▼
-            </button>
+		</div>
 
-            <!-- 検索 -->
-            <div class="search-box">
-                <input
-                    id="song-search"
-                    type="search"
-                    placeholder="曲名・アーティスト名で検索"
-                    autocomplete="off"
-                >
-                <button id="search-clear" type="button">
-                    クリア
-                </button>
-            </div>
+		<!-- 50音ナビゲーション（☰で開閉） -->
+		<div id="artist-nav"></div>
 
-            <!-- ハンバーガー -->
-            <button
-                id="menu-button"
-                type="button"
-                aria-label="50音メニュー"
-            >
-                ☰
-            </button>
+		<!-- 常に最下部に表示される操作バー -->
+		<div id="control-area">
+			<button id="current-mode" type="button">すべて ▼</button>
+			<div class="search-box">
+				<input id="song-search" type="search" placeholder="曲名・アーティスト名で検索" autocomplete="off">
+				<button id="search-clear" type="button">クリア</button>
+			</div>
+			<button id="menu-button" type="button" aria-label="50音メニュー">☰</button>
+		</div>
 
-        </div>
-
-    </div>
-
+	</div>
     
 
    
