@@ -69,7 +69,7 @@ main {
 
 
 /* =========================================================
-   3. 下部固定操作パネル
+   3. 下部固定操作パネル（レイアウトはみ出し修正版）
    ========================================================= */
 
 .menu-panel {
@@ -81,7 +81,7 @@ main {
 
     width: 100%;
     max-width: 600px;
-    padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); /* スマホのSafe Area対応 */
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
 
     background: rgba(255, 255, 255, 0.75);
     border-top: 1px solid rgba(255, 255, 255, 0.6);
@@ -96,7 +96,7 @@ main {
 #control-area {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px; /* 要素間の隙間を少し詰めて収まりを改善 */
     width: 100%;
     max-width: 600px;
     margin: 0 auto;
@@ -105,19 +105,21 @@ main {
 
 .search-box {
     display: flex;
-    gap: 8px;
+    align-items: center;
+    gap: 6px;
     flex: 1;
+    min-width: 0; /* 子要素の溢れを防止 */
 }
 
-/* --- 検索バー（完全な丸み・高さ42pxに統一） --- */
+/* --- 検索バー（文字切れ防止・自動収縮） --- */
 #song-search {
     flex: 1;
-    min-width: 0;
+    min-width: 0; /* 横幅自動調整 */
     height: 42px;
-    padding: 0 16px;
+    padding: 0 12px; /* 内側余白を微調整して文字入りを最適化 */
 
     border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 9999px; /* 完全な丸みに修正 */
+    border-radius: 9999px;
 
     background: rgba(255, 255, 255, 0.6);
     color: var(--text-color, #222222);
@@ -141,19 +143,20 @@ main {
     background: rgba(255, 255, 255, 0.85);
 }
 
-/* --- クリアボタン（丸みに統一） --- */
+/* --- クリアボタン --- */
 #search-clear {
     display: none;
     height: 42px;
-    padding: 0 16px;
+    padding: 0 10px;
+    flex-shrink: 0;
 
     border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 9999px; /* 丸みに統一 */
+    border-radius: 9999px;
     background: rgba(255, 255, 255, 0.6);
     color: var(--text-color, #222222);
 
     font-family: inherit;
-    font-size: 13px;
+    font-size: 12px;
     cursor: pointer;
 
     backdrop-filter: blur(8px);
@@ -164,22 +167,22 @@ main {
     display: block;
 }
 
-/* --- 下部フィルター開閉ボタン（丸みに統一） --- */
+/* --- 下部フィルター開閉ボタン --- */
 #current-mode {
     height: 42px;
-    padding: 0 18px;
+    padding: 0 12px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 4px;
 
     border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 9999px; /* 丸みに統一 */
+    border-radius: 9999px;
     background: rgba(255, 255, 255, 0.65);
     color: var(--text-color, #222222);
 
     font-family: inherit;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     cursor: pointer;
 
@@ -189,7 +192,7 @@ main {
     transition: all 0.2s ease;
     user-select: none;
     white-space: nowrap;
-    flex-shrink: 0;
+    flex-shrink: 0; /* はみ出し防止 */
 }
 
 #current-mode:hover {
@@ -203,20 +206,20 @@ main {
     border-color: var(--theme-color, #333333);
 }
 
-/* --- ハンバーガーボタン（44pxへ大きく＆完全な円形） --- */
+/* --- ハンバーガーボタン（枠内に綺麗に収める設定） --- */
 #menu-button {
     position: static;
-    flex-shrink: 0;
-    width: 44px;  /* 大きさをアップ */
-    height: 44px;
-    border-radius: 50%; /* 正円 */
+    flex-shrink: 0; /* つぶれ・はみ出し防止 */
+    width: 42px;    /* 高さと揃えて42pxに */
+    height: 42px;
+    border-radius: 50%;
 
     border: 1px solid rgba(255, 255, 255, 0.6);
     background: rgba(255, 255, 255, 0.65);
     color: var(--text-color, #222);
 
     font-family: inherit;
-    font-size: 20px;
+    font-size: 18px;
     line-height: 1;
 
     display: flex;
@@ -230,7 +233,6 @@ main {
     transition: all 0.2s ease;
     -webkit-tap-highlight-color: transparent;
 }
-
 
 /* =========================================================
    4. ポップアップメニュー（フィルター & 50音）
