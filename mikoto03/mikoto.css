@@ -20,7 +20,7 @@ html {
 body {
     margin: 0;
     /* 下部に固定ナビ（50音ナビ等）が被らないよう余白を確保 */
-    padding: 0 0 120px 0;
+    padding: 0 0 140px 0;
 
     /* 背景色（画像が読み込まれるまでのフォールバック） */
     background: #f8f8f8;
@@ -94,19 +94,27 @@ main {
     -webkit-tap-highlight-color: transparent;
 }
 
-/* 検索や設定を格納するパネル */
+/* 下部固定操作パネル */
 .menu-panel {
-    position: relative;
-    z-index: 900;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%); /* 画面中央に配置 */
+    z-index: 1000;
 
     width: 100%;
     max-width: 600px;
-    margin: 0 auto;
-    padding: 8px 16px;
+    padding: 8px 16px 16px; /* iPhoneの下部バー対策で下余白を広めに確保 */
 
-    background: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+    /* すりガラス風の背景グラデーション（背景画像になじませる） */
+    background: rgba(255, 255, 255, 0.75);
+    border-top: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 18px 18px 0 0; /* 上側の角を丸く */
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
 }
 
 /* メニューオープン時の表示切り替え用クラス */
@@ -592,4 +600,11 @@ main {
     font-size: 13px;
 
     cursor: pointer;
+}
+
+
+/* 表示状態メニュー・50音メニューを操作バーの上に配置する調整 */
+#mode-menu,
+#artist-nav {
+    margin-bottom: 8px; /* 操作ボタンとの間に間隔をあける */
 }

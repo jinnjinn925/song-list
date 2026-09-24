@@ -35,42 +35,10 @@
         </div>
     </header>
 
-    <!-- 下部操作バー -->
+    <!-- 下部固定操作バー -->
     <div id="menu-panel" class="menu-panel">
 
-        <!-- 表示操作エリア（一列に並ぶ3つの要素） -->
-        <div id="control-area">
-
-            <!-- 1. 現在の表示状態 -->
-            <button id="current-mode" type="button">
-                すべて ▼
-            </button>
-
-            <!-- 2. 検索 -->
-            <div class="search-box">
-                <input
-                    id="song-search"
-                    type="search"
-                    placeholder="曲名・アーティスト名で検索"
-                    autocomplete="off"
-                >
-                <button id="search-clear" type="button">
-                    クリア
-                </button>
-            </div>
-
-            <!-- 3. ハンバーガーボタン -->
-            <button
-                id="menu-button"
-                type="button"
-                aria-label="50音メニュー"
-            >
-                ☰
-            </button>
-
-        </div>
-
-        <!-- 現在の表示状態の選択メニュー -->
+        <!-- 1. 現在の表示状態の選択メニュー（上に開く） -->
         <div id="mode-menu">
             <button id="filter-all" class="favorite-button active">
                 すべて
@@ -87,8 +55,40 @@
             <div id="favorite-artists"></div>
         </div>
 
-        <!-- 50音メニュー（1つだけに整理） -->
+        <!-- 2. 50音メニュー（上に開く） -->
         <div id="artist-nav"></div>
+
+        <!-- 3. 表示操作エリア（常に一番下に表示） -->
+        <div id="control-area">
+
+            <!-- 現在の表示状態 -->
+            <button id="current-mode" type="button">
+                すべて ▼
+            </button>
+
+            <!-- 検索 -->
+            <div class="search-box">
+                <input
+                    id="song-search"
+                    type="search"
+                    placeholder="曲名・アーティスト名で検索"
+                    autocomplete="off"
+                >
+                <button id="search-clear" type="button">
+                    クリア
+                </button>
+            </div>
+
+            <!-- ハンバーガー -->
+            <button
+                id="menu-button"
+                type="button"
+                aria-label="50音メニュー"
+            >
+                ☰
+            </button>
+
+        </div>
 
     </div>
 
