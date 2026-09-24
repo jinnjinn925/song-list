@@ -446,11 +446,6 @@ function displayFavoriteArtists(favoriteList) {
 // =========================
 
 function updateCurrentMode() {
-    if (searchQuery) {
-        currentMode.textContent = '検索中 ▼';
-        return;
-    }
-
     let labels = [];
 
     // 完成度
@@ -464,10 +459,52 @@ function updateCurrentMode() {
 
     if (labels.length > 0) {
         currentMode.textContent = labels.join(' + ') + ' ▼';
+        currentMode.classList.add('filtering');
     } else {
-        currentMode.textContent = 'すべて ▼';
+        currentMode.textContent = 'フィルター ▼';
+        currentMode.classList.remove('filtering');
     }
 }
+
+
+// =========================
+// メニュー開閉制御（ボタン連動）
+// =========================
+
+function closeAllMenus() {
+    artistNav.classList.remove('open');
+    modeMenu.classList.remove('open');
+    menuButton.classList.remove('open');
+    currentMode.classList.remove('open');
+    menuButton.textContent = '☰';
+}
+
+// 50音メニュー（☰）
+menuButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = artistNav.classList.contains('open');
+    
+    closeAllMenus();
+
+    if (!isOpen) {
+        artistNav.classList.add('open');
+        menuButton.classList.add('open');
+        menuButton.textContent = '✕';
+    }
+});
+
+// フィルターメニュー
+currentMode.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isOpen = modeMenu.classList.contains('open');
+    
+    closeAllMenus();
+
+    if (!isOpen) {
+        modeMenu.classList.add('open');
+        currentMode.classList.add('open');
+    }
+});
 
 
 // =========================

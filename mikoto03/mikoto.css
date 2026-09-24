@@ -500,91 +500,85 @@ main {
 
 
 /* =========================================================
-   操作エリア（横一列配置）
+   操作バー & ボタンのスタイル強化
    ========================================================= */
 
 #control-area {
     display: flex;
     align-items: center;
     gap: 8px;
-
     width: 100%;
     max-width: 600px;
-
     margin: 8px auto 0;
     padding: 0;
 }
 
-/* 現在の表示状態（すべて ▼） */
-#current-mode {
-    flex-shrink: 0;
-
+/* フィルターボタン & 50音メニューボタン共通ベース */
+#current-mode,
+#menu-button {
     height: 42px;
-    padding: 0 12px;
-
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 10px;
-
-    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.5);
     color: var(--text-color, #222);
-
     font-family: inherit;
     font-size: 13px;
-
-    white-space: nowrap;
+    font-weight: 600;
     cursor: pointer;
-
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
-
-/* 検索ボックス枠 */
-#control-area .search-box {
-    flex: 1;
-    min-width: 0;
-
-    display: flex;
-    gap: 6px;
-}
-
-/* 検索入力欄 */
-#control-area #song-search {
-    flex: 1;
-    min-width: 0;
-    height: 42px;
-}
-
-/* クリアボタン */
-#search-clear {
-    height: 42px;
-}
-
-/* ハンバーガーボタン */
-#menu-button {
-    position: static; /* absolute（右上固定）を解除して列に並べる */
-    flex-shrink: 0;
-
-    width: 42px;
-    height: 42px;
-
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 10px;
-
-    background: rgba(255, 255, 255, 0.45);
-    color: var(--text-color, #222);
-
-    font-family: inherit;
-    font-size: 20px;
-    line-height: 1;
-
-    cursor: pointer;
-
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     -webkit-tap-highlight-color: transparent;
 }
 
+/* フィルターボタン特有 */
+#current-mode {
+    flex-shrink: 0;
+    padding: 0 14px;
+    white-space: nowrap;
+}
+
+/* 50音メニューボタン特有 */
+#menu-button {
+    position: static;
+    flex-shrink: 0;
+    width: 42px;
+    font-size: 18px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* --- 開いた状態（.open）のスタイリング --- */
+
+#current-mode.open,
+#menu-button.open {
+    background: var(--theme-color, #222222);
+    color: #ffffff;
+    border-color: var(--theme-color, #222222);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.2);
+    transform: translateY(-2px);
+}
+
+/* 50音ボタンが開いている時は「✕」にして少し回転 */
+#menu-button.open {
+    transform: translateY(-2px) rotate(90deg);
+}
+
+/* 絞り込み条件が効いている時のハイライト（メニューを閉じている時） */
+#current-mode.filtering:not(.open) {
+    background: rgba(255, 255, 255, 0.85);
+    border-color: var(--theme-color, #222222);
+    box-shadow: 0 0 0 1.5px var(--theme-color, #222222);
+}
+
+/* ボタンホバー・タップ時のフィードバック */
+#current-mode:active,
+#menu-button:active {
+    transform: scale(0.96);
+}
 
 /* =========================================================
    表示状態メニュー
