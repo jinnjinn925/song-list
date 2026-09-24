@@ -269,10 +269,11 @@ main {
    4. ポップアップメニュー（フィルター & 50音）
    ========================================================= */
 
-/* --- A. フィルターメニュー（透明感のあるガラス質感＋元通りのボタンデザイン） --- */
+
+/* --- A. フィルターメニュー（下からのスライドインに統一） --- */
 #mode-menu {
     position: absolute;
-    bottom: calc(100% + 8px);
+    bottom: calc(100% + 6px); /* 隙間を詰めて自然に接続 */
     left: 0;
 
     display: flex;
@@ -285,20 +286,19 @@ main {
 
     padding: 14px;
     border-radius: 20px;
-    
-    /* 背景を白すぎず黒すぎない透明なすりガラスに変更 */
+
+    /* 透明感のあるすりガラス質感 */
     background: rgba(255, 255, 255, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.7);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 
-    /* アニメーション（左下起点） */
-    transform-origin: bottom left;
+    /* スライドイン設定 */
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: scale(0.95) translateY(8px);
+    transform: translateY(12px); /* 下からの直線的な移動 */
     transition: opacity 0.2s ease,
                 transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
                 visibility 0.25s;
@@ -310,7 +310,7 @@ main {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    transform: scale(1) translateY(0);
+    transform: translateY(0);
 }
 
 /* --- 元のフィルター内パーツ（形状・サイズ完全復元） --- */
