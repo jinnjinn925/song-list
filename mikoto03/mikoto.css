@@ -15,7 +15,7 @@ html {
 
 body {
     margin: 0;
-    padding: 0 0 140px 0;
+    padding: 0 0 100px 0; /* 固定バーの高さに合わせて下部余白を最適化 */
     background: #f8f8f8;
     color: var(--text-color, #222222);
     font-family: var(--dynamic-font, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif);
@@ -69,7 +69,7 @@ main {
 
 
 /* =========================================================
-   3. 下部固定操作パネル & 検索ボックス
+   3. 下部固定操作パネル（白枠を最少サイズに固定）
    ========================================================= */
 
 .menu-panel {
@@ -81,11 +81,11 @@ main {
 
     width: 100%;
     max-width: 600px;
-    padding: 8px 16px 16px;
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); /* スマホのSafe Area対応 */
 
     background: rgba(255, 255, 255, 0.75);
     border-top: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 18px 18px 0 0;
+    border-radius: 16px 16px 0 0;
 
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -112,13 +112,13 @@ main {
 #song-search {
     flex: 1;
     min-width: 0;
-    height: 42px;
+    height: 40px;
     padding: 0 10px;
 
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 10px;
 
-    background: rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.5);
     color: var(--text-color, #222222);
 
     font-family: inherit;
@@ -136,17 +136,17 @@ main {
 
 #song-search:focus {
     border-color: #888;
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.7);
 }
 
 #search-clear {
     display: none;
-    height: 42px;
-    padding: 0 14px;
+    height: 40px;
+    padding: 0 12px;
 
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: 10px;
-    background: rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.5);
     color: var(--text-color, #222222);
 
     font-family: inherit;
@@ -168,10 +168,10 @@ main {
 
 #current-mode,
 #menu-button {
-    height: 42px;
+    height: 40px;
     border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.55);
     color: var(--text-color, #222);
     font-family: inherit;
     font-size: 13px;
@@ -179,21 +179,21 @@ main {
     cursor: pointer;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    transition: all 0.2s ease;
     -webkit-tap-highlight-color: transparent;
 }
 
 #current-mode {
     flex-shrink: 0;
-    padding: 0 14px;
+    padding: 0 12px;
     white-space: nowrap;
 }
 
 #menu-button {
     position: static;
     flex-shrink: 0;
-    width: 42px;
+    width: 40px;
     font-size: 18px;
     line-height: 1;
     display: flex;
@@ -206,12 +206,11 @@ main {
     background: var(--theme-color, #222222);
     color: #ffffff;
     border-color: var(--theme-color, #222222);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 #menu-button.open {
-    transform: translateY(-2px) rotate(90deg);
+    transform: rotate(90deg);
 }
 
 #current-mode.filtering:not(.open) {
@@ -227,36 +226,39 @@ main {
 
 
 /* =========================================================
-   5. ポップアップメニュー（フィルター & 50音）
+   5. ポップアップメニュー（操作バーの上に独立して浮遊表示）
    ========================================================= */
 
 #mode-menu,
 #artist-nav {
+    position: absolute;
+    bottom: calc(100% + 8px); /* 固定バーのすぐ上に配置 */
+    left: 0;
+    right: 0;
+
     display: flex;
     width: 100%;
-    max-width: 600px;
+    max-height: 50vh; /* 高さが出すぎないよう画面半分の高さに制限 */
+    overflow-y: auto;  /* あふれた場合は内部スクロール */
 
-    margin: 0 auto 8px;
-    padding: 12px 16px;
+    margin: 0 auto;
+    padding: 12px;
 
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 
-    /* 表示切替のアニメーション一括管理 */
+    /* 表示切替のアニメーション */
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: translateY(10px) scale(0.98);
-    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                visibility 0.25s;
+    transform: translateY(8px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
 
-    position: relative;
-    z-index: 10;
+    z-index: 1001;
 }
 
 #mode-menu.open,
@@ -264,13 +266,13 @@ main {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
 }
 
 /* --- フィルターメニュー内部構造 --- */
 #mode-menu {
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 .filter-section {
@@ -284,15 +286,14 @@ main {
     font-weight: bold;
     color: var(--text-color, #222222);
     opacity: 0.7;
-    padding-left: 4px;
-    letter-spacing: 0.05em;
+    padding-left: 2px;
 }
 
 .filter-tabs {
     display: flex;
     background: rgba(0, 0, 0, 0.06);
-    border-radius: 10px;
-    padding: 3px;
+    border-radius: 8px;
+    padding: 2px;
     gap: 2px;
 }
 
@@ -300,11 +301,11 @@ main {
     flex: 1;
     border: none;
     background: transparent;
-    padding: 8px 0;
+    padding: 6px 0;
     font-size: 12px;
     font-weight: 600;
     color: var(--text-color, #222222);
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
     text-align: center;
@@ -313,23 +314,23 @@ main {
 .tab-btn.active {
     background: #ffffff;
     color: #222222;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .filter-chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
 }
 
 .chip-btn {
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.6);
     color: var(--text-color, #222222);
-    padding: 6px 14px;
+    padding: 5px 12px;
     font-size: 12px;
     font-weight: 600;
-    border-radius: 20px;
+    border-radius: 16px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -338,7 +339,6 @@ main {
     background: var(--theme-color, #222222);
     color: #ffffff;
     border-color: var(--theme-color, #222222);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* --- 50音メニュー内部構造 --- */
@@ -349,21 +349,21 @@ main {
 }
 
 #artist-nav button {
-    min-width: 38px;
-    min-height: 38px;
-    padding: 4px 8px;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 6px;
 
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.7);
     color: var(--text-color, #222222);
 
     font-family: inherit;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
 }
 
 #artist-nav button.active {
@@ -444,7 +444,7 @@ main {
 
 @media (max-width: 400px) {
     body {
-        padding-bottom: 115px;
+        padding-bottom: 90px;
     }
 
     #page-header {
@@ -469,9 +469,8 @@ main {
     }
 
     #artist-nav button {
-        min-width: 34px;
-        min-height: 34px;
-        padding: 4px 6px;
+        min-width: 32px;
+        height: 32px;
         font-size: 12px;
     }
 }
