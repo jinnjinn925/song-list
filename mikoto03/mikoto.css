@@ -384,10 +384,11 @@ main {
 }
 
 
-/* --- B. 50音メニュー（ハンバーガー側） --- */
+/* --- B. 50音メニュー（下の隙間を詰めて綺麗に接続） --- */
 #artist-nav {
     position: absolute;
-    bottom: calc(100% + 12px);
+    /* 下パネルとの隙間を 12px から 6px に縮小 */
+    bottom: calc(100% + 6px); 
     right: 0;
 
     display: flex;
@@ -402,20 +403,22 @@ main {
 
     padding: 14px 10px;
     border-radius: 20px;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.9);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    
+    /* フィルターメニューと揃えた透明感のあるガラス調 */
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 
-    transform-origin: bottom right;
+    /* スライドイン表示アニメーション */
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: scale(0.8) translateY(10px);
-    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-                visibility 0.2s;
+    transform: translateY(12px); /* 16px から 12px に調整して動きを締める */
+    transition: opacity 0.2s ease,
+                transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0.25s;
 
     z-index: 1002;
 }
@@ -424,7 +427,7 @@ main {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    transform: scale(1) translateY(0);
+    transform: translateY(0);
 }
 
 /* 50音ボタン（丸型カプセルに修正） */
