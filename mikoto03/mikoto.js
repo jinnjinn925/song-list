@@ -64,11 +64,7 @@ const songSearch =
 const searchClear =
     document.getElementById('search-clear');
 
-const menuButton = 
-	  document.getElementById('menu-button');
 
-const currentMode = 
-	  document.getElementById('current-mode');
 
 
 // =========================
