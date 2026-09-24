@@ -653,11 +653,12 @@ async function loadSongs() {
     streamerName.textContent = streamer.name;
 
     // 背景画像を設定
+    // 背景画像を設定（CSS変数にセットしてbody::beforeに適用させる）
     if (streamer.background_image) {
-        document.body.style.backgroundImage = `url('${streamer.background_image}')`;
-        document.body.style.backgroundSize = 'cover';
-        document.body.style.backgroundPosition = 'center';
-        document.body.style.backgroundAttachment = 'fixed';
+        document.documentElement.style.setProperty(
+            '--background-image',
+            `url('${streamer.background_image}')`
+        );
     }
 
     // デザイン・フォント反映処理
