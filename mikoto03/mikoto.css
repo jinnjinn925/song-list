@@ -226,24 +226,24 @@ main {
 
 
 /* =========================================================
-   5. ポップアップメニュー（操作バーの上に独立して浮遊表示）
+   5. ポップアップメニュー（フィルター & 50音の個別スタイリング）
    ========================================================= */
 
-#mode-menu,
-#artist-nav {
+/* --- A. フィルターメニュー（左下から上に展開） --- */
+#mode-menu {
     position: absolute;
-    bottom: calc(100% + 8px); /* 固定バーのすぐ上に配置 */
+    bottom: calc(100% + 8px);
     left: 0;
-    right: 0;
 
     display: flex;
+    flex-direction: column;
+    gap: 10px;
+
     width: 100%;
-    max-height: 50vh; /* 高さが出すぎないよう画面半分の高さに制限 */
-    overflow-y: auto;  /* あふれた場合は内部スクロール */
+    max-height: 50vh;
+    overflow-y: auto;
 
-    margin: 0 auto;
     padding: 12px;
-
     border-radius: 14px;
     background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(16px);
@@ -251,7 +251,6 @@ main {
     border: 1px solid rgba(255, 255, 255, 0.8);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 
-    /* 表示切替のアニメーション */
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
@@ -261,20 +260,59 @@ main {
     z-index: 1001;
 }
 
-#mode-menu.open,
-#artist-nav.open {
+#mode-menu.open {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
     transform: translateY(0);
 }
 
-/* --- フィルターメニュー内部構造 --- */
-#mode-menu {
-    flex-direction: column;
-    gap: 10px;
+
+/* --- B. 50音メニュー（ハンバーガー側：右上/右下起点で展開） --- */
+#artist-nav {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    right: 0; /* 右端を揃える */
+
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+
+    width: calc(100% - 20px); /* 画面幅いっぱいに広がらずコンパクトに */
+    max-width: 380px;         /* ポップアップ風のサイズ制限 */
+    max-height: 45vh;
+    overflow-y: auto;
+
+    padding: 14px 10px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+
+    /* 右下（ボタンの位置）を起点にしてスケールアニメーション */
+    transform-origin: bottom right;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: scale(0.8) translateY(10px);
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+                visibility 0.2s;
+
+    z-index: 1002;
 }
 
+#artist-nav.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: scale(1) translateY(0);
+}
+
+/* --- フィルターメニュー内部パーツ --- */
 .filter-section {
     display: flex;
     flex-direction: column;
@@ -341,22 +379,16 @@ main {
     border-color: var(--theme-color, #222222);
 }
 
-/* --- 50音メニュー内部構造 --- */
-#artist-nav {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 6px;
-}
-
+/* --- 50音ボタン内部パーツ --- */
 #artist-nav button {
     min-width: 36px;
     height: 36px;
     padding: 0 6px;
 
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 8px;
 
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(245, 245, 245, 0.8);
     color: var(--text-color, #222222);
 
     font-family: inherit;
