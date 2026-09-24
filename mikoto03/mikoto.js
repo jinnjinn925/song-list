@@ -539,12 +539,12 @@ function updateCurrentMode() {
     }
 
     if (favoriteMode === 'artist') {
-        currentMode.textContent = '♡ 好きな歌手';
+        currentMode.textContent = '好きな歌手';
         return;
     }
 
     if (favoriteMode === 'confident') {
-        currentMode.textContent = '★ 自信曲';
+        currentMode.textContent = '自信曲';
         return;
     }
 
