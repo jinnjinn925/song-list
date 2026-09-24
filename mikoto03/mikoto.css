@@ -46,7 +46,7 @@ body::before {
     bottom: 0;
 
     /* 背景画像の設定 */
-    background-image: var(--background-image, url("background.jpg"));
+    background-image: var(--background-image, url("../background.jpg"));
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
