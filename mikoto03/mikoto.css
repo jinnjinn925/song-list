@@ -269,23 +269,23 @@ main {
    4. ポップアップメニュー（フィルター & 50音）
    ========================================================= */
 
-/* --- A. フィルターメニュー（ダーク調のガラス質感に変更） --- */
+/* --- A. フィルターメニュー（透明感を高めたトーン） --- */
 #mode-menu {
     position: absolute;
     bottom: calc(100% + 8px);
     left: 0;
-    
-    /* 枠線と背景を半透明の黒系に変更 */
-    background: rgba(20, 20, 22, 0.75); 
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    
+
+    /* ボタン全体の大きさ・形は変更せず、背景の透明感とぼかしを強化 */
+    background: rgba(255, 255, 255, 0.45); /* 白の透明度を上げて軽やかに */
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+
     border-radius: 16px;
     padding: 8px;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
-    
-    /* アニメーション用設定 */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+
+    /* アニメーション（左下起点の展開） */
     transform-origin: bottom left;
     opacity: 0;
     visibility: hidden;
@@ -294,6 +294,7 @@ main {
     transition: opacity 0.2s ease,
                 transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
                 visibility 0.25s;
+
     z-index: 1001;
 }
 
@@ -304,29 +305,28 @@ main {
     transform: scale(1) translateY(0);
 }
 
-/* メニュー内のテキスト・ボタン色調整 */
+/* メニュー内アイテムのテキスト・見た目（元の明るいデザインに合わせる） */
 #mode-menu .mode-option,
 #mode-menu button,
 #mode-menu a {
-    color: rgba(255, 255, 255, 0.9); /* 文字色を白系に */
+    color: var(--text-color, #222222); /* 文字色は元通りのダークカラー */
     background: transparent;
-    border-radius: 8px;
+    border-radius: 10px;
+    padding: 8px 12px;
     transition: background 0.15s ease, color 0.15s ease;
 }
 
-/* ホバー時の背景 */
+/* ホバー時 */
 #mode-menu .mode-option:hover,
 #mode-menu button:hover,
 #mode-menu a:hover {
-    background: rgba(255, 255, 255, 0.12);
-    color: #ffffff;
+    background: rgba(255, 255, 255, 0.5);
 }
 
-/* 選択中（アクティブ）の項目の強調 */
+/* 選択中（アクティブ）項目 */
 #mode-menu .mode-option.active,
 #mode-menu button.active {
-    background: rgba(255, 255, 255, 0.2);
-    color: #ffffff;
+    background: rgba(255, 255, 255, 0.75);
     font-weight: 600;
 }
 
