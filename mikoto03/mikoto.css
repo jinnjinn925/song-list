@@ -56,7 +56,7 @@ body::before {
 
 /* メインコンテンツエリア：背景画像の上に透ける白レイヤー */
 main {
-    background: rgba(255, 255, 255, 0.2);
+    background: transparent;
 }
 
 
@@ -96,8 +96,7 @@ main {
 
 /* 検索や設定を格納するパネル */
 .menu-panel {
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: 900;
 
     width: 100%;
