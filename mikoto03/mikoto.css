@@ -1,658 +1,787 @@
-@charset "utf-8";
-/* CSS Document */
+// =========================
+// Supabaseへの接続
+// =========================
 
-/* =========================================================
-   1. 全体設定・ルート変数
-   ========================================================= */
+const supabaseUrl = 'https://dgssybbbgnnygmccjltn.supabase.co';
+const supabaseKey = 'sb_publishable_JNz1mi6gysaFjOa0A4I5ow_iDe3PQbd';
 
-/* ボックスモデルの共通化 */
-* {
-    box-sizing: border-box;
+const supabaseClient = window.supabase.createClient(
+    supabaseUrl,
+    supabaseKey
+);
+
+
+// =========================
+// HTMLの要素を取得
+// =========================
+
+const list = document.getElementById('song-list');
+const streamerName = document.getElementById('streamer-name');
+const songCount = document.getElementById('song-count');
+const modeMenu = document.getElementById('mode-menu');
+const menuButton = document.getElementById('menu-button');
+const currentMode = document.getElementById('current-mode');
+const artistNav = document.getElementById('artist-nav');
+const nav = document.getElementById('artist-nav');
+const songSearch = document.getElementById('song-search');
+const searchClear = document.getElementById('search-clear');
+
+// 完成度タブボタン
+const filterAll = document.getElementById('filter-all');
+const filterComplete = document.getElementById('filter-complete');
+const filterPartial = document.getElementById('filter-partial');
+const filterPractice = document.getElementById('filter-practice');
+
+// クイックフィルター（自信曲・お気に入り）用コンテナ
+const favoriteArtistsContainer = document.getElementById('favorite-artists');
+
+
+// =========================
+// 50音
+// =========================
+
+const initials = [
+    '一覧',
+    'あ',
+    'か',
+    'さ',
+    'た',
+    'な',
+    'は',
+    'ま',
+    'や',
+    'ら',
+    'わ'
+];
+
+
+// =========================
+// 現在の表示状態
+// =========================
+
+let data = [];
+let currentRow = null;
+let searchQuery = '';
+
+// 状態変数
+let statusFilter = 'all';       // 'all' | 'complete' | 'partial' | 'practice'
+let isConfidentFilter = false;  // true / false
+let isArtistFilter = false;     // true / false
+let favoriteArtistList = [];
+let sortOrder = 'artist';       // 'artist' (アーティスト順) | 'title' (曲名順)
+
+
+// =========================
+// 50音用の読みを整理
+// =========================
+
+function normalizeForRow(text) {
+    if (!text) return '';
+
+    return text
+        .normalize('NFC')
+        .replace(
+            /[\u30A1-\u30F6]/g,
+            char =>
+                String.fromCharCode(
+                    char.charCodeAt(0) - 0x60
+                )
+        );
 }
 
-/* ルートのフォントサイズ定義 */
-html {
-    font-size: 16px;
+
+// =========================
+// 何行か判定
+// =========================
+
+function getRow(text) {
+    if (!text) return '';
+
+    text = normalizeForRow(text);
+    const first = text.charAt(0);
+
+    const rowMap = {
+        'あ': 'あいうえお',
+        'か': 'かきくけこがぎぐげご',
+        'さ': 'さしすせそざじずぜぞ',
+        'た': 'たちつてとだぢづでど',
+        'な': 'なにぬねの',
+        'は': 'はひふへほばびぶべぼぱぴぷぺぽ',
+        'ま': 'まみむめも',
+        'や': 'やゆよ',
+        'ら': 'らりるれろ',
+        'わ': 'わをん'
+    };
+
+    for (const row in rowMap) {
+        if (rowMap[row].includes(first)) {
+            return row;
+        }
+    }
+
+    return 'その他';
 }
 
-/* ページ全体の基本スタイル */
-/* ページ全体の基本スタイル */
-body {
-    margin: 0;
-    /* 下部に固定ナビ（50音ナビ等）が被らないよう余白を確保 */
-    padding: 0 0 140px 0;
 
-    /* 背景色（画像が読み込まれるまでのフォールバック） */
-    background: #f8f8f8;
+// =========================
+// 日本語の並び順
+// =========================
+
+const collator = new Intl.Collator('ja', {
+    sensitivity: 'base',
+    numeric: false
+});
+
+
+// =========================
+// 並び替え用の読み
+// =========================
+
+function createSortKey(text) {
+    if (!text) return '';
+
+    let key = text
+        .normalize('NFC')
+        .replace(
+            /[\u30A1-\u30F6]/g,
+            char =>
+                String.fromCharCode(
+                    char.charCodeAt(0) - 0x60
+                )
+        );
+
+    const vowelMap = {
+        'あ': 'あ', 'か': 'あ', 'が': 'あ', 'さ': 'あ', 'ざ': 'あ', 'た': 'あ', 'だ': 'あ', 'な': 'あ', 'は': 'あ', 'ば': 'あ', 'ぱ': 'あ', 'ま': 'あ', 'や': 'あ', 'ら': 'あ', 'わ': 'あ',
+        'い': 'い', 'き': 'い', 'ぎ': 'い', 'し': 'い', 'じ': 'い', 'ち': 'い', 'ぢ': 'い', 'に': 'い', 'ひ': 'い', 'び': 'い', 'ぴ': 'い', 'み': 'い', 'り': 'い',
+        'う': 'う', 'く': 'う', 'ぐ': 'う', 'す': 'う', 'ず': 'う', 'つ': 'う', 'づ': 'う', 'ぬ': 'う', 'ふ': 'う', 'ぶ': 'う', 'ぷ': 'う', 'む': 'う', 'ゆ': 'う', 'る': 'う',
+        'え': 'え', 'け': 'え', 'げ': 'え', 'せ': 'え', 'ぜ': 'え', 'て': 'え', 'で': 'え', 'ね': 'え', 'へ': 'え', 'べ': 'え', 'ぺ': 'え', 'め': 'え', 'れ': 'え',
+        'お': 'お', 'こ': 'お', 'ご': 'お', 'そ': 'お', 'ぞ': 'お', 'と': 'お', 'ど': 'お', 'の': 'お', 'ほ': 'お', 'ぼ': 'お', 'ぽ': 'お', 'も': 'お', 'よ': 'お', 'ろ': 'お', 'を': 'お'
+    };
+
+    const smallVowelMap = {
+        'ゃ': 'あ',
+        'ゅ': 'う',
+        'ょ': 'お'
+    };
+
+    let result = '';
+    let previousMainChar = null;
+
+    for (const char of key) {
+        if (char === 'ー') {
+            if (result.length > 0 && smallVowelMap[previousMainChar]) {
+                result += smallVowelMap[previousMainChar];
+            } else if (result.length > 0 && vowelMap[previousMainChar]) {
+                result += vowelMap[previousMainChar];
+            } else {
+                result += 'ー';
+            }
+            continue;
+        }
+
+        result += char;
+
+        if (vowelMap[char] || smallVowelMap[char]) {
+            previousMainChar = char;
+        } else if (char !== 'っ') {
+            previousMainChar = char;
+        }
+    }
+
+    return result;
+}
+
+
+// =========================
+// 読みを比較
+// =========================
+
+function compareReading(a, b) {
+    return collator.compare(
+        createSortKey(a),
+        createSortKey(b)
+    );
+}
+
+
+// =========================
+// 表示する曲を決定（掛け合わせ検索 & ソート）
+// =========================
+
+function getVisibleSongs() {
+    let songs = [...data];
+
+    // 1. 完成度フィルター
+    if (statusFilter === 'complete') {
+        songs = songs.filter(song => song.complete === true);
+    } else if (statusFilter === 'partial') {
+        songs = songs.filter(song => song.complete === null || song.complete === undefined);
+    } else if (statusFilter === 'practice') {
+        songs = songs.filter(song => song.complete === false);
+    }
+
+    // 2. 自信曲フィルター
+    if (isConfidentFilter) {
+        songs = songs.filter(song => song.confident === true);
+    }
+
+    // 3. 好きな歌手フィルター
+    if (isArtistFilter) {
+        songs = songs.filter(song => favoriteArtistList.includes(song.artist));
+    }
+
+    // 4. 50音フィルター
+    if (currentRow) {
+        songs = songs.filter(song => {
+            const targetInitial = sortOrder === 'artist' ? song.artist_initial : song.title_initial;
+            return getRow(targetInitial) === currentRow;
+        });
+    }
+
+    // 5. 検索キーワード
+    if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        songs = songs.filter(song => {
+            const artist = (song.artist || '').toLowerCase();
+            const title = (song.title || '').toLowerCase();
+            const artistInitial = (song.artist_initial || '').toLowerCase();
+            const titleInitial = (song.title_initial || '').toLowerCase();
+
+            return (
+                artist.includes(query) ||
+                title.includes(query) ||
+                artistInitial.includes(query) ||
+                titleInitial.includes(query)
+            );
+        });
+    }
+
+    // 6. ソート実行
+    songs.sort((a, b) => {
+        if (sortOrder === 'artist') {
+            const artistResult = compareReading(a.artist_initial, b.artist_initial);
+            if (artistResult !== 0) return artistResult;
+
+            const titleResult = compareReading(a.title_initial, b.title_initial);
+            if (titleResult !== 0) return titleResult;
+
+            return collator.compare(a.title, b.title);
+        } else {
+            // 曲名順
+            const titleResult = compareReading(a.title_initial, b.title_initial);
+            if (titleResult !== 0) return titleResult;
+
+            const artistResult = compareReading(a.artist_initial, b.artist_initial);
+            if (artistResult !== 0) return artistResult;
+
+            return collator.compare(a.artist, b.artist);
+        }
+    });
+
+    return songs;
+}
+
+
+// =========================
+// 曲一覧を表示
+// =========================
+
+function displaySongs(songs) {
+    list.innerHTML = '';
+
+    if (songs.length === 0) {
+        list.textContent = '該当する曲がありません';
+        return;
+    }
+
+    let currentGroup = '';
+    let groupSongsContainer = null;
+
+    const shouldOpen = isConfidentFilter || (
+        !searchQuery &&
+        currentRow === null &&
+        !isArtistFilter &&
+        statusFilter === 'all'
+    );
+
+    songs.forEach(song => {
+        const groupKey = sortOrder === 'artist' 
+            ? song.artist 
+            : (getRow(song.title_initial) ? getRow(song.title_initial) + '行' : 'その他');
+
+        if (groupKey !== currentGroup) {
+            currentGroup = groupKey;
+
+            const groupHeaderDiv = document.createElement('div');
+            groupHeaderDiv.textContent = groupKey;
+            groupHeaderDiv.className = 'artist';
+
+            const newGroupSongs = document.createElement('div');
+            newGroupSongs.className = 'artist-songs';
+
+            if (shouldOpen) {
+                newGroupSongs.classList.remove('collapsed');
+                groupHeaderDiv.classList.remove('collapsed');
+            } else {
+                newGroupSongs.classList.add('collapsed');
+                groupHeaderDiv.classList.add('collapsed');
+            }
+
+            groupHeaderDiv.addEventListener('click', () => {
+                groupHeaderDiv.classList.toggle('collapsed');
+                newGroupSongs.classList.toggle('collapsed');
+                updateSongCount();
+            });
+
+            list.appendChild(groupHeaderDiv);
+            list.appendChild(newGroupSongs);
+
+            groupSongsContainer = newGroupSongs;
+        }
+
+        const songDiv = document.createElement('div');
+        songDiv.className = 'song';
+
+        const titleDiv = document.createElement('div');
+        if (sortOrder === 'title') {
+            titleDiv.textContent = `${song.title} (${song.artist})${song.complete ? ' *' : ''}`;
+        } else {
+            titleDiv.textContent = song.title + (song.complete ? ' *' : '');
+        }
+
+        songDiv.appendChild(titleDiv);
+        groupSongsContainer.appendChild(songDiv);
+    });
+}
+
+
+// =========================
+// 曲数表示
+// =========================
+
+function updateSongCount() {
+    const total = data.length;
+
+    const visible = document.querySelectorAll(
+        '.artist-songs:not(.collapsed) .song'
+    ).length;
+
+    if (searchQuery) {
+        songCount.textContent = `「${searchQuery}」を含む ${visible}曲 / ${total}曲`;
+    } else if (
+        currentRow !== null ||
+        isConfidentFilter ||
+        isArtistFilter ||
+        statusFilter !== 'all'
+    ) {
+        songCount.textContent = `${visible}曲 / ${total}曲`;
+    } else {
+        songCount.textContent = `曲数：${visible}曲`;
+    }
+}
+
+
+// =========================
+// 完成度フィルターイベント
+// =========================
+
+function setStatusFilter(type, activeTab) {
+    statusFilter = type;
     
-    /* 基本の文字色（タイトル・曲名等：--text-color） */
-    color: var(--text-color, #222222);
-
-    /* ★ 修正：JavaScriptから指定される動的フォント変数を受け取れるように変更 */
-    font-family: var(--dynamic-font, "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif);
-
-    /* 行間を広げて読みやすく */
-    line-height: 1.6;
-    position: relative;
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    activeTab.classList.add('active');
+    
+    render();
 }
 
-/* 疑似要素を使った画面固定背景 */
-body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    /* 背景画像の設定 */
-    background-image: var(--background-image, none);
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-
-    z-index: -1;
-}
-
-/* メインコンテンツエリア：背景画像の上に透ける白レイヤー */
-main {
-    background: transparent;
-}
-
-
-/* =========================================================
-   2. ヘッダーエリア
-   ========================================================= */
-
-/* ページ上部のヘッダー外枠 */
-#page-header {
-    position: relative;
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 20px 16px 10px;
-}
-
-/* メニュー開閉ボタン（右上アイコン） */
-#menu-button {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-
-    width: 44px;
-    height: 44px;
-
-    border: none;
-    border-radius: 10px;
-    background: transparent;
-    color: #f8f8f8;
-
-    font-size: 26px;
-    cursor: pointer;
-    z-index: 1001;
-
-    -webkit-tap-highlight-color: transparent;
-}
-
-/* 下部固定操作パネル */
-.menu-panel {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%); /* 画面中央に配置 */
-    z-index: 1000;
-
-    width: 100%;
-    max-width: 600px;
-    padding: 8px 16px 16px; /* iPhoneの下部バー対策で下余白を広めに確保 */
-
-    /* すりガラス風の背景グラデーション（背景画像になじませる） */
-    background: rgba(255, 255, 255, 0.75);
-    border-top: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 18px 18px 0 0; /* 上側の角を丸く */
-
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
-}
-
-/* メニューオープン時の表示切り替え用クラス */
-.menu-panel.open {
-    display: block;
-}
-
-/* パネル内の見出しラベル */
-.menu-panel label {
-    display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
-    font-weight: 700;
-}
-
-/* 検索窓とクリアボタンを横並びにするコンテナ */
-.search-box {
-    display: flex;
-    gap: 8px;
-}
-
-/* 楽曲検索入力テキストボックス */
-#song-search {
-    flex: 1;
-    min-width: 0;
-    height: 42px;
-    padding: 0 10px;
-
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 10px;
-
-    background: rgba(255, 255, 255, 0.45);
-    color: var(--text-color, #222222);
-
-    font-family: inherit;
-    font-size: 13px;
-    outline: none;
-
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
-
-/* 検索入力欄のプレースホルダー */
-#song-search::placeholder {
-    color: #666;
-	font-size: 13px;
-}
-
-/* 検索入力欄にフォーカスが当たった時のスタイル */
-#song-search:focus {
-    border-color: #888;
-    background: rgba(255, 255, 255, 0.6);
-}
-
-/* 検索文字のクリアボタン */
-#search-clear {
-    display: none;
-    height: 44px;
-    padding: 0 14px;
-
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 10px;
-    background: rgba(255, 255, 255, 0.45);
-    color: var(--text-color, #222222);
-
-    font-family: inherit;
-    font-size: 14px;
-    cursor: pointer;
-
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
-
-/* 検索文字がある時に表示されるクラス */
-#search-clear.visible {
-    display: block;
-}
-
-/* 配信者名などのタイトルテキスト */
-#streamer-name {
-    margin: 0 0 5px;
-    font-size: 24px;
-    font-weight: 700;
-    color: var(--text-color, #222222);
-}
-
-/* 件数表示 */
-#song-count {
-    margin-bottom: 14px;
-    font-size: 14px;
-    color: #555;
-}
-
-
-/* =========================================================
-   表示状態メニュー & 50音メニュー（共通コンテナ & スマートアニメーション）
-   ========================================================= */
-
-/* メニュー共通のポップアップ基盤 */
-#mode-menu,
-#artist-nav {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 600px;
-
-    margin: 0 auto 8px;
-    padding: 12px 16px;
-
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.65);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-
-    /* --- アニメーション用初期状態（非表示） --- */
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(12px) scale(0.98);
-    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                visibility 0.25s;
-
-    pointer-events: none; /* 非表示時にタップを無効化 */
-}
-
-/* メニューオープン時（ふわっと下から出現） */
-#mode-menu.open,
-#artist-nav.open {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);
-    pointer-events: auto;
-}
-
-/* ---------------------------------------------------------
-   表示状態メニュー内部（レイアウト・ボタン）
-   --------------------------------------------------------- */
-
-.mode-menu {
-    gap: 12px;
-}
-
-/* グループのセクション */
-.filter-section {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-/* 見出し（ラベル） */
-.filter-label {
-    font-size: 11px;
-    font-weight: bold;
-    color: var(--text-color, #222222);
-    opacity: 0.7;
-    padding-left: 4px;
-    letter-spacing: 0.05em;
-}
-
-/* 1. 完成度タブ（横並び / 均等配置） */
-.filter-tabs {
-    display: flex;
-    background: rgba(0, 0, 0, 0.06);
-    border-radius: 10px;
-    padding: 3px;
-    gap: 2px;
-}
-
-.tab-btn {
-    flex: 1;
-    border: none;
-    background: transparent;
-    padding: 8px 0;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-color, #222222);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-align: center;
-}
-
-/* 選択中のタブ */
-.tab-btn.active {
-    background: #ffffff;
-    color: #222222;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* 2. 絞り込みチップ（トグルボタン） */
-.filter-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.chip-btn {
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    background: rgba(255, 255, 255, 0.45);
-    color: var(--text-color, #222222);
-    padding: 6px 14px;
-    font-size: 12px;
-    font-weight: 600;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
-
-/* ON状態（選択中）のチップ */
-.chip-btn.active {
-    background: var(--theme-color, #222222);
-    color: #ffffff;
-    border-color: var(--theme-color, #222222);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-/* ---------------------------------------------------------
-   ハンバーガーボタン（アイコン切り替え用アニメーション）
-   --------------------------------------------------------- */
-
-#menu-button {
-    transition: transform 0.2s ease, background-color 0.2s ease;
-}
-
-#menu-button.open {
-    transform: rotate(90deg);
-    background: rgba(0, 0, 0, 0.08);
-}
-
-/* =========================================================
-   4. 楽曲リストエリア
-   ========================================================= */
-
-/* 楽曲リストのメインカード枠 */
-#song-list {
-    width: 100%;
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 10px 16px;
-
-    background: rgba(255, 255, 255, 0.35);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 18px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
-
-/* アーティスト名の見出し（--artist-color を参照） */
-.artist {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-
-    margin-top: 24px;
-    padding: 8px 4px 5px;
-
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--artist-color, var(--text-color, #222222));
-
-    /* 下線は --theme-color を参照 */
-    border-bottom: 2px solid var(--theme-color, #184F88);
-    cursor: pointer;
-
-    -webkit-tap-highlight-color: transparent;
-}
-
-.artist:first-child {
-    margin-top: 0;
-}
-
-.artist::after {
-    content: "−";
-    font-size: 18px;
-    font-weight: 400;
-}
-
-.artist.collapsed::after {
-    content: "+";
-}
-
-.artist-songs {
-    overflow: hidden;
-}
-
-.artist-songs.collapsed {
-    display: none;
-}
-
-/* 各楽曲1件ごとのスタイル（本文の文字色 --text-color に設定） */
-.song {
-    padding: 9px 5px;
-    font-size: 16px;
-    color: var(--artist-color, #222222);
-}
-
-
-/* =========================================================
-   5. 50音インデックスナビ（画面下部固定）
-   ========================================================= */
-
-
-
-#artist-nav button {
-    min-width: 38px;
-    min-height: 38px;
-    padding: 5px 8px;
-
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 8px;
-
-    background: rgba(255, 255, 255, 0.4);
-    color: var(--text-color, #222222);
-
-    font-family: inherit;
-    font-size: 14px;
-    cursor: pointer;
-
-    -webkit-tap-highlight-color: transparent;
-}
-
-#artist-nav button.active {
-    background: var(--theme-color, rgba(34, 34, 34, 0.85));
-    color: #ffffff;
-    border-color: var(--theme-color, rgba(34, 34, 34, 0.85));
-}
-
-#artist-nav button:active {
-    transform: scale(0.95);
-}
-
-
-/* =========================================================
-   6. レスポンシブ対応：画面幅 400px 以下
-   ========================================================= */
-
-@media (max-width: 400px) {
-
-    body {
-        padding-bottom: 115px;
+if (filterAll) filterAll.addEventListener('click', () => setStatusFilter('all', filterAll));
+if (filterComplete) filterComplete.addEventListener('click', () => setStatusFilter('complete', filterComplete));
+if (filterPartial) filterPartial.addEventListener('click', () => setStatusFilter('partial', filterPartial));
+if (filterPractice) filterPractice.addEventListener('click', () => setStatusFilter('practice', filterPractice));
+
+
+// =========================
+// お気に入り・クイックフィルター表示
+// =========================
+
+function displayFavoriteArtists(favoriteList) {
+    favoriteArtistList = favoriteList || [];
+    favoriteArtistsContainer.innerHTML = '';
+
+    // 好きな歌手ボタン
+    if (favoriteArtistList.length > 0) {
+        const artistButton = document.createElement('button');
+        artistButton.textContent = '好きな歌手';
+        artistButton.className = 'chip-btn';
+        artistButton.addEventListener('click', () => {
+            isArtistFilter = !isArtistFilter;
+            artistButton.classList.toggle('active', isArtistFilter);
+            render();
+        });
+        favoriteArtistsContainer.appendChild(artistButton);
     }
 
-    #page-header {
-        padding: 16px 12px 8px;
-    }
+    // 自信曲ボタン
+    const confidentButton = document.createElement('button');
+    confidentButton.textContent = '自信曲';
+    confidentButton.className = 'chip-btn';
+    confidentButton.addEventListener('click', () => {
+        isConfidentFilter = !isConfidentFilter;
+        confidentButton.classList.toggle('active', isConfidentFilter);
+        render();
+    });
+    favoriteArtistsContainer.appendChild(confidentButton);
+}
 
-    #streamer-name {
-        font-size: 22px;
-    }
 
-    #favorite-section,
-    #song-list {
-        padding-left: 12px;
-        padding-right: 12px;
-    }
+// =========================
+// 下部の現在モード表示更新
+// =========================
 
-    .artist {
-        font-size: 17px;
-    }
+function updateCurrentMode() {
+    let labels = [];
 
-    .song {
-        font-size: 15px;
-    }
+    // 完成度
+    if (statusFilter === 'complete') labels.push('フル');
+    else if (statusFilter === 'partial') labels.push('途中まで');
+    else if (statusFilter === 'practice') labels.push('練習中');
 
-    #artist-nav {
-        padding: 6px;
-        gap: 4px;
-    }
+    // クイックフィルター
+    if (isConfidentFilter) labels.push('自信曲');
+    if (isArtistFilter) labels.push('好きな歌手');
 
-    #artist-nav button {
-        min-width: 34px;
-        min-height: 34px;
-        padding: 4px 6px;
-        font-size: 13px;
+    if (labels.length > 0) {
+        currentMode.textContent = labels.join(' + ') + ' ▼';
+        currentMode.classList.add('filtering');
+    } else {
+        currentMode.textContent = 'フィルター ▼';
+        currentMode.classList.remove('filtering');
     }
 }
 
 
-/* =========================================================
-   操作バー & ボタンのスタイル強化
-   ========================================================= */
+// =========================
+// メニュー開閉制御（修正一本化版）
+// =========================
 
-#control-area {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    max-width: 600px;
-    margin: 8px auto 0;
-    padding: 0;
+function closeAllMenus() {
+    if (artistNav) artistNav.classList.remove('open');
+    if (modeMenu) modeMenu.classList.remove('open');
+    if (menuButton) {
+        menuButton.classList.remove('open');
+        menuButton.textContent = '☰';
+    }
+    if (currentMode) currentMode.classList.remove('open');
 }
 
-/* フィルターボタン & 50音メニューボタン共通ベース */
-#current-mode,
-#menu-button {
-    height: 42px;
-    border: 1px solid rgba(255, 255, 255, 0.6);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.5);
-    color: var(--text-color, #222);
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    -webkit-tap-highlight-color: transparent;
+// 50音メニューボタン
+if (menuButton) {
+    menuButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isCurrentlyOpen = artistNav.classList.contains('open');
+        closeAllMenus();
+
+        if (!isCurrentlyOpen) {
+            artistNav.classList.add('open');
+            menuButton.classList.add('open');
+            menuButton.textContent = '✕';
+        }
+    });
 }
 
-/* フィルターボタン特有 */
-#current-mode {
-    flex-shrink: 0;
-    padding: 0 14px;
-    white-space: nowrap;
+// フィルターメニューボタン
+if (currentMode) {
+    currentMode.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isCurrentlyOpen = modeMenu.classList.contains('open');
+        closeAllMenus();
+
+        if (!isCurrentlyOpen) {
+            modeMenu.classList.add('open');
+            currentMode.classList.add('open');
+        }
+    });
 }
 
-/* 50音メニューボタン特有 */
-#menu-button {
-    position: static;
-    flex-shrink: 0;
-    width: 42px;
-    font-size: 18px;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+// メニュー枠外（背景等）をクリックした時のみメニューを閉じる
+document.addEventListener('click', (e) => {
+    const isClickInsideMenu = e.target.closest('#mode-menu') || 
+                              e.target.closest('#artist-nav') || 
+                              e.target.closest('#control-area');
 
-/* --- 開いた状態（.open）のスタイリング --- */
+    if (!isClickInsideMenu) {
+        closeAllMenus();
+    }
+});
 
-#current-mode.open,
-#menu-button.open {
-    background: var(--theme-color, #222222);
-    color: #ffffff;
-    border-color: var(--theme-color, #222222);
-    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-}
+// ESCキー対応
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeAllMenus();
+    }
+});
 
-/* 50音ボタンが開いている時は「✕」にして少し回転 */
-#menu-button.open {
-    transform: translateY(-2px) rotate(90deg);
-}
 
-/* 絞り込み条件が効いている時のハイライト（メニューを閉じている時） */
-#current-mode.filtering:not(.open) {
-    background: rgba(255, 255, 255, 0.85);
-    border-color: var(--theme-color, #222222);
-    box-shadow: 0 0 0 1.5px var(--theme-color, #222222);
-}
+// =========================
+// 現在の条件で再表示
+// =========================
 
-/* ボタンホバー・タップ時のフィードバック */
-#current-mode:active,
-#menu-button:active {
-    transform: scale(0.96);
-}
-
-/* =========================================================
-   表示状態メニュー
-   ========================================================= */
-
-/* 非表示時の基本 */
-#mode-menu,
-#artist-nav {
-    display: flex;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
-    transform: translateY(10px);
-}
-
-/* open クラスがついた時（表示） */
-#mode-menu.open,
-#artist-nav.open {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-    transform: translateY(0);
-}
-
-/* =========================================================
-   50音メニュー
-   ========================================================= */
-
-#artist-nav {
-    display: none;
-
-    width: 100%;
-    max-width: 600px;
-
-    margin: 8px auto 0;
-    padding: 8px 16px;
-
-    gap: 5px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    border-radius: 12px;
-
-    background: rgba(255, 255, 255, 0.35);
-}
-
-/* ハンバーガーを押したとき */
-#artist-nav.open {
-    display: flex;
-}
-
-/* 50音ボタン */
-#artist-nav button {
-    min-width: 38px;
-    min-height: 38px;
-
-    padding: 4px 8px;
-
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 8px;
-
-    background: rgba(255, 255, 255, 0.5);
-    color: var(--text-color, #222);
-
-    font-family: inherit;
-    font-size: 13px;
-
-    cursor: pointer;
+function render() {
+    const visibleSongs = getVisibleSongs();
+    displaySongs(visibleSongs);
+    updateCurrentMode();
+    updateSongCount();
 }
 
 
-/* 表示状態メニュー・50音メニューを操作バーの上に配置する調整 */
-#mode-menu,
-#artist-nav {
-    margin-bottom: 8px; /* 操作ボタンとの間に間隔をあける */
+// =========================
+// ナビゲーションメニュー（50音＋ソート切替）生成
+// =========================
+
+function buildNavMenu() {
+    nav.innerHTML = '';
+
+    // 1. ソート切替ボタンエリア
+    const sortContainer = document.createElement('div');
+    sortContainer.className = 'sort-container';
+    sortContainer.style.cssText = `
+        display: flex;
+        gap: 8px;
+        padding: 4px;
+        margin-bottom: 8px;
+        width: 100%;
+        box-sizing: border-box;
+    `;
+
+    const artistSortBtn = document.createElement('button');
+    artistSortBtn.textContent = '歌手順';
+    artistSortBtn.className = sortOrder === 'artist' ? 'active' : '';
+    artistSortBtn.style.flex = '1';
+
+    const titleSortBtn = document.createElement('button');
+    titleSortBtn.textContent = '曲名順';
+    titleSortBtn.className = sortOrder === 'title' ? 'active' : '';
+    titleSortBtn.style.flex = '1';
+
+    artistSortBtn.addEventListener('click', () => {
+        sortOrder = 'artist';
+        artistSortBtn.classList.add('active');
+        titleSortBtn.classList.remove('active');
+        render();
+    });
+
+    titleSortBtn.addEventListener('click', () => {
+        sortOrder = 'title';
+        titleSortBtn.classList.add('active');
+        artistSortBtn.classList.remove('active');
+        render();
+    });
+
+    sortContainer.appendChild(artistSortBtn);
+    sortContainer.appendChild(titleSortBtn);
+    nav.appendChild(sortContainer);
+
+    // 2. 50音ボタンエリア
+    const initialsContainer = document.createElement('div');
+    initialsContainer.className = 'initials-container';
+    initialsContainer.style.cssText = `
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        justify-content: center;
+        width: 100%;
+    `;
+
+    initials.forEach(initial => {
+        const button = document.createElement('button');
+        button.textContent = initial;
+        if ((initial === '一覧' && currentRow === null) || initial === currentRow) {
+            button.classList.add('active');
+        }
+
+        button.addEventListener('click', () => {
+            if (initial === '一覧') {
+                currentRow = null;
+            } else {
+                currentRow = initial;
+            }
+
+            document.querySelectorAll('.initials-container button').forEach(navButton => {
+                navButton.classList.remove('active');
+            });
+
+            button.classList.add('active');
+            render();
+        });
+
+        initialsContainer.appendChild(button);
+    });
+
+    nav.appendChild(initialsContainer);
 }
+
+
+// =========================
+// 曲を読み込む
+// =========================
+
+async function loadSongs() {
+    const params = new URLSearchParams(window.location.search);
+    const urlId = params.get('streamer');
+
+    const { data: streamer, error: streamerError } = await supabaseClient
+        .from('streamers')
+        .select('*')
+        .eq('url_id', urlId)
+        .single();
+
+    if (streamerError || !streamer) {
+        console.error(streamerError);
+        list.textContent = 'ストリーマーが見つかりません';
+        return;
+    }
+
+    streamerName.textContent = streamer.name;
+
+    if (streamer.background_image) {
+        document.documentElement.style.setProperty(
+            '--background-image',
+            `url('${streamer.background_image}')`
+        );
+    }
+
+    if (streamer.font_family) {
+        const rawFontFamily = streamer.font_family.trim();
+        const dynamicStyles = document.getElementById('dynamic-styles');
+
+        if (dynamicStyles) {
+            const primaryFont = rawFontFamily.split(',')[0].replace(/['"]/g, '').trim();
+
+            const googleFontMap = {
+                'M PLUS Rounded 1c': 'family=M+PLUS+Rounded+1c:wght@400;700',
+                'Kiwi Maru': 'family=Kiwi+Maru:wght@400;500',
+                'Dela Gothic One': 'family=Dela+Gothic+One',
+                'Shippori Mincho': 'family=ShipporiMincho:wght@400;700',
+                'Kaisei Tokumin': 'family=Kaisei+Tokumin:wght@400;700'
+            };
+
+            let importCss = '';
+
+            if (googleFontMap[primaryFont]) {
+                const fontParam = googleFontMap[primaryFont];
+                const fontImportUrl = `https://fonts.googleapis.com/css2?${fontParam}&display=swap`;
+                importCss = `@import url('${fontImportUrl}');\n`;
+            }
+
+            dynamicStyles.textContent = `
+                ${importCss}
+                body, body *, button, input {
+                    font-family: ${rawFontFamily} !important;
+                }
+            `;
+        }
+    }
+
+    if (streamer.title_color) {
+        document.documentElement.style.setProperty(
+            '--text-color',
+            streamer.title_color
+        );
+    }
+
+    if (streamer.artist_color) {
+        document.documentElement.style.setProperty(
+            '--artist-color',
+            streamer.artist_color
+        );
+    }
+
+    if (streamer.theme_color) {
+        document.documentElement.style.setProperty(
+            '--theme-color',
+            streamer.theme_color
+        );
+    }
+
+    displayFavoriteArtists(streamer.favorite_artists || []);
+
+    const { data: streamerSongs, error: songsError } = await supabaseClient
+        .from('streamer_songs')
+        .select(`
+            id,
+            complete,
+            confident,
+            song:songs(
+                id,
+                title,
+                title_initial,
+                artist:artists(
+                    id,
+                    name,
+                    artist_initial
+                )
+            )
+        `)
+        .eq('streamer_id', streamer.id);
+
+    if (songsError) {
+        console.error(songsError);
+        list.textContent = '曲の読み込みに失敗しました';
+        return;
+    }
+
+    const songs = streamerSongs
+        .filter(row => row.song && row.song.artist)
+        .map(row => {
+            return {
+                id: row.song.id,
+                title: row.song.title,
+                title_initial: row.song.title_initial,
+                artist: row.song.artist.name,
+                artist_initial: row.song.artist.artist_initial,
+                complete: row.complete,
+                confident: row.confident
+            };
+        });
+
+    data = songs;
+
+    buildNavMenu();
+    render();
+}
+
+
+// =========================
+// 検索メニュー
+// =========================
+
+songSearch.addEventListener('input', () => {
+    searchQuery = songSearch.value.trim();
+    searchClear.classList.toggle('visible', searchQuery.length > 0);
+
+    if (searchQuery) {
+        currentRow = null;
+        document.querySelectorAll('#artist-nav button').forEach(button => {
+            button.classList.remove('active');
+        });
+    }
+
+    render();
+});
+
+searchClear.addEventListener('click', () => {
+    songSearch.value = '';
+    searchQuery = '';
+    searchClear.classList.remove('visible');
+    render();
+    songSearch.focus();
+});
+
+
+// =========================
+// 実行
+// =========================
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadSongs();
+});
