@@ -397,8 +397,8 @@ main {
     justify-content: center;
     gap: 6px;
 
-    width: calc(100% - 20px);
-    max-width: 380px;
+    width: 100%;
+    max-width: none;
     max-height: 45vh;
     overflow-y: auto;
 
@@ -411,7 +411,7 @@ main {
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
 
-    transform-origin: bottom right;
+    transform-origin: bottom center;
 
     opacity: 0;
     visibility: hidden;
