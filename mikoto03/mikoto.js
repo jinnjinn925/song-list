@@ -474,7 +474,7 @@ function displayFavoriteArtists(favoriteList) {
     // 好きな歌手ボタン
     const artistButton = document.createElement('button');
     artistButton.textContent = '好きな歌手';
-    
+    artistButton.className = 'favorite-button';
 
     artistButton.addEventListener('click', () => {
         favoriteMode = (favoriteMode === 'artist') ? null : 'artist';
