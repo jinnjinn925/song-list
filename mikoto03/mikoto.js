@@ -626,9 +626,9 @@ function buildNavMenu() {
 
 async function loadSongs() {
     const params = new URLSearchParams(window.location.search);
-    const urlId = params.get('streamer');
-	
-	// ★ Androidや一部ブラウザでのURLエンコード揺れ対策
+    let urlId = params.get('streamer');
+
+    // ★ Androidや一部ブラウザでのURLエンコード揺れ対策
     if (urlId) {
         try {
             urlId = decodeURIComponent(urlId).trim();
@@ -653,6 +653,8 @@ async function loadSongs() {
         list.textContent = 'ストリーマーが見つかりません';
         return;
     }
+    
+    /* 以下、既存の処理... */
 
     streamerName.textContent = streamer.name;
 
