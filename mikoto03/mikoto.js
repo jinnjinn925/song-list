@@ -628,10 +628,13 @@ async function loadSongs() {
     const params = new URLSearchParams(window.location.search);
     let urlId = params.get('streamer');
 
-    // ★ Androidや一部ブラウザでのURLエンコード揺れ対策
     if (urlId) {
         try {
-            urlId = decodeURIComponent(urlId).trim();
+            // URLデコードし、末尾のスラッシュや余計な空白・制御文字を完全に除去
+            urlId = decodeURIComponent(urlId)
+                .trim()
+                .replace(/\/+$/, '') // 末尾の / を削除
+                .toLowerCase();      // 小文字に統一
         } catch (e) {
             console.error('URL decode error:', e);
         }
@@ -642,17 +645,22 @@ async function loadSongs() {
         return;
     }
 
-    const { data: streamer, error: streamerError } = await supabaseClient
+    // .eq() から .ilike() に変更（大文字小文字・表記揺れを許容して取得）
+    const { data: streamerData, error: streamerError } = await supabaseClient
         .from('streamers')
         .select('*')
-        .eq('url_id', urlId)
-        .single();
+        .ilike('url_id', urlId);
+
+    // ilike の場合は配列で返ってくるため、最初の1件を取得
+    const streamer = streamerData && streamerData.length > 0 ? streamerData[0] : null;
 
     if (streamerError || !streamer) {
-        console.error(streamerError);
+        console.error('Streamer fetch error:', streamerError);
         list.textContent = 'ストリーマーが見つかりません';
         return;
     }
+
+    streamerName.textContent = streamer.name;
     
     /* 以下、既存の処理... */
 
