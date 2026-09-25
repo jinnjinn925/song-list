@@ -443,9 +443,9 @@ function updateCurrentMode() {
     let labels = [];
 
     // 完成度
-    if (statusFilter === 'complete') labels.push('フル');
-    else if (statusFilter === 'partial') labels.push('途中まで');
-    else if (statusFilter === 'practice') labels.push('練習中');
+    if (statusFilter === 'complete') labels.push('機材曲');
+    else if (statusFilter === 'partial') labels.push('両方');
+    else if (statusFilter === 'practice') labels.push('弾き語り');
 
     // クイックフィルター
     if (isConfidentFilter) labels.push('自信曲');
@@ -627,20 +627,6 @@ function buildNavMenu() {
 async function loadSongs() {
     const params = new URLSearchParams(window.location.search);
     const urlId = params.get('streamer');
-	
-	// ★ Androidや一部ブラウザでのURLエンコード揺れ対策
-    if (urlId) {
-        try {
-            urlId = decodeURIComponent(urlId).trim();
-        } catch (e) {
-            console.error('URL decode error:', e);
-        }
-    }
-
-    if (!urlId) {
-        list.textContent = 'ストリーマーが指定されていません';
-        return;
-    }
 
     const { data: streamer, error: streamerError } = await supabaseClient
         .from('streamers')
