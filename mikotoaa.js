@@ -443,9 +443,9 @@ function updateCurrentMode() {
     let labels = [];
 
     // 完成度
-    if (statusFilter === 'complete') labels.push('フル');
-    else if (statusFilter === 'partial') labels.push('途中まで');
-    else if (statusFilter === 'practice') labels.push('練習中');
+    if (statusFilter === 'complete') labels.push('機材曲');
+    else if (statusFilter === 'partial') labels.push('両方');
+    else if (statusFilter === 'practice') labels.push('弾き語り');
 
     // クイックフィルター
     if (isConfidentFilter) labels.push('自信曲');

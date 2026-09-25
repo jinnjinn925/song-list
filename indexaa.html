@@ -35,49 +35,63 @@
         </div>
     </header>
 
-    <div id="menu-panel" class="menu-panel">
-        <div class="search-box">
-            <input
-                id="song-search"
-                type="search"
-                placeholder="曲名・アーティスト名で検索"
-                autocomplete="off"
-            >
-            <button id="search-clear" type="button">クリア</button>
-        </div>
-    </div>
+    <!-- 下部固定操作パネル -->
+	<div id="menu-panel" class="menu-panel">
 
-    <section id="favorite-section">
-        <div id="complete-filter-buttons">
-            <button id="filter-all" class="favorite-button active">
-                すべて
-            </button>
+		<!-- メニュー展開エリア（「すべて▼」で開閉） -->
+		<div id="mode-menu" class="mode-menu">
 
-            <button id="filter-complete" class="favorite-button">
-                機材歌
-            </button>
-            
-            <button id="filter-partial" class="favorite-button">
-                両方
-            </button>
+			<!-- グループ1：完成度（単一選択） -->
+			<div class="filter-section">
+				<span class="filter-label"></span>
+				<div class="filter-tabs">
+					<button id="filter-all" class="tab-btn active">すべて</button>
+					<button id="filter-complete" class="tab-btn">機材曲</button>
+					<button id="filter-partial" class="tab-btn">両方</button>
+					<button id="filter-practice" class="tab-btn">弾き語り</button>
+				</div>
+			</div>
 
-            <button id="filter-practice" class="favorite-button">
-                弾き語り
-            </button>
-        </div>
+			<!-- グループ2：クイックフィルター（ON/OFFトグル） -->
+			<div class="filter-section">
+				<span class="filter-label">絞り込み</span>
+				<div id="favorite-artists" class="filter-chips">
+					<!-- JSで「★ 自信曲」「♥ 好きな歌手」などをチップ形式で描画 -->
+					<button class="chip-btn" data-type="confident">自信曲</button>
+					<button class="chip-btn" data-type="favorite">好きな歌手</button>
+				</div>
+			</div>
 
-        <div id="favorite-artists">
-        </div>
-    </section>
+		</div>
 
-    <div id="artist-nav"></div>
+		<!-- 50音ナビゲーション（☰で開閉） -->
+		<div id="artist-nav"></div>
+
+		<!-- 常に最下部に表示される操作バー -->
+		<div id="control-area">
+			<button id="current-mode" type="button">フィルター ▾</button>
+			<div class="search-box">
+				<input id="song-search" type="search" placeholder="曲名・アーティスト名で検索" autocomplete="off">
+				<button id="search-clear" type="button">クリア</button>
+			</div>
+			<button id="menu-button" aria-label="メニュー">
+				<span></span>
+				<span></span>
+				<span></span>
+			</button>
+		</div>
+
+	</div>
+    
+
+   
 
     <!-- 曲一覧・アーティスト名部分 -->
     <div id="song-list">
         読み込み中...
     </div>
 
-    <script src="mikoto.js"></script>
+	<script src="mikotoaa.js"></script>
 
 </body>
 </html>
