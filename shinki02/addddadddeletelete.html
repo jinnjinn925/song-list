@@ -9,8 +9,8 @@
     <title>レパートリー管理</title>
 	
 	<!-- アイコンの設定を追加 -->
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="../apple-touch-icon.png">
 
     <link rel="stylesheet" href="add.css">
 
@@ -163,6 +163,15 @@
             class="add-row-button">
             ＋ 行を追加
         </button>
+		
+		<!-- 既存の「＋ 行を追加」ボタンの下あたりに追加 -->
+		<button
+			type="button"
+			id="open-db-search-modal-btn"
+			class="sub-button"
+			style="margin-top: 8px; background: #e8f4fd; color: #2980b9; border: 1px solid #3498db;">
+			 登録済みのデータベースから曲を探して追加
+		</button>
 
 
         <button
@@ -360,6 +369,51 @@
     <div id="message"></div>
 
 </main>
+	
+	
+<!-- DB検索モーダル -->
+<div id="db-search-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>データベースから曲を選択</h3>
+            <button type="button" id="close-db-search-modal-btn" class="modal-close-btn">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="db-search-inputs">
+                <input type="text" id="db-artist-search-input" placeholder="歌手名を入力 (例: Vaundy)" autocomplete="off">
+                <button type="button" id="db-search-execute-btn" class="main-button" style="margin: 0; width: auto; padding: 0 16px;">検索</button>
+            </div>
+            
+            <div class="db-search-options" style="margin-top: 10px; display: flex; align-items: center; gap: 12px; font-size: 13px;">
+                <label style="display: inline-flex; align-items: center; gap: 4px; cursor: pointer;">
+                    <input type="checkbox" id="db-select-all-checkbox"> この歌手の曲をすべて選択
+                </label>
+            </div>
+
+            <div class="db-search-results-container" style="margin-top: 12px; max-height: 300px; overflow-y: auto; border: 1px solid #ddd; border-radius: 6px;">
+                <table class="song-table" style="min-width: 100%;">
+                    <thead>
+                        <tr>
+                            <th style="width: 40px; text-align: center;">選択</th>
+                            <th>曲名</th>
+                        </tr>
+                    </thead>
+                    <tbody id="db-search-results-body">
+                        <tr><td colspan="2" style="text-align: center; color: #888;">歌手名を入力して検索してください。</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="modal-footer" style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 10px;">
+            <button type="button" id="close-modal-sub-btn" class="sub-button" style="margin: 0; width: auto;">キャンセル</button>
+            <button type="button" id="add-selected-db-songs-btn" class="main-button" style="margin: 0; width: auto;">選択した曲を追加する</button>
+        </div>
+    </div>
+</div>
+	
+	
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {

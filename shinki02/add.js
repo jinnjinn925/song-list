@@ -1177,3 +1177,160 @@ document.getElementById('update-favorites-btn')?.addEventListener('click', async
         alert(err.message);
     }
 });
+
+
+
+
+
+// ========================================
+// DB曲検索 & モーダル追加機能
+// ========================================
+
+const dbSearchModal = document.getElementById('db-search-modal');
+const openDbModalBtn = document.getElementById('open-db-search-modal-btn');
+const closeDbModalBtn = document.getElementById('close-db-search-modal-btn');
+const closeDbModalSubBtn = document.getElementById('close-modal-sub-btn');
+const dbArtistSearchInput = document.getElementById('db-artist-search-input');
+const dbSearchExecuteBtn = document.getElementById('db-search-execute-btn');
+const dbSearchResultsBody = document.getElementById('db-search-results-body');
+const dbSelectAllCheckbox = document.getElementById('db-select-all-checkbox');
+const addSelectedDbSongsBtn = document.getElementById('add-selected-db-songs-btn');
+
+let currentSearchedArtistName = '';
+
+// モーダル開閉
+if (openDbModalBtn) {
+    openDbModalBtn.addEventListener('click', () => {
+        dbSearchModal.style.display = 'flex';
+        dbArtistSearchInput.focus();
+    });
+}
+
+function closeModal() {
+    if (dbSearchModal) dbSearchModal.style.display = 'none';
+}
+
+if (closeDbModalBtn) closeDbModalBtn.addEventListener('click', closeModal);
+if (closeDbModalSubBtn) closeDbModalSubBtn.addEventListener('click', closeModal);
+
+// 歌手名での検索処理
+async function executeDbSearch() {
+    const query = dbArtistSearchInput.value.trim();
+    if (!query) {
+        alert('歌手名を入力してください。');
+        return;
+    }
+
+    dbSearchResultsBody.innerHTML = '<tr><td colspan="2" style="text-align: center;">検索中...</td></tr>';
+    dbSelectAllCheckbox.checked = false;
+
+    // 既存の artists からあいまい検索
+    const normQuery = normalizeName(query);
+    const matchedArtists = existingArtists.filter(a => normalizeName(a.name).includes(normQuery));
+
+    if (matchedArtists.length === 0) {
+        dbSearchResultsBody.innerHTML = '<tr><td colspan="2" style="text-align: center; color: #888;">該当する歌手が見つかりませんでした。</td></tr>';
+        return;
+    }
+
+    const artistIds = matchedArtists.map(a => a.id);
+    currentSearchedArtistName = matchedArtists[0].name; // 代表の歌手名としてセット
+
+    const { data: songs, error } = await supabaseClient
+        .from('songs')
+        .select('id, title, artist:artists(name)')
+        .in('artist_id', artistIds)
+        .order('title', { ascending: true });
+
+    if (error) {
+        console.error(error);
+        dbSearchResultsBody.innerHTML = '<tr><td colspan="2" style="text-align: center; color: red;">検索エラーが発生しました。</td></tr>';
+        return;
+    }
+
+    if (!songs || songs.length === 0) {
+        dbSearchResultsBody.innerHTML = '<tr><td colspan="2" style="text-align: center; color: #888;">該当する曲が見つかりませんでした。</td></tr>';
+        return;
+    }
+
+    dbSearchResultsBody.innerHTML = '';
+    songs.forEach(song => {
+        const tr = document.createElement('tr');
+
+        const selectTd = document.createElement('td');
+        selectTd.className = 'checkbox-cell';
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.className = 'db-song-checkbox';
+        checkbox.dataset.artist = song.artist ? song.artist.name : currentSearchedArtistName;
+        checkbox.dataset.title = song.title;
+        selectTd.appendChild(checkbox);
+
+        const titleTd = document.createElement('td');
+        titleTd.textContent = song.title + (matchedArtists.length > 1 ? ` (${song.artist.name})` : '');
+
+        tr.appendChild(selectTd);
+        tr.appendChild(titleTd);
+        dbSearchResultsBody.appendChild(tr);
+    });
+}
+
+if (dbSearchExecuteBtn) {
+    dbSearchExecuteBtn.addEventListener('click', executeDbSearch);
+}
+
+if (dbArtistSearchInput) {
+    dbArtistSearchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            executeDbSearch();
+        }
+    });
+}
+
+// 全選択チェックボックス
+if (dbSelectAllCheckbox) {
+    dbSelectAllCheckbox.addEventListener('change', () => {
+        const checkboxes = dbSearchResultsBody.querySelectorAll('.db-song-checkbox');
+        checkboxes.forEach(cb => cb.checked = dbSelectAllCheckbox.checked);
+    });
+}
+
+// 選択した曲を入力欄に反映
+if (addSelectedDbSongsBtn) {
+    addSelectedDbSongsBtn.addEventListener('click', () => {
+        const selectedCheckboxes = dbSearchResultsBody.querySelectorAll('.db-song-checkbox:checked');
+        if (selectedCheckboxes.length === 0) {
+            alert('曲を選択してください。');
+            return;
+        }
+
+        // 空の末尾行があれば活用、無ければ新規行追加
+        selectedCheckboxes.forEach((cb) => {
+            const artist = cb.dataset.artist;
+            const title = cb.dataset.title;
+
+            // 既存の入力行で空のものがあるか確認
+            const rows = inputBody.querySelectorAll('tr');
+            let filled = false;
+
+            for (let tr of rows) {
+                const artistInput = tr.querySelector('.row-artist');
+                const titleInput = tr.querySelector('.row-title');
+                if (artistInput && titleInput && !artistInput.value.trim() && !titleInput.value.trim()) {
+                    artistInput.value = artist;
+                    titleInput.value = title;
+                    filled = true;
+                    break;
+                }
+            }
+
+            if (!filled) {
+                addInputRow(artist, title);
+            }
+        });
+
+        closeModal();
+        alert(`${selectedCheckboxes.length}件の曲を入力欄に追加しました。「まとめて登録する」を押して確定してください。`);
+    });
+}
