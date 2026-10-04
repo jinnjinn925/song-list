@@ -753,3 +753,110 @@ textarea {
     cursor: wait !important;
     pointer-events: none !important;
 }
+
+
+
+
+
+/* ========================================
+   DB曲検索モーダル（スマホ最適化）
+   ======================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 12px;
+}
+
+.modal-content {
+    background-color: #fff;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    box-sizing: border-box;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 0 8px;
+}
+
+.db-search-inputs {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.db-search-inputs input {
+    flex: 1;
+    height: 44px;
+    padding: 0 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+/* モーダル内の曲一覧表示（タップしやすく調整） */
+#db-search-results-body tr {
+    display: flex !important;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 0;
+    border: none;
+    border-bottom: 1px solid #eee;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+#db-search-results-body tr:last-child {
+    border-bottom: none;
+}
+
+#db-search-results-body td {
+    margin: 0;
+    padding: 0;
+}
+
+#db-search-results-body td.checkbox-cell {
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+}
+
+#db-search-results-body td.checkbox-cell input[type="checkbox"] {
+    width: 22px;
+    height: 22px;
+}
+
+#db-search-results-body td::before {
+    display: none; /* スマホカード表示用のラベルをモーダル内では非表示 */
+}
